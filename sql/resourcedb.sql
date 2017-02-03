@@ -39,13 +39,13 @@ LOCK TABLES `discipline` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `ip_blocks`
+-- Table structure for table `ip_block`
 --
 
-DROP TABLE IF EXISTS `ip_blocks`;
+DROP TABLE IF EXISTS `ip_block`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `ip_blocks` (
+CREATE TABLE `ip_block` (
   `ip_block_id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `addr_lower` int(10) DEFAULT NULL,
   `addr_upper` int(10) DEFAULT NULL,
@@ -68,17 +68,17 @@ CREATE TABLE `ip_blocks` (
   CONSTRAINT `FK_role` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   CONSTRAINT `FK_discipline` FOREIGN KEY (`discipline_id`) REFERENCES `discipline` (`discipline_id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   CONSTRAINT `FK_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  CONSTRAINT `ip_blocks_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`organization_id`) ON DELETE NO ACTION ON UPDATE CASCADE
+  CONSTRAINT `ip_block_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`organization_id`) ON DELETE NO ACTION ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ip_blocks`
+-- Dumping data for table `ip_block`
 --
 
-LOCK TABLES `ip_blocks` WRITE;
-/*!40000 ALTER TABLE `ip_blocks` DISABLE KEYS */;
-/*!40000 ALTER TABLE `ip_blocks` ENABLE KEYS */;
+LOCK TABLES `ip_block` WRITE;
+/*!40000 ALTER TABLE `ip_block` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ip_block` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -159,4 +159,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-03 21:55:26
+-- Dump completed on 2017-02-03 21:59:51
