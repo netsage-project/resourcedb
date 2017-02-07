@@ -1,0 +1,33 @@
+=head1 NAME
+
+GRNOC::NetSage::ResourceDB::DataService - GlobalNOC NetSage::ResourceDB WebService DataService Library
+
+=head1 SYNOPSIS
+
+  my $ds = GRNOC::NetSage::ResourceDB::DataService->new( config_file => '/etc/grnoc/netsage/resourcedb/config.xml' );
+
+=head1 DESCRIPTION
+
+This library is responsible for communicating with the back end database and generating the appropriate query
+based upon the method provided and all of the filter arguments given.  It is used by the callbacks in the
+GRNOC::NetSage::ResourceDB::GWS library to return back JSON-encoded webservice results.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( OPTIONS )
+
+=over 4
+
+=item config_file <STRING> [required]
+
+The location of the NetSage::ResourceDB webservice config file, typically "/etc/grnoc/netsage/resourcedb/config.xml"
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over 4
