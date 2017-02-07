@@ -47,6 +47,7 @@ DROP TABLE IF EXISTS `ip_block`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ip_block` (
   `ip_block_id` int(6) unsigned NOT NULL AUTO_INCREMENT,
+  `addr_str` varchar(64) NOT NULL,
   `addr_lower` int(10) DEFAULT NULL,
   `addr_upper` int(10) DEFAULT NULL,
   `mask` int(10) DEFAULT NULL,
@@ -65,9 +66,9 @@ CREATE TABLE `ip_block` (
   KEY `FK_project` (`project_id`),
   KEY `FK_discipline` (`discipline_id`),
   KEY `FK_role` (`role_id`),
-  CONSTRAINT `FK_role` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   CONSTRAINT `FK_discipline` FOREIGN KEY (`discipline_id`) REFERENCES `discipline` (`discipline_id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   CONSTRAINT `FK_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `FK_role` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   CONSTRAINT `ip_block_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`organization_id`) ON DELETE NO ACTION ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -159,4 +160,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-03 21:59:51
+-- Dump completed on 2017-02-07 16:24:58
