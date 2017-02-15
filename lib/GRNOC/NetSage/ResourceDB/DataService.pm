@@ -44,7 +44,7 @@ sub new {
     bless( $self, $class );
 
     # parse config, setup database connections, etc.
-    $self->_init();
+    #$self->_init();
 
     return $self;
 }
@@ -119,3 +119,29 @@ sub error {
     return $self->{'error'};
 }
 
+sub format_find {
+    my ($self, %args) = @_;
+    my $find        = $args{'find'} || {};
+    my $find_logic  = $args{'find_logic'} || '$and';
+    my $field_logic = $args{'field_logic'} || '$or';
+    my $field       = $args{'field'};
+    my $values      = $args{'values'};
+
+    if(!defined($values)){
+        return $find;
+    }
+
+    if(!defined($find->{$find_logic})){
+        $find->{$find_logic} = [];
+    }
+
+    my $formatted_values = { $field_logic => [] };
+    foreach my $value (@$values){
+        push(@{$formatted_values->{$field_logic}}, { $field => $value});
+    }
+    push(@{$find->{$find_logic}}, $formatted_values);
+
+    return $find;
+}
+
+1;
