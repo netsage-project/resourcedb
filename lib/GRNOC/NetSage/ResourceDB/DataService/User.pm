@@ -52,8 +52,6 @@ sub get_roles {
 
     my ( $self, %args ) = @_;
 
-    warn "getting roles";
-
     my $remote_user = $args{'remote_user'};
 
     my $select_fields = ['role.role_id',
@@ -101,28 +99,58 @@ sub get_roles {
 
 }
 
+sub get_organizations {
 
-### callbacks ###
-sub _get_roles {
+    my ( $self, %args ) = @_;
 
-    my ( $self, $method, $args ) = @_;
+    my $remote_user = $args{'remote_user'};
 
-    #my $result = $self->{'dataservice'}->get_roles( remote_user => $ENV{'REMOTE_USER'},
-    #                                                   $self->process_args( $args ) );
+    my $select_fields = ['organization.organization_id',
+                         'organization.name',
+                         ];
 
-    my $result; # TODO: fix
-    # handle error
-    if ( !$result ) {
+    my @where = ();
 
-        #$self->error( $self->{'dataservice'}->error() );
+    # handle optional role_id param
+    my $id_param = GRNOC::MetaParameter->new( name => 'organization_id',
+                                                      field => 'organization.organization_id' );
+
+    @where = $id_param->process( args => \%args,
+                                         where => \@where );
+
+    # get the order_by value
+    my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
+    my $order_by = $order_by_param->parse( %args );
+
+    my $limit = $args{'limit'};
+    my $offset = $args{'offset'};
+
+    my $from_sql = 'organization ';
+
+    my $results = $self->dbq_rw()->select( table => $from_sql,
+                                           fields => $select_fields,
+                                           where => [-and => \@where],
+                                           order_by => $order_by,
+                                           limit => $limit,
+                                           offset => $offset );
+
+    if ( !$results ) {
+
+        $self->error( 'An unknown error occurred getting the organizations.' );
         return;
     }
 
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'offset' => $result->offset(),
-            'warning' => $result->warning()};
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
+                                                                 total => $num_rows,
+                                                                 offset => $offset );
+
+    return $result;
+
 }
+
+
 
 1;
 
