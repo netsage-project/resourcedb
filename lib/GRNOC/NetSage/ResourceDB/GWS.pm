@@ -2,21 +2,20 @@
 # Other GWS modules should inherit this
 # Provides common helper methods that all GWS methods should use
 
-package GRNOC::Netsage::ResourceDB::GWS;
+package GRNOC::NetSage::ResourceDB::GWS;
 
 use strict;
 use warnings;
 
 use GRNOC::Config;
 use GRNOC::DatabaseQuery;
-#use GRNOC::WebService::Method::CDS;
 use GRNOC::WebService::Dispatcher;
 use GRNOC::WebService::Regex;
 
 use HTML::Parser;
 use Data::Dumper;
 
-use GRNOC::Netsage::ResourceDB::DataService;
+use GRNOC::NetSage::ResourceDB::DataService;
 
 sub new {
 
@@ -32,11 +31,23 @@ sub new {
 
     bless( $self, $class );
 
-    $self->{'dataservice'} = GRNOC::Netsage::ResourceDB::DataService->new(@_);
+    $self->{'dataservice'} = GRNOC::NetSage::ResourceDB::DataService->new(@_);
 
     $self->_init();
 
     return $self;
+}
+
+sub _init {
+    my $self = shift;
+
+    $self->_init_config();
+    $self->_init_websvc();
+
+    $self->_init_get_methods();
+    #$self->_init_add_methods();
+    #$self->_init_update_methods();
+    #$self->_init_delete_methods();
 }
 
 sub config {
@@ -70,17 +81,6 @@ sub process_args {
     return %results;
 }
 
-sub _init {
-    my $self = shift;
-
-    $self->_init_config();
-    $self->_init_websvc();
-
-    $self->_init_get_methods();
-    $self->_init_add_methods();
-    $self->_init_update_methods();
-    $self->_init_delete_methods();
-}
 
 sub _init_config {
     my $self = shift;
@@ -134,6 +134,43 @@ sub _disallow_html {
     $parser->eof();
 
     return !$contains_html;
+}
+
+sub user_ds {
+
+    my ( $self, $user_ds ) = @_;
+
+    $self->{'user_ds'} = $user_ds if ( defined( $user_ds ) );
+
+    return $self->{'user_ds'};
+}
+
+sub websvc {
+
+    my ( $self, $websvc ) = @_;
+
+    $self->{'websvc'} = $websvc if ( defined( $websvc ) );
+
+    return $self->{'websvc'};
+}
+
+sub process_args {
+
+    my ( $self, $args ) = @_;
+
+    my %results;
+
+    my @names = keys( %$args );
+
+    foreach my $name ( @names ) {
+
+        if ( $args->{$name}{'is_set'} ) {
+
+            $results{$name} = $args->{$name}{'value'};
+        }
+    }
+
+    return %results;
 }
 
 1;

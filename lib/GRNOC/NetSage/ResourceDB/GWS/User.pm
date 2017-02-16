@@ -7,8 +7,11 @@ use GRNOC::Config;
 use GRNOC::DatabaseQuery;
 use GRNOC::WebService::Method;
 use GRNOC::WebService::Regex;
+use GRNOC::NetSage::ResourceDB::DataService::User;
 
 use Data::Dumper;
+
+our $websvc;
 
 use base 'GRNOC::NetSage::ResourceDB::GWS';
 
@@ -24,7 +27,7 @@ sub new {
     bless( $self, $class );
 
     # get/store our data service
-    #$self->report_ds( GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
+    $self->user_ds( $websvc = GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
 
     return $self;
 }
@@ -36,11 +39,11 @@ sub _init_get_methods {
     my $method;
 
     # get_requests
-    $method = GRNOC::WebService::Method::CDS->new( name => 'get_roles',
+    $method = GRNOC::WebService::Method->new( name => 'get_roles',
                                                    description => "Returns the Roles.",
                                                    expires => "-1d",
-                                                   default_order_by => ['name'],
-                                                   callback => sub { $self->_get_roles( @_ ) } );
+                                                   #default_order_by => ['name'],
+                                                   callback => sub { $self->user_ds->_get_roles( @_ ) } );
 
     # add the optional 'request_id' input param to the get_requests() method
     $method->add_input_parameter( name        => 'role_id',
@@ -49,7 +52,7 @@ sub _init_get_methods {
                                   multiple    => 1,
                                   description => 'The id of the role');
 
-    $self->{'websvc'}->register_method( $method );
+    $self->websvc()->register_method( $method );
 
 
 }

@@ -13,7 +13,7 @@
 use strict;
 use warnings;
 
-use GRNOC::NetSage::ResourceDB;
+use GRNOC::NetSage::ResourceDB::GWS::User;
 
 use constant DEFAULT_CONFIG_FILE => '/etc/grnoc/netsage/resourcedb/config.xml';
 
@@ -22,7 +22,7 @@ our $websvc;
 # make sure we only instantiate it once under mod_perl
 if ( !defined( $websvc ) ) {
 
-    $websvc = GRNOC::NetSage::ResourceDB->new( config_file => DEFAULT_CONFIG_FILE );
+    $websvc = GRNOC::NetSage::ResourceDB::GWS::User->new( config_file => DEFAULT_CONFIG_FILE );
 }
 
 $websvc->handle_request();
