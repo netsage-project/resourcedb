@@ -22,12 +22,14 @@ NetSage Resource Database (Science Registry)
 
 %build
 %{__perl} Makefile.PL PREFIX="%{buildroot}%{_prefix}" INSTALLDIRS="vendor"
-make
 
 %install
 %{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www/static
 
 cp -ar www/static/* %{buildroot}%{_datadir}/resourcedb/www/static
+
+%check
+make test_jenkins
 
 %clean
 rm -rf $RPM_BUILD_ROOT

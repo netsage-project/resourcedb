@@ -5,10 +5,11 @@ use ExtUtils::MakeMaker;
 
 
 sub MY::postamble { << 'END'; }
-TEST_VERBOSE=1
+TEST_VERBOSE ?= 1
+BUILD_NUMBER ?= 1
 
 rpm: dist
-	rpmbuild -ta resourcedb-$(VERSION).tar.gz --define="_buildno 1"
+	rpmbuild -ta resourcedb-$(VERSION).tar.gz --define="_buildno ${BUILD_NUMBER}"
 
 test: pure_all
 	$(FULLPERL) t/TEST $(TEST_VERBOSE)
@@ -16,10 +17,7 @@ END
 
 
 sub MY::test { << 'END'; }
-TEST_VERBOSE=1
-
-rpm_jenkins: dist
-	rpmbuild -ta resourcedb-$(VERSION).tar.gz --define="_buildno ${BUILD_NUMBER}"
+TEST_VERBOSE ?= 1
 
 test_jenkins: pure_all
 	$(FULLPERL) t/TEST $(TEST_VERBOSE) --formatter=TAP::Formatter::Console
