@@ -17,6 +17,8 @@ use GRNOC::NetSage::ResourceDB::GWS::User;
 
 use constant DEFAULT_CONFIG_FILE => '/etc/grnoc/netsage/resourcedb/config.xml';
 
+warn "config_file" . DEFAULT_CONFIG_FILE;
+
 our $websvc;
 
 # make sure we only instantiate it once under mod_perl

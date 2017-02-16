@@ -88,6 +88,8 @@ sub _init_config {
     my $config = GRNOC::Config->new( config_file => $self->{'config_file'},
                                      force_array => 0 );
 
+    warn "config " . Dumper $config;
+
     $self->config( $config );
 }
 

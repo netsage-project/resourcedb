@@ -27,7 +27,7 @@ sub new {
     bless( $self, $class );
 
     # get/store our data service
-    $self->user_ds( $websvc = GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
+    $self->user_ds( GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
 
     return $self;
 }
@@ -43,7 +43,7 @@ sub _init_get_methods {
                                                    description => "Returns the Roles.",
                                                    expires => "-1d",
                                                    #default_order_by => ['name'],
-                                                   callback => sub { $self->user_ds->_get_roles( @_ ) } );
+                                                   callback => sub { $self->_get_roles( @_ ) } );
 
     # add the optional 'request_id' input param to the get_requests() method
     $method->add_input_parameter( name        => 'role_id',
@@ -59,35 +59,19 @@ sub _init_get_methods {
 
 
 ### callbacks ###
-sub _email_opened {
 
-    my ($self, $method, $args ) = @_;
-
-    my $result = $self->{'dataservice'}->email_opened( remote_user => $ENV{'REMOTE_USER'},
-                                                        $self->process_args($args));
-
-    # handle error
-    if ( !$result ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $result};
-
-}
-
-sub _get_requests {
+sub _get_roles {
 
     my ( $self, $method, $args ) = @_;
 
-    my $result = $self->{'dataservice'}->get_requests( remote_user => $ENV{'REMOTE_USER'},
-                                                       $self->process_args( $args ) );
+    warn "calling get_roles ...";
+
+    my $result = $self->user_ds()->get_roles( $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {
 
-        $method->set_error( $self->{'dataservice'}->error() );
+        $method->set_error( $self->user_ds()->error() );
         return;
     }
 

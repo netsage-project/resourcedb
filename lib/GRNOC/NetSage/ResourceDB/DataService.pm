@@ -44,7 +44,7 @@ sub new {
     bless( $self, $class );
 
     # parse config, setup database connections, etc.
-    #$self->_init();
+    $self->_init();
 
     return $self;
 }
@@ -143,5 +143,61 @@ sub format_find {
 
     return $find;
 }
+
+### private methods ###
+
+sub _init {
+
+    my ( $self ) = @_;
+
+    # first parse and store the config file
+    my $config = GRNOC::Config->new( config_file => $self->{'config_file'},
+        force_array => 0 );
+
+    if ( !defined( $config ) ) {
+
+        $self->error( 'Unable to parse the config file.' );
+        return;
+    }
+
+    $self->config( $config );
+
+    # create the database handles
+    my $dbq_ro = GRNOC::DatabaseQuery->new( name  => $config->get( '/config/database-name' ),
+        user  => $config->get( '/config/database-readonly-username' ),
+        pass  => $config->get( '/config/database-readonly-password' ),
+        srv   => $config->get( '/config/database-host' ),
+        port  => $config->get( '/config/database-port' ),
+        debug => $config->get( '/config/database-query-debug' ) );
+
+    my $ret = $dbq_ro->connect();
+
+    if ( !$ret ) {
+
+        $self->error( 'Unable to connect to the database using read-only credentials.' );
+        return;
+    }
+
+    my $dbq_rw = GRNOC::DatabaseQuery->new( name  => $config->get( '/config/database-name' ),
+        user  => $config->get( '/config/database-readwrite-username' ),
+        pass  => $config->get( '/config/database-readwrite-password' ),
+        srv   => $config->get( '/config/database-host' ),
+        port  => $config->get( '/config/database-port' ),
+        debug => $config->get( '/config/database-query-debug' ) );
+
+    $ret = $dbq_rw->connect();
+
+    if ( !$ret ) {
+
+        $self->error( 'Unable to connect to the database using read-write credentials.' );
+        return;
+    }
+
+    $self->dbq_ro( $dbq_ro );
+    $self->dbq_rw( $dbq_rw );
+
+    return 1;
+}
+
 
 1;

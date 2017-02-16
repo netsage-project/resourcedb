@@ -52,31 +52,53 @@ sub get_roles {
 
     my ( $self, %args ) = @_;
 
-    my $role_id = $args{'role_id'};
-    my $order_by = $args{'order_by'};
-    my $order = $args{'order'};
+    warn "getting roles";
+
+    my $remote_user = $args{'remote_user'};
+
+    my $select_fields = ['role.role_id',
+                         'role.name',
+                         ];
+
+    my @where = ();
+
+    # handle optional role_id param
+    my $role_id_param = GRNOC::MetaParameter->new( name => 'role_id',
+                                                      field => 'role.role_id' );
+
+    @where = $role_id_param->process( args => \%args,
+                                         where => \@where );
+
+    # get the order_by value
+    my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
+    my $order_by = $order_by_param->parse( %args );
+
     my $limit = $args{'limit'};
     my $offset = $args{'offset'};
 
+    my $from_sql = 'role ';
 
-    my $sort = {};
-    $sort->{'order'} = $order if $order;
-    $sort->{'order_by'} = $order_by if $order_by;
-    $sort->{'offset'} = $offset if $offset;
-    $sort->{'limit'} = $limit if $limit;
+    my $results = $self->dbq_rw()->select( table => $from_sql,
+                                           fields => $select_fields,
+                                           where => [-and => \@where],
+                                           order_by => $order_by,
+                                           limit => $limit,
+                                           offset => $offset );
 
-    my $find = $self->format_find(
-        field  => 'role_id',
-        values => $role_id
-    ); 
-
-    my $results = $self->_get_roles($find, $sort);
     if ( !$results ) {
-        $self->error( "Error getting roles" );
+
+        $self->error( 'An unknown error occurred getting the roles.' );
         return;
     }
 
-    return $results;
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
+                                                                 total => $num_rows,
+                                                                 offset => $offset );
+
+    return $result;
+
 }
 
 
@@ -85,7 +107,7 @@ sub _get_roles {
 
     my ( $self, $method, $args ) = @_;
 
-    #my $result = $self->{'dataservice'}->get_requests( remote_user => $ENV{'REMOTE_USER'},
+    #my $result = $self->{'dataservice'}->get_roles( remote_user => $ENV{'REMOTE_USER'},
     #                                                   $self->process_args( $args ) );
 
     my $result; # TODO: fix
