@@ -50,7 +50,8 @@ sub new {
 
 sub get_roles {
 
-    my ( $self, %args ) = @_;
+    my ( $self, $name, %args ) = @_;
+    warn "get_roles name: $name";
 
     my $remote_user = $args{'remote_user'};
 
@@ -113,7 +114,7 @@ sub get_organizations {
 
     # handle optional role_id param
     my $id_param = GRNOC::MetaParameter->new( name => 'organization_id',
-                                                      field => 'organization.organization_id' );
+                                              field => 'organization.organization_id' );
 
     @where = $id_param->process( args => \%args,
                                          where => \@where );
@@ -149,6 +150,7 @@ sub get_organizations {
     return $result;
 
 }
+
 
 
 

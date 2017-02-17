@@ -81,7 +81,11 @@ sub _get_roles {
 
     my ( $self, $method, $args ) = @_;
 
-    my $result = $self->user_ds()->get_roles( $self->process_args( $args ) );
+    my $name = "role";
+
+    warn "name: $name";
+
+    my $result = $self->user_ds()->get_basic( $name, $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {
@@ -93,6 +97,7 @@ sub _get_roles {
     return {'results' => $result->results(),
             'total' => $result->total(),
             'offset' => $result->offset(),
+            'name' => $name,
             'warning' => $result->warning()};
 }
 

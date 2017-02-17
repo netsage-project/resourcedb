@@ -28,6 +28,13 @@ use Time::HiRes;
 use constant SERVICE_CACHE_FILE => '/etc/grnoc/name-service-cacher/name-service.xml';
 use constant COOKIE_FILE => '/tmp/netsage_resourcedb_cookies';
 
+use constant VALID_DYNAMIC_DB_NAMES => {
+    'role',
+    'organization',
+    'project',
+    'disciplines'
+};
+
 ### constructor ###
 
 sub new {
@@ -144,7 +151,75 @@ sub format_find {
     return $find;
 }
 
+### public methods ###
+
+sub get_basic {
+
+    my ( $self, $name, %args ) = @_;
+
+    #if ( !$self->_is_dbname_valid( $name ) ) {
+    #    $self->error( "Invalid db name specified: $name" );
+    #    return;
+    #}
+    warn "name: $name";
+
+    my $remote_user = $args{'remote_user'};
+
+    my $select_fields = ["${name}.${name}_id",
+                         "$name.name",
+                         ];
+
+    my @where = ();
+
+    # handle optional role_id param
+    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
+                                              field => "${name}.${name}_id" );
+
+    @where = $id_param->process( args => \%args,
+                                 where => \@where );
+
+    # get the order_by value
+    my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
+    my $order_by = $order_by_param->parse( %args );
+
+    my $limit = $args{'limit'};
+    my $offset = $args{'offset'};
+
+    my $from_sql = "$name ";
+
+    my $results = $self->dbq_rw()->select( table => $from_sql,
+                                           fields => $select_fields,
+                                           where => [-and => \@where],
+                                           order_by => $order_by,
+                                           limit => $limit,
+                                           offset => $offset );
+
+    if ( !$results ) {
+
+        $self->error( "An unknown error occurred getting the ${name}s" );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
+                                                                 total => $num_rows,
+                                                                 offset => $offset );
+
+    return $result;
+
+}
+
 ### private methods ###
+
+sub _is_dbname_valid {
+    my ( $self, $name ) = @_;
+    warn "valid dbs " . Dumper VALID_DYNAMIC_DB_NAMES();
+    if ( exists ${ VALID_DYNAMIC_DB_NAMES() }{$name}  ) {
+        return 1;
+    }
+    return 0;
+}
 
 sub _init {
 
