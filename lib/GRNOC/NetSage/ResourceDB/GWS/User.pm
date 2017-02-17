@@ -27,7 +27,9 @@ sub new {
     bless( $self, $class );
 
     # get/store our data service
-    $self->user_ds( $websvc = GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
+    $self->user_ds( GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
+
+    $self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
 
     return $self;
 }
@@ -36,16 +38,20 @@ sub _init_get_methods {
 
     my $self = shift;
 
+    my $method_in = shift;
+
+    my $args = shift;
+
     my $method;
 
-    # get_requests
+    # get_roles
     $method = GRNOC::WebService::Method->new( name => 'get_roles',
                                                    description => "Returns the Roles.",
                                                    expires => "-1d",
                                                    #default_order_by => ['name'],
-                                                   callback => sub { $self->user_ds->_get_roles( @_ ) } );
+                                                   callback => sub { $self->_get_table_dynamically( "role", $method_in, $args ) } );
 
-    # add the optional 'request_id' input param to the get_requests() method
+    # add the optional 'role_id' input param to the get_roles() method
     $method->add_input_parameter( name        => 'role_id',
                                   pattern     => $INTEGER,
                                   required    => 0,
@@ -55,39 +61,75 @@ sub _init_get_methods {
     $self->websvc()->register_method( $method );
 
 
+    # get_organizations
+    $method = GRNOC::WebService::Method->new( name => 'get_organizations',
+                                                   description => "Returns the Organizations.",
+                                                   expires => "-1d",
+                                                   #default_order_by => ['name'],
+                                                   callback => sub { $self->_get_table_dynamically( "organization", $method_in, $args ) } );
+
+    # add the optional 'organization_id' input param to the get_organizations() method
+    $method->add_input_parameter( name        => 'organization_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 1,
+                                  description => 'The id of the organization');
+
+    $self->websvc()->register_method( $method );
+
+    # get_ip_blocks
+    $method = GRNOC::WebService::Method->new( name => 'get_ip_blocks',
+                                                   description => "Returns the IP blocks.",
+                                                   expires => "-1d",
+                                                   #default_order_by => ['name'],
+                                                   callback => sub { $self->_get_ip_blocks( @_ ) } );
+
+    # add the optional 'ip_block_id' input param to the get_ip_blocks() method
+    $method->add_input_parameter( name        => 'ip_block_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 1,
+                                  description => 'The id of the IP block');
+
+    $self->websvc()->register_method( $method );
+
+
 }
 
 
 ### callbacks ###
-sub _email_opened {
 
-    my ($self, $method, $args ) = @_;
+sub _get_table_dynamically {
 
-    my $result = $self->{'dataservice'}->email_opened( remote_user => $ENV{'REMOTE_USER'},
-                                                        $self->process_args($args));
+    my ( $self, $name, $method, $args ) = @_;
+
+    my $result = $self->user_ds()->get_table_dynamically( $name, $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {
 
-        $method->set_error( $self->{'dataservice'}->error() );
+        $method->set_error( $self->user_ds()->error() );
         return;
     }
 
-    return {'results' => $result};
-
+    return {'results' => $result->results(),
+            'total' => $result->total(),
+            'offset' => $result->offset(),
+            'name' => $name,
+            'warning' => $result->warning()};
 }
 
-sub _get_requests {
+
+sub _get_ip_blocks {
 
     my ( $self, $method, $args ) = @_;
 
-    my $result = $self->{'dataservice'}->get_requests( remote_user => $ENV{'REMOTE_USER'},
-                                                       $self->process_args( $args ) );
+    my $result = $self->user_ds()->get_ip_blocks( $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {
 
-        $method->set_error( $self->{'dataservice'}->error() );
+        $method->set_error( $self->user_ds()->error() );
         return;
     }
 
@@ -97,428 +139,6 @@ sub _get_requests {
             'warning' => $result->warning()};
 }
 
-sub _get_existing_contacts {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->{'dataservice'}->get_existing_contacts( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$result ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'offset' => $result->offset(),
-            'warning' => $result->warning()};
-}
-
-sub _get_updated_contacts {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->{'dataservice'}->get_updated_contacts( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$result ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'offset' => $result->offset(),
-            'warning' => $result->warning()};
-}
-
-sub _get_entity_contacts {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->{'dataservice'}->get_entity_contacts( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$result ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'warning' => $result->warning()};
-}
-
-sub _get_new_contacts {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->{'dataservice'}->get_new_contacts( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$result ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'offset' => $result->offset(),
-            'warning' => $result->warning()};
-}
-
-sub _get_new_contact_methods {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->{'dataservice'}->get_new_contact_methods( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$result ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'offset' => $result->offset(),
-            'warning' => $result->warning()};
-}
-
-sub _get_existing_contact_methods {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->{'dataservice'}->get_existing_contact_methods( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$result ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'offset' => $result->offset(),
-            'warning' => $result->warning()};
-}
-
-sub _add_existing_contacts {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->{'dataservice'}->add_existing_contacts( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$result ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $result};
-}
-
-sub _update_existing_contacts {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->{'dataservice'}->update_existing_contacts( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$result ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $result};
-}
-
-sub _update_existing_contact_method {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $results = $self->{'dataservice'}->update_existing_contact_method( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$results ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $results};
-}
-
-sub _update_new_contacts {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $results = $self->{'dataservice'}->update_new_contacts( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$results ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $results};
-}
-
-sub _add_submission {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->{'dataservice'}->add_submission( remote_user => $ENV{'REMOTE_USER'},
-                                                         $self->process_args( $args ) );
-
-    # handle error
-    if ( !$result ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $result };
-}
-
-
-sub _add_new_contact {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $results = $self->{'dataservice'}->add_new_contact( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$results ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $results};
-}
-
-sub _add_new_contact_method {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $results = $self->{'dataservice'}->add_new_contact_method( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$results ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $results};
-}
-
-sub _update_new_contact_method {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $results = $self->{'dataservice'}->update_new_contact_method( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$results ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $results};
-}
-
-sub _delete_new_contacts {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $results = $self->{'dataservice'}->delete_new_contacts( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$results ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $results};
-}
-
-sub _delete_existing_contacts {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $results = $self->{'dataservice'}->delete_existing_contacts( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$results ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $results};
-}
-
-sub _delete_existing_contact_methods {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $results = $self->{'dataservice'}->delete_existing_contact_methods( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$results ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $results};
-}
-
-sub _delete_new_contact_methods {
-
-    my ( $self, $method, $args ) = @_;
-
-    my $results = $self->{'dataservice'}->delete_new_contact_methods( $self->process_args( $args ) );
-
-    # handle error
-    if ( !$results ) {
-
-        $method->set_error( $self->{'dataservice'}->error() );
-        return;
-    }
-
-    return {'results' => $results};
-}
-
-sub _get_existing_contact_role_memberships {
-
-    my ($self, $method, $args) = @_; 
-
-    my $results = $self->{'dataservice'}->get_existing_contact_role_memberships( $self->process_args($args) );
-
-    if ( !$results) {
-
-        $method->set_error($self->{'dataservice'}->error());
-        return;
-    }   
-
-
-    return {'results' => $results->results(),
-            'total' => $results->total(),
-            'offset' => $results->offset()};
-}
-
-sub _get_new_contact_role_memberships {
-
-    my ($self, $method, $args) = @_; 
-
-    my $results = $self->{'dataservice'}->get_new_contact_role_memberships( $self->process_args($args) );
-
-    if ( !$results) {
-
-        $method->set_error($self->{'dataservice'}->error());
-        return;
-    }   
-
-
-    return {'results' => $results->results(),
-            'total' => $results->total(),
-            'offset' => $results->offset()};
-}
-
-sub _update_new_contact_role_memberships {
-
-    my ($self, $method, $args) = @_; 
-
-    my $results = $self->{'dataservice'}->update_new_contact_role_memberships($self->process_args($args));
-
-    if (!$results) {
-
-        $method->set_error($self->{'dataservice'}->error());
-        return;
-    }   
-
-    return {'results' => $results};
-}
-
-sub _update_existing_contact_role_memberships {
-
-    my ($self, $method, $args) = @_; 
-
-    my $results = $self->{'dataservice'}->update_existing_contact_role_memberships($self->process_args($args));
-
-    if (!$results) {
-
-        $method->set_error($self->{'dataservice'}->error());
-        return;
-    }   
-
-    return {'results' => $results};
-}
-
-sub _delete_existing_contact_role_memberships {
-    
-    my ($self, $method, $args) = @_; 
-    my $results = $self->{'dataservice'}->delete_existing_contact_role_memberships($self->process_args($args));
-    if (!$results) {
-        $method->set_error($self->{'dataservice'}->error());
-        return;
-    }   
-    return {'results' => $results};
-}
-
-sub _delete_new_contact_role_memberships {
-    
-    my ($self, $method, $args) = @_; 
-    my $results = $self->{'dataservice'}->delete_new_contact_role_memberships($self->process_args($args));
-    if (!$results) {
-        $method->set_error($self->{'dataservice'}->error());
-        return;
-    }   
-    return {'results' => $results};
-}
-
-
-
-sub _add_existing_contact_role_membership {
-
-    my ($self, $method, $args) = @_; 
-
-    my $results = $self->{'dataservice'}->add_existing_contact_role_membership($self->process_args($args));
-
-    if (!$results) {
-        $method->set_error($self->{'dataservice'}->error());
-        return;
-    }   
-    return {'results' => $results};
-}
-
-sub _add_new_contact_role_membership {
-
-    my ($self, $method, $args) = @_; 
-
-    my $results = $self->{'dataservice'}->add_new_contact_role_membership($self->process_args($args));
-
-    if (!$results) {
-        $method->set_error($self->{'dataservice'}->error());
-        return;
-    }   
-    return {'results' => $results};
-}
 
 1;
 

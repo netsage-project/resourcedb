@@ -1,0 +1,13 @@
+<config debug="0">
+  <database-name>resourcedb</database-name>
+  <database-root-username>root</database-root-username>
+  <database-root-password>root-pass</database-root-password>
+  <database-readonly-username>readonly-user</database-readonly-username>
+  <database-readonly-password>readonly-pass</database-readonly-password>
+  <database-readwrite-username>readwrite-user</database-readwrite-username>
+  <database-readwrite-password>readwrite-pass</database-readwrite-password>
+  <database-host>localhost</database-host>
+  <database-port>3306</database-port> 
+  <database-query-debug>0</database-query-debug>
+   
+</config>

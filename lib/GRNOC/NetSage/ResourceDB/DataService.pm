@@ -28,6 +28,13 @@ use Time::HiRes;
 use constant SERVICE_CACHE_FILE => '/etc/grnoc/name-service-cacher/name-service.xml';
 use constant COOKIE_FILE => '/tmp/netsage_resourcedb_cookies';
 
+use constant VALID_DYNAMIC_DB_NAMES => {
+    'role',
+    'organization',
+    'project',
+    'disciplines'
+};
+
 ### constructor ###
 
 sub new {
@@ -44,7 +51,7 @@ sub new {
     bless( $self, $class );
 
     # parse config, setup database connections, etc.
-    #$self->_init();
+    $self->_init();
 
     return $self;
 }
@@ -119,6 +126,16 @@ sub error {
     return $self->{'error'};
 }
 
+# just a getter
+sub valid_dynamic_db_names {
+
+    my ( $self ) = @_;
+
+    return VALID_DYNAMIC_DB_NAMES();
+
+}
+
+
 sub format_find {
     my ($self, %args) = @_;
     my $find        = $args{'find'} || {};
@@ -143,5 +160,127 @@ sub format_find {
 
     return $find;
 }
+
+### public methods ###
+
+sub get_table_dynamically {
+
+    my ( $self, $name, %args ) = @_;
+
+    if ( !$self->_is_dbname_valid( $name ) ) {
+        $self->error( "Invalid db name specified: $name" );
+        return;
+    }
+
+    my $remote_user = $args{'remote_user'};
+
+    my $select_fields = ["${name}.${name}_id",
+                         "$name.name",
+                         ];
+
+    my @where = ();
+
+    # handle optional role_id param
+    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
+                                              field => "${name}.${name}_id" );
+
+    @where = $id_param->process( args => \%args,
+                                 where => \@where );
+
+    # get the order_by value
+    my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
+    my $order_by = $order_by_param->parse( %args );
+
+    my $limit = $args{'limit'};
+    my $offset = $args{'offset'};
+
+    my $from_sql = "$name ";
+
+    my $results = $self->dbq_rw()->select( table => $from_sql,
+                                           fields => $select_fields,
+                                           where => [-and => \@where],
+                                           order_by => $order_by,
+                                           limit => $limit,
+                                           offset => $offset );
+
+    if ( !$results ) {
+
+        $self->error( "An unknown error occurred getting the ${name}s" );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
+                                                                 total => $num_rows,
+                                                                 offset => $offset );
+
+    return $result;
+
+}
+
+### private methods ###
+
+sub _is_dbname_valid {
+    my ( $self, $name ) = @_;
+    if ( exists ${ VALID_DYNAMIC_DB_NAMES() }{$name}  ) {
+        return 1;
+    }
+    return 0;
+}
+
+sub _init {
+
+    my ( $self ) = @_;
+
+    # first parse and store the config file
+    my $config = GRNOC::Config->new( config_file => $self->{'config_file'},
+        force_array => 0 );
+
+    if ( !defined( $config ) ) {
+
+        $self->error( 'Unable to parse the config file.' );
+        return;
+    }
+
+    $self->config( $config );
+
+    # create the database handles
+    my $dbq_ro = GRNOC::DatabaseQuery->new( name  => $config->get( '/config/database-name' ),
+        user  => $config->get( '/config/database-readonly-username' ),
+        pass  => $config->get( '/config/database-readonly-password' ),
+        srv   => $config->get( '/config/database-host' ),
+        port  => $config->get( '/config/database-port' ),
+        debug => $config->get( '/config/database-query-debug' ) );
+
+    my $ret = $dbq_ro->connect();
+
+    if ( !$ret ) {
+
+        $self->error( 'Unable to connect to the database using read-only credentials.' );
+        return;
+    }
+
+    my $dbq_rw = GRNOC::DatabaseQuery->new( name  => $config->get( '/config/database-name' ),
+        user  => $config->get( '/config/database-readwrite-username' ),
+        pass  => $config->get( '/config/database-readwrite-password' ),
+        srv   => $config->get( '/config/database-host' ),
+        port  => $config->get( '/config/database-port' ),
+        debug => $config->get( '/config/database-query-debug' ) );
+
+    $ret = $dbq_rw->connect();
+
+    if ( !$ret ) {
+
+        $self->error( 'Unable to connect to the database using read-write credentials.' );
+        return;
+    }
+
+    $self->dbq_ro( $dbq_ro );
+    $self->dbq_rw( $dbq_rw );
+
+    return 1;
+}
+
 
 1;
