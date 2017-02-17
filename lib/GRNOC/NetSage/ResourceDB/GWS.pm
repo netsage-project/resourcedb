@@ -138,6 +138,15 @@ sub _disallow_html {
     return !$contains_html;
 }
 
+sub valid_dynamic_db_names {
+
+    my ( $self, $valid_dynamic_db_names ) = @_;
+
+    $self->{'valid_dynamic_db_names'} = $valid_dynamic_db_names if ( defined( $valid_dynamic_db_names ) );
+
+    return $self->{'valid_dynamic_db_names'};
+}
+
 sub user_ds {
 
     my ( $self, $user_ds ) = @_;
@@ -156,24 +165,6 @@ sub websvc {
     return $self->{'websvc'};
 }
 
-sub process_args {
-
-    my ( $self, $args ) = @_;
-
-    my %results;
-
-    my @names = keys( %$args );
-
-    foreach my $name ( @names ) {
-
-        if ( $args->{$name}{'is_set'} ) {
-
-            $results{$name} = $args->{$name}{'value'};
-        }
-    }
-
-    return %results;
-}
 
 1;
 

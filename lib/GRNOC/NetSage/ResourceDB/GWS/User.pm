@@ -29,12 +29,18 @@ sub new {
     # get/store our data service
     $self->user_ds( GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
 
+    $self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
+
     return $self;
 }
 
 sub _init_get_methods {
 
     my $self = shift;
+
+    my $method_in = shift;
+
+    my $args = shift;
 
     my $method;
 
@@ -43,9 +49,9 @@ sub _init_get_methods {
                                                    description => "Returns the Roles.",
                                                    expires => "-1d",
                                                    #default_order_by => ['name'],
-                                                   callback => sub { $self->_get_roles( @_ ) } );
+                                                   callback => sub { $self->_get_table_dynamically( "role", $method_in, $args ) } );
 
-    # add the optional 'request_id' input param to the get_roles() method
+    # add the optional 'role_id' input param to the get_roles() method
     $method->add_input_parameter( name        => 'role_id',
                                   pattern     => $INTEGER,
                                   required    => 0,
@@ -60,7 +66,7 @@ sub _init_get_methods {
                                                    description => "Returns the Organizations.",
                                                    expires => "-1d",
                                                    #default_order_by => ['name'],
-                                                   callback => sub { $self->_get_organizations( @_ ) } );
+                                                   callback => sub { $self->_get_table_dynamically( "organization", $method_in, $args ) } );
 
     # add the optional 'request_id' input param to the get_organizations() method
     $method->add_input_parameter( name        => 'organization_id',
@@ -77,15 +83,11 @@ sub _init_get_methods {
 
 ### callbacks ###
 
-sub _get_roles {
+sub _get_table_dynamically {
 
-    my ( $self, $method, $args ) = @_;
+    my ( $self, $name, $method, $args ) = @_;
 
-    my $name = "role";
-
-    warn "name: $name";
-
-    my $result = $self->user_ds()->get_basic( $name, $self->process_args( $args ) );
+    my $result = $self->user_ds()->get_table_dynamically( $name, $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {
@@ -102,11 +104,11 @@ sub _get_roles {
 }
 
 
-sub _get_organizations {
+sub _get_ip_blocks {
 
     my ( $self, $method, $args ) = @_;
 
-    my $result = $self->user_ds()->get_organizations( $self->process_args( $args ) );
+    my $result = $self->user_ds()->get_ip_blocks( $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {

@@ -126,6 +126,16 @@ sub error {
     return $self->{'error'};
 }
 
+# just a getter
+sub valid_dynamic_db_names {
+
+    my ( $self ) = @_;
+
+    return VALID_DYNAMIC_DB_NAMES();
+
+}
+
+
 sub format_find {
     my ($self, %args) = @_;
     my $find        = $args{'find'} || {};
@@ -153,7 +163,7 @@ sub format_find {
 
 ### public methods ###
 
-sub get_basic {
+sub get_table_dynamically {
 
     my ( $self, $name, %args ) = @_;
 
