@@ -68,12 +68,28 @@ sub _init_get_methods {
                                                    #default_order_by => ['name'],
                                                    callback => sub { $self->_get_table_dynamically( "organization", $method_in, $args ) } );
 
-    # add the optional 'request_id' input param to the get_organizations() method
+    # add the optional 'organization_id' input param to the get_organizations() method
     $method->add_input_parameter( name        => 'organization_id',
                                   pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 1,
                                   description => 'The id of the organization');
+
+    $self->websvc()->register_method( $method );
+
+    # get_ip_blocks
+    $method = GRNOC::WebService::Method->new( name => 'get_ip_blocks',
+                                                   description => "Returns the IP blocks.",
+                                                   expires => "-1d",
+                                                   #default_order_by => ['name'],
+                                                   callback => sub { $self->_get_ip_blocks( @_ ) } );
+
+    # add the optional 'ip_block_id' input param to the get_ip_blocks() method
+    $method->add_input_parameter( name        => 'ip_block_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 1,
+                                  description => 'The id of the IP block');
 
     $self->websvc()->register_method( $method );
 

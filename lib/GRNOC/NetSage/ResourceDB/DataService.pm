@@ -167,11 +167,10 @@ sub get_table_dynamically {
 
     my ( $self, $name, %args ) = @_;
 
-    #if ( !$self->_is_dbname_valid( $name ) ) {
-    #    $self->error( "Invalid db name specified: $name" );
-    #    return;
-    #}
-    warn "name: $name";
+    if ( !$self->_is_dbname_valid( $name ) ) {
+        $self->error( "Invalid db name specified: $name" );
+        return;
+    }
 
     my $remote_user = $args{'remote_user'};
 
@@ -224,7 +223,6 @@ sub get_table_dynamically {
 
 sub _is_dbname_valid {
     my ( $self, $name ) = @_;
-    warn "valid dbs " . Dumper VALID_DYNAMIC_DB_NAMES();
     if ( exists ${ VALID_DYNAMIC_DB_NAMES() }{$name}  ) {
         return 1;
     }
