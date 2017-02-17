@@ -19,3 +19,6 @@ nytprof.out
 *.bs
 /_eumm/
 .*.sw*
+*~
+resourcedb-0.0.1.tar.gz
+MANIFEST
