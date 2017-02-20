@@ -14,6 +14,10 @@ BuildRequires: perl
 BuildRequires: httpd-devel
 BuildRequires: mod_perl-devel
 
+Requires: mariadb
+Requires: mariadb-server
+Requires: perl-DBD-MySQL
+
 %description
 NetSage Resource Database (Science Registry)
 
@@ -24,15 +28,28 @@ NetSage Resource Database (Science Registry)
 %{__perl} Makefile.PL PREFIX="%{buildroot}%{_prefix}" INSTALLDIRS="vendor"
 
 %install
+# HTTP and web files
 %{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www/static
 
 cp -ar www/static/* %{buildroot}%{_datadir}/resourcedb/www/static
 
-%check
-make test_jenkins
+# Configuration and schema files
+%{__install} -d -p %{buildroot}%{_sysconfdir}/grnoc/resourcedb
+
+%{__install} -m 544 sql/resourcedb.sql %{buildroot}%{_sysconfdir}/grnoc/resourcedb
+
+# Executables
+%{__install} -d -p %{buildroot}%{_bindir}/grnoc/resourcedb
+
+%{__install} -m 544 bin/resourcedb-init-db %{buildroot}%{_bindir}
+
+#%check
+#make test_jenkins
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %{_datadir}/resourcedb/www/static/
+%{_sysconfdir}/grnoc/resourcedb/resourcedb.sql
+%{_bindir}/resourcedb-init-db
