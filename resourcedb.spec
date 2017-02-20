@@ -43,8 +43,8 @@ cp -ar www/static/* %{buildroot}%{_datadir}/resourcedb/www/static
 
 %{__install} -m 544 bin/resourcedb-init-db %{buildroot}%{_bindir}
 
-#%check
-#make test_jenkins
+%check
+make test_jenkins
 
 %clean
 rm -rf $RPM_BUILD_ROOT
