@@ -1,0 +1,72 @@
+=head1 GRNOC::NetSage::ResourceDB::DataService::Util
+
+=head1 SYNOPSIS
+
+  my $util = GRNOC::NetSage::ResourceDB::DataService::Util->new(
+    username => 'guest',
+    password => 'guest',
+    host => '127.0.0.1',
+    port => 1234,
+    schema => '/etc/grnoc/resourcedb/database.sql'
+  )
+
+  my ($version, $err) = $util->install_database($path);
+  if (defined $err) {
+    warn "An error occurred while setting up database: $err";
+  }
+
+  print "Database schema version $version is installed.";
+
+=head1 DESCRIPTION
+
+This package contains utilities for the maintenance of this project's
+database.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( OPTIONS )
+
+=over 4
+
+=item username <STRING> [required]
+
+ResourceDB database user's name.
+
+=item password <STRING> [required]
+
+ResourceDB database user's password.
+
+=item host <STRING> [required]
+
+Database IP address.
+
+=item port <INTEGER> [required]
+
+Database TCP port number.
+
+=item schema <STRING> [required]
+
+Path to the database schema.
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item install_database ( )
+
+Installs the lastest version of the database schema if not already
+installed. Upgrades older database schemas. Returns the running
+version number and error if a failure occurs.
+
+    my ($version, $err) = $util->install_database();
+    if (defined $err) {
+        warn "Failure occurred: $err";
+    }
+
+=back
