@@ -13,6 +13,8 @@ package GRNOC::NetSage::ResourceDB::DataService::Util;
 use strict;
 use warnings;
 
+use GRNOC::Log;
+
 use Data::Dumper;
 use DBI;
 
@@ -32,6 +34,9 @@ sub new {
                 @_};
 
     bless( $self, $class );
+
+    $self->{'logger'} = GRNOC::Log->get_logger("GRNOC.NetSage.ResourceDB.DataService.Util");
+
     return $self;
 }
 
@@ -42,14 +47,14 @@ sub install_database {
     my $ok;
     my $version;
 
-    # 1. Connect to the mysql database
     my $db = DBI->connect("DBI:mysql:;host=$self->{'host'};port=$self->{'port'}",
                               $self->{'username'},
                               $self->{'password'},
                               {PrintError => 0});
     if (!$db) {
-        warn "Couldn't connect to database: " . $DBI::errstr . "\n";
-        return undef;
+        $self->{'logger'}->error($DBI::errstr);
+        $err = "Couldn't connect to database.";
+        return (undef, $err);
     }
 
     $ok = $self->database_created($db);
