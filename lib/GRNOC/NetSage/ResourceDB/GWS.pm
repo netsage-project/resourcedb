@@ -33,6 +33,9 @@ sub new {
 
     $self->{'dataservice'} = GRNOC::NetSage::ResourceDB::DataService->new(@_);
 
+    # get/store our data service
+    $self->user_ds( GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
+
     $self->_init();
 
     return $self;

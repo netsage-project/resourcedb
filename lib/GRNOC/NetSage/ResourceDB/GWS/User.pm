@@ -26,10 +26,6 @@ sub new {
 
     bless( $self, $class );
 
-    # get/store our data service
-    $self->user_ds( GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
-
-    $self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
 
     return $self;
 }
@@ -37,45 +33,16 @@ sub new {
 sub _init_get_methods {
 
     my $self = shift;
-
     my $method_in = shift;
-
     my $args = shift;
 
     my $method;
 
-    # get_roles
-    $method = GRNOC::WebService::Method->new( name => 'get_roles',
-                                                   description => "Returns the Roles.",
-                                                   expires => "-1d",
-                                                   #default_order_by => ['name'],
-                                                   callback => sub { $self->_get_table_dynamically( "role", $method_in, $args ) } );
 
-    # add the optional 'role_id' input param to the get_roles() method
-    $method->add_input_parameter( name        => 'role_id',
-                                  pattern     => $INTEGER,
-                                  required    => 0,
-                                  multiple    => 1,
-                                  description => 'The id of the role');
+    $self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
 
-    $self->websvc()->register_method( $method );
+    $self->_init_dynamic_get_methods( @_ );
 
-
-    # get_organizations
-    $method = GRNOC::WebService::Method->new( name => 'get_organizations',
-                                                   description => "Returns the Organizations.",
-                                                   expires => "-1d",
-                                                   #default_order_by => ['name'],
-                                                   callback => sub { $self->_get_table_dynamically( "organization", $method_in, $args ) } );
-
-    # add the optional 'organization_id' input param to the get_organizations() method
-    $method->add_input_parameter( name        => 'organization_id',
-                                  pattern     => $INTEGER,
-                                  required    => 0,
-                                  multiple    => 1,
-                                  description => 'The id of the organization');
-
-    $self->websvc()->register_method( $method );
 
     # get_ip_blocks
     $method = GRNOC::WebService::Method->new( name => 'get_ip_blocks',
@@ -92,6 +59,38 @@ sub _init_get_methods {
                                   description => 'The id of the IP block');
 
     $self->websvc()->register_method( $method );
+
+
+
+}
+
+sub _init_dynamic_get_methods {
+    my ( $self, $method_in, $args ) = @_;
+    #my $self = shift;
+    #my $method_in = shift;
+    #my $args = shift;
+
+    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $method;
+        # get_roles
+        $method = GRNOC::WebService::Method->new( name => "get_${name}s",
+            description => "Returns the ${name}s",
+            expires => "-1d",
+            #default_order_by => ['name'],
+            callback => sub { $self->_get_table_dynamically( $name, $method_in, $args ) } );
+
+        # add the optional 'role_id' input param to the get_roles() method
+        $method->add_input_parameter( name        => "${name}_id",
+            pattern     => $INTEGER,
+            required    => 0,
+            multiple    => 1,
+            description => "The id of the $name");
+
+        $self->websvc()->register_method( $method );
+
+
+
+    }
 
 
 }

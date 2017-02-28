@@ -29,10 +29,10 @@ use constant SERVICE_CACHE_FILE => '/etc/grnoc/name-service-cacher/name-service.
 use constant COOKIE_FILE => '/tmp/netsage_resourcedb_cookies';
 
 use constant VALID_DYNAMIC_DB_NAMES => {
-    'role',
-    'organization',
-    'project',
-    'disciplines'
+    'role' => 1,
+    'organization' => 1,
+    'project' => 1,
+    'discipline' => 1
 };
 
 ### constructor ###
@@ -128,8 +128,7 @@ sub error {
 
 # just a getter
 sub valid_dynamic_db_names {
-
-    my ( $self ) = @_;
+    my $self = shift;
 
     return VALID_DYNAMIC_DB_NAMES();
 
