@@ -218,7 +218,7 @@ sub get_table_dynamically {
 
 }
 
-sub insert_table_dynamically {
+sub add_table_dynamically {
 
     my ( $self, $name, %args ) = @_;
 
@@ -229,34 +229,15 @@ sub insert_table_dynamically {
 
     my $remote_user = $args{'remote_user'};
 
-    my $select_fields = ["${name}.${name}_id",
-                         "$name.name",
-                         ];
-
-    my @where = ();
-
-    # handle optional role_id param
-    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
-                                              field => "${name}.${name}_id" );
-
-    @where = $id_param->process( args => \%args,
-                                 where => \@where );
-
-    # get the order_by value
-    my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
-    my $order_by = $order_by_param->parse( %args );
-
-    my $limit = $args{'limit'};
-    my $offset = $args{'offset'};
-
     my $from_sql = "$name ";
 
+    my $name_val = $args{'name'};
+
     my $results = $self->dbq_rw()->insert( table => $from_sql,
-                                           fields => $select_fields,
-                                           where => [-and => \@where],
-                                           order_by => $order_by,
-                                           limit => $limit,
-                                           offset => $offset );
+                                           fields => {
+                                              'name' => $name_val
+                                           }
+                                         );
 
     if ( !$results ) {
 
@@ -268,7 +249,7 @@ sub insert_table_dynamically {
 
     my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
                                                                  total => $num_rows,
-                                                                 offset => $offset );
+                                                                 );
 
     return $result;
 

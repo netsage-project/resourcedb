@@ -16,6 +16,8 @@ use HTML::Parser;
 use Data::Dumper;
 
 use GRNOC::NetSage::ResourceDB::DataService;
+use GRNOC::NetSage::ResourceDB::DataService::User;
+use GRNOC::NetSage::ResourceDB::DataService::Admin;
 
 sub new {
 
@@ -33,8 +35,11 @@ sub new {
 
     $self->{'dataservice'} = GRNOC::NetSage::ResourceDB::DataService->new(@_);
 
-    # get/store our data service
+    # get/store our user data service
     $self->user_ds( GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
+
+    # get/store our admin data service
+    $self->admin_ds( GRNOC::NetSage::ResourceDB::DataService::Admin->new( @_ ) );
 
     $self->_init();
 
@@ -48,7 +53,7 @@ sub _init {
     $self->_init_websvc();
 
     $self->_init_get_methods();
-    #$self->_init_add_methods();
+    $self->_init_add_methods();
     #$self->_init_update_methods();
     #$self->_init_delete_methods();
 }
@@ -155,6 +160,15 @@ sub user_ds {
     $self->{'user_ds'} = $user_ds if ( defined( $user_ds ) );
 
     return $self->{'user_ds'};
+}
+
+sub admin_ds {
+
+    my ( $self, $admin_ds ) = @_;
+
+    $self->{'admin_ds'} = $admin_ds if ( defined( $admin_ds ) );
+
+    return $self->{'admin_ds'};
 }
 
 sub websvc {

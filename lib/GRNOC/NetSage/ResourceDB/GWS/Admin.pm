@@ -1,4 +1,4 @@
-package GRNOC::NetSage::ResourceDB::GWS::Admin
+package GRNOC::NetSage::ResourceDB::GWS::Admin;
 
 use strict;
 use warnings;
@@ -30,26 +30,25 @@ sub new {
     return $self;
 }
 
-sub _init_get_methods {
+sub _init_add_methods {
 
     my $self = shift;
-    my $method_in = shift;
-    my $args = shift;
+    #my $method_in = shift;
+    #my $args = shift;
 
     my $method;
 
-
     $self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
 
-    $self->_init_dynamic_get_methods( @_ );
+    $self->_init_dynamic_add_methods( @_ );
 
 
-    # get_ip_blocks
-    $method = GRNOC::WebService::Method->new( name => 'get_ip_blocks',
-                                                   description => "Returns the IP blocks.",
+    # add_ip_blocks
+    $method = GRNOC::WebService::Method->new( name => 'add_ip_blocks',
+                                                   description => "Adds the specified IP blocks.",
                                                    expires => "-1d",
                                                    #default_order_by => ['name'],
-                                                   callback => sub { $self->_get_ip_blocks( @_ ) } );
+                                                   callback => sub { $self->_add_ip_blocks( @_ ) } );
 
     # add the optional 'ip_block_id' input param to the get_ip_blocks() method
     $method->add_input_parameter( name        => 'ip_block_id',
@@ -64,27 +63,29 @@ sub _init_get_methods {
 
 }
 
-sub _init_dynamic_get_methods {
-    my ( $self, $method_in, $args ) = @_;
-    #my $self = shift;
+sub _init_dynamic_add_methods {
+    #my ( $self, $method_in, $args ) = @_;
+    my $self = shift;
     #my $method_in = shift;
     #my $args = shift;
 
     foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
         my $method;
         # get_roles
-        $method = GRNOC::WebService::Method->new( name => "get_${name}s",
-            description => "Returns the ${name}s",
+        $method = GRNOC::WebService::Method->new( name => "add_${name}s",
+            description => "Adds the ${name}",
             expires => "-1d",
             #default_order_by => ['name'],
-            callback => sub { $self->_get_table_dynamically( $name, $method_in, $args ) } );
+            callback => sub { $self->_add_table_dynamically( $name, @_ ) } );
+        #callback => sub { $self->_add_table_dynamically( $name, $method_in, $args ) } );
 
         # add the optional 'role_id' input param to the get_roles() method
-        $method->add_input_parameter( name        => "${name}_id",
-            pattern     => $INTEGER,
-            required    => 0,
-            multiple    => 1,
-            description => "The id of the $name");
+        $method->add_input_parameter( 
+            name        => 'name',
+            pattern     => $TEXT,
+            required    => 1,
+            multiple    => 0,
+            description => "The name of the $name");
 
         $self->websvc()->register_method( $method );
 
@@ -98,23 +99,21 @@ sub _init_dynamic_get_methods {
 
 ### callbacks ###
 
-sub _get_table_dynamically {
+sub _add_table_dynamically {
 
     my ( $self, $name, $method, $args ) = @_;
 
-    my $result = $self->user_ds()->get_table_dynamically( $name, $self->process_args( $args ) );
+    my $result = $self->admin_ds()->add_table_dynamically( $name, $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {
 
-        $method->set_error( $self->user_ds()->error() );
+        $method->set_error( $self->admin_ds()->error() );
         return;
     }
 
     return {'results' => $result->results(),
             'total' => $result->total(),
-            'offset' => $result->offset(),
-            'name' => $name,
             'warning' => $result->warning()};
 }
 
