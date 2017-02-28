@@ -25,3 +25,9 @@ configuration file will be stored at
 ```
 sudo resourcedb-init-db
 ```
+
+Run the database upgrade script every time you upgrade resourcedb.
+
+```
+resourcedb-update-db
+```

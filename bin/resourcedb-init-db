@@ -26,27 +26,56 @@ sub main {
 
     print "Connected to database.\n";
 
-    my $alpha = undef;
-    my $bravo = undef;
-    while (1) {
-        $alpha = $cli->get_password("rdb user password");
-        $bravo = $cli->get_password("rdb user password confirmation");
+    my $rw_alpha = undef;
+    my $rw_bravo = undef;
+    my $rw_user  = $cli->get_input("Read/Write Username", default => "rdb");
 
-        last if ($alpha eq $bravo);
+    while (1) {
+        $rw_alpha = $cli->get_password("$rw_user Password:");
+        $rw_bravo = $cli->get_password("$rw_user Password Confirmation:");
+
+        last if ($rw_alpha eq $rw_bravo);
         print "Passwords do not match. Please try again.\n";
     }
 
-    $handle->do("GRANT ALL ON resourcedb.* to 'rdb'\@'localhost' identified by '$alpha'") or die DBI::errstr;
-    $handle->do("GRANT ALL ON resourcedbtest.* to 'rdb'\@'localhost' identified by '$alpha'") or die DBI::errstr;
+    $handle->do("GRANT ALL ON resourcedb.* to '$rw_user'\@'localhost' identified by '$rw_alpha'") or die DBI::errstr;
+    $handle->do("GRANT ALL ON resourcedbtest.* to '$rw_user'\@'localhost' identified by '$rw_alpha'") or die DBI::errstr;
     $handle->do("flush privileges");
 
-    print "ResourceDB's database user was created.\n";
+    my $ro_alpha = undef;
+    my $ro_bravo = undef;
+    my $ro_user  = $cli->get_input("Read Only Username", default => "rdb_ro");
 
-    `/bin/mkdir -p /etc/grnoc/resourcedb/`;
-    open(FILE, "> /etc/grnoc/resourcedb/config.xml");
+    while (1) {
+        $ro_alpha = $cli->get_password("$ro_user Password:");
+        $ro_bravo = $cli->get_password("$ro_user Password Confirmation:");
+
+        last if ($ro_alpha eq $ro_bravo);
+        print "Passwords do not match. Please try again.\n";
+    }
+
+    $handle->do("GRANT ALL ON resourcedb.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
+    $handle->do("GRANT ALL ON resourcedbtest.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
+    $handle->do("flush privileges");
+
+    print "ResourceDB's database users were created.\n";
+
+    `/bin/mkdir -p /etc/grnoc/netsage/resourcedb/`;
+    open(FILE, "> /etc/grnoc/netsage/resourcedb/config.xml");
     print FILE << "END";
-<config>
-  <db name="resourcedb" username="rdb" password="$alpha" port="$port" host="$host" schema="/etc/grnoc/resouredb/resourcedb.sql"/>
+<config debug="0">
+  <database-name>resourcedb</database-name>
+  <database-schema>/etc/grnoc/netsage/resourcedb/resourcedb.sql</database-schema>
+
+  <database-readonly-username>$ro_user</database-readonly-username>
+  <database-readonly-password>$ro_alpha</database-readonly-password>
+
+  <database-readwrite-username>$rw_user</database-readwrite-username>
+  <database-readwrite-password>$rw_alpha</database-readwrite-password>
+
+  <database-host>$host</database-host>
+  <database-port>$port</database-port>
+  <database-query-debug>0</database-query-debug>
 </config>
 END
 
