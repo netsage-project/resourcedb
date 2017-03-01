@@ -40,8 +40,6 @@ sub add_ip_blocks {
 
     my ( $self, %args ) = @_;
 
-    warn "add_ip_block_args: " . Dumper %args;
-
     my $remote_user = $args{'remote_user'};
     # TODO: check remote_user, what should this be?
 
@@ -72,10 +70,10 @@ sub add_ip_blocks {
 sub _get_ip_block_args {
     my ( $self, %args_in ) = @_;
 
-    warn "args_in: " . Dumper %args_in;
-
     my %args = ();
 
+
+    ## iterate over all keys (not doing this currently)
     #while( my ($key, $val) = each %args_in ) {
     #    if ( ! defined ( $val ) ) {
     #        next;
@@ -83,6 +81,12 @@ sub _get_ip_block_args {
     #    $args{ $key } = $val;
     #}
 
+    # TODO: figure out how to set these derived fields:
+    #  - addr_lower
+    #  - addr_upper
+    #  -  mask
+    #  - continent_name
+    #  - country_name
     my @all_args = (
         'name',
         'addr_str',
