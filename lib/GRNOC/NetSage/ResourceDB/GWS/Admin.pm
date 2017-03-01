@@ -61,6 +61,14 @@ sub _add_ip_block_params {
                                   multiple    => 0,
                                   description => 'The address string (CIDR)');
 
+    # add the optional 'name' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'name',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The name of the ip resource block');
+
+
     # add the optional 'asn' input param to the add_ip_blocks() method
     $method->add_input_parameter( name        => 'asn',
                                   pattern     => $INTEGER,
@@ -214,6 +222,27 @@ sub _get_ip_blocks {
     return {'results' => $result->results(),
             'total' => $result->total(),
             'offset' => $result->offset(),
+            'warning' => $result->warning()};
+}
+
+
+### CALLBACKS - add methods
+
+sub _add_ip_blocks {
+
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->add_ip_blocks( $self->process_args( $args ) );
+
+    # handle error
+    if ( !$result ) {
+
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return {'results' => $result->results(),
+            'total' => $result->total(),
             'warning' => $result->warning()};
 }
 
