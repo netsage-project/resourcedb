@@ -31,10 +31,7 @@ sub new {
 }
 
 sub _init_add_methods {
-
     my $self = shift;
-    #my $method_in = shift;
-    #my $args = shift;
 
     my $method;
 
@@ -47,39 +44,122 @@ sub _init_add_methods {
     $method = GRNOC::WebService::Method->new( name => 'add_ip_blocks',
                                                    description => "Adds the specified IP blocks.",
                                                    expires => "-1d",
-                                                   #default_order_by => ['name'],
                                                    callback => sub { $self->_add_ip_blocks( @_ ) } );
 
-    # add the optional 'ip_block_id' input param to the get_ip_blocks() method
-    $method->add_input_parameter( name        => 'ip_block_id',
-                                  pattern     => $INTEGER,
-                                  required    => 0,
-                                  multiple    => 1,
-                                  description => 'The id of the IP block');
+    $self->_add_ip_block_params( $method );
 
     $self->websvc()->register_method( $method );
 
+}
+
+sub _add_ip_block_params {
+    my ( $self, $method ) = @_;
+    # add the required 'addr_str' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'addr_str',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The address string (CIDR)');
+
+    # add the optional 'asn' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'asn',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The ASN of the IP block');
+
+    # add the optional 'organization_id' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'organization_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The organization id');
+
+    # add the optional 'discipline_id' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'discipline_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The discipline id');
+
+    # add the optional 'role_id' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'role_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The role id');
+
+    # add the optional 'project_id' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'project_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The project id');
+
+    # add the optional 'country_code' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'country_code',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The country code');
+
+    # add the optional 'country_name' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'country_name',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The country name');
 
 
+    # add the optional 'continent_code' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'continent_code',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The continent code');
+
+    # add the optional 'continent_name' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'continent_name',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The continent name');
+
+    # add the optional 'postal_code' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'postal_code',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The postal code');
+
+    # add the optional 'latitude' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'latitude',
+                                  pattern     => $FLOAT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The latitude');
+
+    # add the optional 'longitude' input param to the add_ip_blocks() method
+    $method->add_input_parameter( name        => 'longitude',
+                                  pattern     => $FLOAT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The longitude');
+    return $method;
 }
 
 sub _init_dynamic_add_methods {
-    #my ( $self, $method_in, $args ) = @_;
     my $self = shift;
-    #my $method_in = shift;
-    #my $args = shift;
 
     foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
         my $method;
-        # get_roles
+        # add
         $method = GRNOC::WebService::Method->new( name => "add_${name}s",
             description => "Adds the ${name}",
             expires => "-1d",
-            #default_order_by => ['name'],
             callback => sub { $self->_add_table_dynamically( $name, @_ ) } );
-        #callback => sub { $self->_add_table_dynamically( $name, $method_in, $args ) } );
 
-        # add the optional 'role_id' input param to the get_roles() method
+        # add the required 'name' input param to all the basic dynamic methods
         $method->add_input_parameter( 
             name        => 'name',
             pattern     => $TEXT,
