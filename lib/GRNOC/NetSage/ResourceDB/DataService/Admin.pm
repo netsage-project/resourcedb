@@ -59,11 +59,7 @@ sub add_ip_blocks {
 
     my $num_rows = $self->dbq_rw()->num_rows();
 
-    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
-                                                                 total => $num_rows,
-                                                                 );
-
-    return $result;
+    return [{'ip_block_id' => $results}];
 
 }
 
@@ -81,10 +77,10 @@ sub update_ip_blocks {
     my @where = ();
 
     # handle required ip_block_id param
-    my $role_id_param = GRNOC::MetaParameter->new( name => 'ip_block_id',
+    my $id_param = GRNOC::MetaParameter->new( name => 'ip_block_id',
                                                    field => 'ip_block.ip_block_id' );
 
-    @where = $role_id_param->process( args => \%args,
+    @where = $id_param->process( args => \%args,
                                       where => \@where );
 
     my $results = $self->dbq_rw()->update( table => $from_sql,
@@ -100,11 +96,8 @@ sub update_ip_blocks {
 
     my $num_rows = $self->dbq_rw()->num_rows();
 
-    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
-                                                                 total => $num_rows,
-                                                                 );
-
-    return $result;
+    $results = [ {'ip_block_id' => $args{'ip_block_id'} }];
+    return $results;
 
 }
 

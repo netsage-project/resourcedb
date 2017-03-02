@@ -59,7 +59,7 @@ sub _init_update_methods {
 
     $self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
 
-    #$self->_init_dynamic_update_methods( @_ );
+    $self->_init_dynamic_update_methods( @_ );
 
 
     # update_ip_blocks
@@ -213,6 +213,40 @@ sub _init_dynamic_add_methods {
 
 }
 
+sub _init_dynamic_update_methods {
+    my $self = shift;
+
+    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $method;
+        # add
+        $method = GRNOC::WebService::Method->new( name => "update_${name}s",
+            description => "Updates the ${name}",
+            expires => "-1d",
+            callback => sub { $self->_update_table_dynamically( $name, @_ ) } );
+
+        # add the required 'id' input param to all the basic dynamic methods
+        $method->add_input_parameter(
+            name        => "${name}_id",
+            pattern     => $NUMBER_ID,
+            required    => 1,
+            multiple    => 0,
+            description => "The id of the $name");
+
+        # add the required 'name' input param to all the basic dynamic methods
+        $method->add_input_parameter(
+            name        => 'name',
+            pattern     => $TEXT,
+            required    => 1,
+            multiple    => 0,
+            description => "The name of the $name");
+
+        $self->websvc()->register_method( $method );
+
+    }
+
+
+}
+
 
 ### callbacks ###
 
@@ -229,9 +263,23 @@ sub _add_table_dynamically {
         return;
     }
 
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'warning' => $result->warning()};
+    return { 'results' => $result };
+}
+
+sub _update_table_dynamically {
+
+    my ( $self, $name, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->update_table_dynamically( $name, $self->process_args( $args ) );
+
+    # handle error
+    if ( !$result ) {
+
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return { 'results' => $result };
 }
 
 
@@ -270,9 +318,7 @@ sub _add_ip_blocks {
         return;
     }
 
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'warning' => $result->warning()};
+    return { 'results' => $result };
 }
 
 
@@ -291,9 +337,8 @@ sub _update_ip_blocks {
         return;
     }
 
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'warning' => $result->warning()};
+    return { 'results' => $result };
+
 }
 
 
