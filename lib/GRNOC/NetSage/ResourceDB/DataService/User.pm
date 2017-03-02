@@ -89,7 +89,7 @@ sub get_ip_blocks {
     $from_sql .= 'left join discipline on ( ip_block.discipline_id = discipline.discipline_id ) ';
     $from_sql .= 'left join project on ( ip_block.project_id = project.project_id ) ';
 
-    my $results = $self->dbq_rw()->select( table => $from_sql,
+    my $results = $self->dbq_ro()->select( table => $from_sql,
                                            fields => $select_fields,
                                            where => [-and => \@where],
                                            order_by => $order_by,
@@ -102,7 +102,7 @@ sub get_ip_blocks {
         return;
     }
 
-    my $num_rows = $self->dbq_rw()->num_rows();
+    my $num_rows = $self->dbq_ro()->num_rows();
 
     my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
                                                                  total => $num_rows,
@@ -111,60 +111,6 @@ sub get_ip_blocks {
     return $result;
 
 }
-
-sub get_organizations {
-
-    my ( $self, %args ) = @_;
-
-    my $remote_user = $args{'remote_user'};
-
-    my $select_fields = ['organization.organization_id',
-                         'organization.name',
-                         ];
-
-    my @where = ();
-
-    # handle optional role_id param
-    my $id_param = GRNOC::MetaParameter->new( name => 'organization_id',
-                                              field => 'organization.organization_id' );
-
-    @where = $id_param->process( args => \%args,
-                                         where => \@where );
-
-    # get the order_by value
-    my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
-    my $order_by = $order_by_param->parse( %args );
-
-    my $limit = $args{'limit'};
-    my $offset = $args{'offset'};
-
-    my $from_sql = 'organization ';
-
-    my $results = $self->dbq_rw()->select( table => $from_sql,
-                                           fields => $select_fields,
-                                           where => [-and => \@where],
-                                           order_by => $order_by,
-                                           limit => $limit,
-                                           offset => $offset );
-
-    if ( !$results ) {
-
-        $self->error( 'An unknown error occurred getting the organizations.' );
-        return;
-    }
-
-    my $num_rows = $self->dbq_rw()->num_rows();
-
-    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
-                                                                 total => $num_rows,
-                                                                 offset => $offset );
-
-    return $result;
-
-}
-
-
-
 
 1;
 

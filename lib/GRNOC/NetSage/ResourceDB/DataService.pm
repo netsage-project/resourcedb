@@ -29,10 +29,10 @@ use constant SERVICE_CACHE_FILE => '/etc/grnoc/name-service-cacher/name-service.
 use constant COOKIE_FILE => '/tmp/netsage_resourcedb_cookies';
 
 use constant VALID_DYNAMIC_DB_NAMES => {
-    'role',
-    'organization',
-    'project',
-    'disciplines'
+    'role' => 1,
+    'organization' => 1,
+    'project' => 1,
+    'discipline' => 1
 };
 
 ### constructor ###
@@ -128,8 +128,7 @@ sub error {
 
 # just a getter
 sub valid_dynamic_db_names {
-
-    my ( $self ) = @_;
+    my $self = shift;
 
     return VALID_DYNAMIC_DB_NAMES();
 
@@ -214,6 +213,43 @@ sub get_table_dynamically {
     my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
                                                                  total => $num_rows,
                                                                  offset => $offset );
+
+    return $result;
+
+}
+
+sub add_table_dynamically {
+
+    my ( $self, $name, %args ) = @_;
+
+    if ( !$self->_is_dbname_valid( $name ) ) {
+        $self->error( "Invalid db name specified: $name" );
+        return;
+    }
+
+    my $remote_user = $args{'remote_user'};
+
+    my $from_sql = "$name ";
+
+    my $name_val = $args{'name'};
+
+    my $results = $self->dbq_rw()->insert( table => $from_sql,
+                                           fields => {
+                                              'name' => $name_val
+                                           }
+                                         );
+
+    if ( !$results ) {
+
+        $self->error( "An unknown error occurred inserting the ${name}" );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
+                                                                 total => $num_rows,
+                                                                 );
 
     return $result;
 
