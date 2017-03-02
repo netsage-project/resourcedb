@@ -52,16 +52,45 @@ sub _init_add_methods {
 
 }
 
+sub _init_update_methods {
+    my $self = shift;
+
+    my $method;
+
+    $self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
+
+    #$self->_init_dynamic_update_methods( @_ );
+
+
+    # update_ip_blocks
+    $method = GRNOC::WebService::Method->new( name => 'update_ip_blocks',
+                                                   description => "Updates the specified IP blocks.",
+                                                   expires => "-1d",
+                                                   callback => sub { $self->_update_ip_blocks( @_ ) } );
+
+    # add the required 'ip_block_id' input param to the update_ip_blocks() method
+    $method->add_input_parameter( name        => 'ip_block_id',
+                                  pattern     => $INTEGER,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The id of the IP block');
+
+    $self->_add_ip_block_params( $method );
+
+    $self->websvc()->register_method( $method );
+
+}
+
 sub _add_ip_block_params {
     my ( $self, $method ) = @_;
-    # add the required 'addr_str' input param to the add_ip_blocks() method
+    # add the required 'addr_str' input param to the  method
     $method->add_input_parameter( name        => 'addr_str',
                                   pattern     => $TEXT,
                                   required    => 1,
                                   multiple    => 0,
                                   description => 'The address string (CIDR)');
 
-    # add the optional 'name' input param to the add_ip_blocks() method
+    # add the optional 'name' input param to the  method
     $method->add_input_parameter( name        => 'name',
                                   pattern     => $TEXT,
                                   required    => 0,
@@ -69,49 +98,49 @@ sub _add_ip_block_params {
                                   description => 'The name of the ip resource block');
 
 
-    # add the optional 'asn' input param to the add_ip_blocks() method
+    # add the optional 'asn' input param to the  method
     $method->add_input_parameter( name        => 'asn',
                                   pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The ASN of the IP block');
 
-    # add the optional 'organization_id' input param to the add_ip_blocks() method
+    # add the optional 'organization_id' input param to the  method
     $method->add_input_parameter( name        => 'organization_id',
                                   pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The organization id');
 
-    # add the optional 'discipline_id' input param to the add_ip_blocks() method
+    # add the optional 'discipline_id' input param to the  method
     $method->add_input_parameter( name        => 'discipline_id',
                                   pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The discipline id');
 
-    # add the optional 'role_id' input param to the add_ip_blocks() method
+    # add the optional 'role_id' input param to the  method
     $method->add_input_parameter( name        => 'role_id',
                                   pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The role id');
 
-    # add the optional 'project_id' input param to the add_ip_blocks() method
+    # add the optional 'project_id' input param to the  method
     $method->add_input_parameter( name        => 'project_id',
                                   pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The project id');
 
-    # add the optional 'country_code' input param to the add_ip_blocks() method
+    # add the optional 'country_code' input param to the  method
     $method->add_input_parameter( name        => 'country_code',
                                   pattern     => $TEXT,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The country code');
 
-    # add the optional 'country_name' input param to the add_ip_blocks() method
+    # add the optional 'country_name' input param to the  method
     $method->add_input_parameter( name        => 'country_name',
                                   pattern     => $TEXT,
                                   required    => 0,
@@ -119,35 +148,35 @@ sub _add_ip_block_params {
                                   description => 'The country name');
 
 
-    # add the optional 'continent_code' input param to the add_ip_blocks() method
+    # add the optional 'continent_code' input param to the  method
     $method->add_input_parameter( name        => 'continent_code',
                                   pattern     => $TEXT,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The continent code');
 
-    # add the optional 'continent_name' input param to the add_ip_blocks() method
+    # add the optional 'continent_name' input param to the  method
     $method->add_input_parameter( name        => 'continent_name',
                                   pattern     => $TEXT,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The continent name');
 
-    # add the optional 'postal_code' input param to the add_ip_blocks() method
+    # add the optional 'postal_code' input param to the  method
     $method->add_input_parameter( name        => 'postal_code',
                                   pattern     => $TEXT,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The postal code');
 
-    # add the optional 'latitude' input param to the add_ip_blocks() method
+    # add the optional 'latitude' input param to the  method
     $method->add_input_parameter( name        => 'latitude',
                                   pattern     => $FLOAT,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The latitude');
 
-    # add the optional 'longitude' input param to the add_ip_blocks() method
+    # add the optional 'longitude' input param to the  method
     $method->add_input_parameter( name        => 'longitude',
                                   pattern     => $FLOAT,
                                   required    => 0,
@@ -233,6 +262,27 @@ sub _add_ip_blocks {
     my ( $self, $method, $args ) = @_;
 
     my $result = $self->admin_ds()->add_ip_blocks( $self->process_args( $args ) );
+
+    # handle error
+    if ( !$result ) {
+
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return {'results' => $result->results(),
+            'total' => $result->total(),
+            'warning' => $result->warning()};
+}
+
+
+### CALLBACKS - update methods
+
+sub _update_ip_blocks {
+
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->update_ip_blocks( $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {

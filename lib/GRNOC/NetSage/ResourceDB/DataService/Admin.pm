@@ -67,6 +67,47 @@ sub add_ip_blocks {
 
 }
 
+sub update_ip_blocks {
+
+    my ( $self, %args ) = @_;
+
+    my $remote_user = $args{'remote_user'};
+    # TODO: check remote_user, what should this be?
+
+    my $from_sql = 'ip_block ';
+
+    my $fields = $self->_get_ip_block_args( %args );
+
+    my @where = ();
+
+    # handle required ip_block_id param
+    my $role_id_param = GRNOC::MetaParameter->new( name => 'ip_block_id',
+                                                   field => 'ip_block.ip_block_id' );
+
+    @where = $role_id_param->process( args => \%args,
+                                      where => \@where );
+
+    my $results = $self->dbq_rw()->update( table => $from_sql,
+                                           fields => $fields,
+                                           where => [-and => \@where],
+                                       );
+
+    if ( !$results ) {
+
+        $self->error( 'An unknown error occurred updating the ip blocks.' );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
+                                                                 total => $num_rows,
+                                                                 );
+
+    return $result;
+
+}
+
 sub _get_ip_block_args {
     my ( $self, %args_in ) = @_;
 
