@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use DBI;
+
+use GRNOC::CLI;
+
+sub main {
+    my $cli = GRNOC::CLI->new();
+
+    my $user = $cli->get_input("Database username", default => "root");
+    my $pass = $cli->get_password("Database password");
+    my $host = $cli->get_input("Database host address", default => "127.0.0.1");
+    my $port = $cli->get_input("Database Port number", default => 3306);
+
+    my $handle = DBI->connect("DBI:mysql:dbname=mysql;host=$host;port=$port",
+                              $user,
+                              $pass,
+                              {PrintError => 0});
+    if (!$handle) {
+        warn "Couldn't connect to database: " . $DBI::errstr . "\n";
+        exit 1;
+    }
+
+    print "Connected to database.\n";
+
+    my $rw_alpha = undef;
+    my $rw_bravo = undef;
+    my $rw_user  = $cli->get_input("Read/Write Username", default => "rdb");
+
+    while (1) {
+        $rw_alpha = $cli->get_password("$rw_user Password:");
+        $rw_bravo = $cli->get_password("$rw_user Password Confirmation:");
+
+        last if ($rw_alpha eq $rw_bravo);
+        print "Passwords do not match. Please try again.\n";
+    }
+
+    $handle->do("GRANT ALL ON resourcedb.* to '$rw_user'\@'localhost' identified by '$rw_alpha'") or die DBI::errstr;
+    $handle->do("GRANT ALL ON resourcedbtest.* to '$rw_user'\@'localhost' identified by '$rw_alpha'") or die DBI::errstr;
+    $handle->do("flush privileges");
+
+    my $ro_alpha = undef;
+    my $ro_bravo = undef;
+    my $ro_user  = $cli->get_input("Read Only Username", default => "rdb_ro");
+
+    while (1) {
+        $ro_alpha = $cli->get_password("$ro_user Password:");
+        $ro_bravo = $cli->get_password("$ro_user Password Confirmation:");
+
+        last if ($ro_alpha eq $ro_bravo);
+        print "Passwords do not match. Please try again.\n";
+    }
+
+    $handle->do("GRANT ALL ON resourcedb.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
+    $handle->do("GRANT ALL ON resourcedbtest.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
+    $handle->do("flush privileges");
+
+    print "ResourceDB's database users were created.\n";
+
+    `/bin/mkdir -p /etc/grnoc/netsage/resourcedb/`;
+    open(FILE, "> /etc/grnoc/netsage/resourcedb/config.xml");
+    print FILE << "END";
+<config debug="0">
+  <database-name>resourcedb</database-name>
+  <database-schema>/etc/grnoc/netsage/resourcedb/resourcedb.sql</database-schema>
+
+  <database-readonly-username>$ro_user</database-readonly-username>
+  <database-readonly-password>$ro_alpha</database-readonly-password>
+
+  <database-readwrite-username>$rw_user</database-readwrite-username>
+  <database-readwrite-password>$rw_alpha</database-readwrite-password>
+
+  <database-host>$host</database-host>
+  <database-port>$port</database-port>
+  <database-query-debug>0</database-query-debug>
+</config>
+END
+
+    return 1;
+}
+
+main();

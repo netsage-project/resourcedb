@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use GRNOC::Config;
+use GRNOC::NetSage::ResourceDB::DataService::Util;
+
+use DBI;
+
+use constant DEFAULT_CONFIG_FILE => '/etc/grnoc/netsage/resourcedb/config.xml';
+
+sub main {
+    my $config = GRNOC::Config->new(
+        config_file => DEFAULT_CONFIG_FILE,
+        force_array => 0
+    );
+    if (!defined $config) {
+        warn "Unable to parse the config file.";
+        return;
+    }
+
+    my $db_util = GRNOC::NetSage::ResourceDB::DataService::Util->new(
+        username => $config->get( '/config/database-readwrite-username' ),
+        password => $config->get( '/config/database-readwrite-password' ),
+        host     => $config->get( '/config/database-host' ),
+        port     => $config->get( '/config/database-port' ),
+        schema   => $config->get( '/config/database-schema' )
+    );
+
+    my ($version, $err) = $db_util->install_database();
+    if (defined $err) {
+        warn "$err";
+        return;
+    }
+
+    return 1;
+}
+
+main();
