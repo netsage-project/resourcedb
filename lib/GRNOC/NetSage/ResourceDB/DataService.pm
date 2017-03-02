@@ -247,11 +247,68 @@ sub add_table_dynamically {
 
     my $num_rows = $self->dbq_rw()->num_rows();
 
-    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
-                                                                 total => $num_rows,
-                                                                 );
+    #my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
+    #                                                             total => $num_rows,
+    #                                                             );
 
-    return $result;
+    return [{ "${name}_id" => $results }];
+
+}
+
+sub update_table_dynamically {
+
+    my ( $self, $name, %args ) = @_;
+
+    if ( !$self->_is_dbname_valid( $name ) ) {
+        $self->error( "Invalid db name specified: $name" );
+        return;
+    }
+
+    my $remote_user = $args{'remote_user'};
+
+    # handle required ${name}_id param
+    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
+                                              field => "${name}_id" );
+
+    my @where = ();
+
+    @where = $id_param->process( args => \%args,
+                                      where => \@where );
+
+    my $from_sql = "$name ";
+
+    my $name_val = $args{'name'};
+
+    my %fields = (
+        'name' => $name_val,
+    );
+
+    my $results = $self->dbq_rw()->update( table => $from_sql,
+                                           fields => \%fields,
+                                           where => [-and => \@where],
+                                         );
+
+    if ( !$results ) {
+
+        $self->error( "An unknown error occurred inserting the ${name}" );
+        return;
+    }
+
+    if ( $results == 0 ) {
+        $self->error( "No rows affected" );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+
+    #my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
+    #                                                            total => $num_rows,
+    #                                                            );
+
+
+                                                                 #return $result;
+    return [{ "${name}_id" => $args{"${name}_id"} }];
 
 }
 

@@ -54,7 +54,7 @@ sub _init {
 
     $self->_init_get_methods();
     $self->_init_add_methods();
-    #$self->_init_update_methods();
+    $self->_init_update_methods();
     #$self->_init_delete_methods();
 }
 
