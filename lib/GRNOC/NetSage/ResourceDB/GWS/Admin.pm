@@ -81,6 +81,33 @@ sub _init_update_methods {
 
 }
 
+sub _init_delete_methods {
+    my $self = shift;
+
+    my $method;
+
+    #$self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
+
+    $self->_init_dynamic_delete_methods( @_ );
+
+
+    # delete_ip_blocks
+    $method = GRNOC::WebService::Method->new( name => 'delete_ip_blocks',
+                                                   description => "Deletes the specified IP blocks.",
+                                                   expires => "-1d",
+                                                   callback => sub { $self->_delete_ip_blocks( @_ ) } );
+
+    # add the required 'ip_block_id' input param to the delete_ip_blocks() method
+    $method->add_input_parameter( name        => 'ip_block_id',
+                                  pattern     => $INTEGER,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The id of the IP block to delete');
+
+    $self->websvc()->register_method( $method );
+
+}
+
 sub _add_ip_block_params {
     my ( $self, $method ) = @_;
     # add the required 'addr_str' input param to the  method
@@ -247,6 +274,32 @@ sub _init_dynamic_update_methods {
 
 }
 
+sub _init_dynamic_delete_methods {
+    my $self = shift;
+
+    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $method;
+        # add
+        $method = GRNOC::WebService::Method->new( name => "delete_${name}s",
+            description => "Deletes the ${name}",
+            expires => "-1d",
+            callback => sub { $self->_delete_table_dynamically( $name, @_ ) } );
+
+        # add the required 'id' input param to all the basic dynamic methods
+        $method->add_input_parameter(
+            name        => "${name}_id",
+            pattern     => $NUMBER_ID,
+            required    => 1,
+            multiple    => 0,
+            description => "The id of the $name");
+
+        $self->websvc()->register_method( $method );
+
+    }
+
+
+}
+
 
 ### callbacks ###
 
@@ -271,6 +324,22 @@ sub _update_table_dynamically {
     my ( $self, $name, $method, $args ) = @_;
 
     my $result = $self->admin_ds()->update_table_dynamically( $name, $self->process_args( $args ) );
+
+    # handle error
+    if ( !$result ) {
+
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return { 'results' => $result };
+}
+
+sub _delete_table_dynamically {
+
+    my ( $self, $name, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->delete_table_dynamically( $name, $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {
@@ -329,6 +398,25 @@ sub _update_ip_blocks {
     my ( $self, $method, $args ) = @_;
 
     my $result = $self->admin_ds()->update_ip_blocks( $self->process_args( $args ) );
+
+    # handle error
+    if ( !$result ) {
+
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return { 'results' => $result };
+
+}
+
+### CALLBACKS - delete methods
+
+sub _delete_ip_blocks {
+
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->delete_ip_blocks( $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {
