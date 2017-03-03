@@ -58,6 +58,20 @@ sub _init_get_methods {
                                   multiple    => 1,
                                   description => 'The id of the IP block');
 
+    # add the optional 'limit' input param to the get_ip_blocks() method
+    $method->add_input_parameter( name        => 'limit',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The limit of how many results to return');
+
+    # add the optional 'offset' input param to the get_ip_blocks() method
+    $method->add_input_parameter( name        => 'offset',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The offset (pagination)');
+
     $self->websvc()->register_method( $method );
 
 
@@ -66,29 +80,38 @@ sub _init_get_methods {
 
 sub _init_dynamic_get_methods {
     my ( $self, $method_in, $args ) = @_;
-    #my $self = shift;
-    #my $method_in = shift;
-    #my $args = shift;
 
     foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
         my $method;
-        # get_roles
+        # get_$names
         $method = GRNOC::WebService::Method->new( name => "get_${name}s",
             description => "Returns the ${name}s",
             expires => "-1d",
             #default_order_by => ['name'],
-            callback => sub { $self->_get_table_dynamically( $name, $method_in, $args ) } );
+            callback => sub { $self->_get_table_dynamically( $name, @_ ) } );
 
-        # add the optional 'role_id' input param to the get_roles() method
+        # add the optional 'role_id' input param to the get_$names() method
         $method->add_input_parameter( name        => "${name}_id",
             pattern     => $INTEGER,
             required    => 0,
             multiple    => 1,
             description => "The id of the $name");
 
+        # add the optional 'limit' input param to the get_$names() method
+        $method->add_input_parameter( name        => "limit",
+            pattern     => $INTEGER,
+            required    => 0,
+            multiple    => 0,
+            description => "The limit of number of items to return");
+
+        # add the optional 'offset' input param to the get_$names() method
+        $method->add_input_parameter( name        => "offset",
+            pattern     => $INTEGER,
+            required    => 0,
+            multiple    => 0,
+            description => "The offset number of records for pagination");
+
         $self->websvc()->register_method( $method );
-
-
 
     }
 
@@ -114,7 +137,6 @@ sub _get_table_dynamically {
     return {'results' => $result->results(),
             'total' => $result->total(),
             'offset' => $result->offset(),
-            'name' => $name,
             'warning' => $result->warning()};
 }
 

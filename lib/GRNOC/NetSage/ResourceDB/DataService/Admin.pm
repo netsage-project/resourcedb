@@ -101,6 +101,47 @@ sub update_ip_blocks {
 
 }
 
+sub delete_ip_blocks {
+
+    my ( $self, %args ) = @_;
+
+    my $remote_user = $args{'remote_user'};
+    # TODO: check remote_user, what should this be?
+
+    my $from_sql = 'ip_block ';
+
+    my @where = ();
+
+    # handle required ip_block_id param
+    my $id_param = GRNOC::MetaParameter->new( name => 'ip_block_id',
+                                                   field => 'ip_block.ip_block_id' );
+
+    @where = $id_param->process( args => \%args,
+                                      where => \@where );
+
+    my $results = $self->dbq_rw()->delete( table => $from_sql,
+                                           where => [-and => \@where],
+                                       );
+
+    if ( !$results ) {
+
+        $self->error( 'An unknown error occurred deleting the ip blocks.' );
+        return;
+    }
+
+    if ( $results == 0 ) {
+        $self->error( "No rows affected" );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    $results = [ {'ip_block_id' => $args{'ip_block_id'} }];
+    return $results;
+
+}
+
+
 sub _get_ip_block_args {
     my ( $self, %args_in ) = @_;
 

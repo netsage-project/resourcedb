@@ -245,8 +245,6 @@ sub add_table_dynamically {
         return;
     }
 
-    my $num_rows = $self->dbq_rw()->num_rows();
-
     #my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
     #                                                             total => $num_rows,
     #                                                             );
@@ -290,7 +288,7 @@ sub update_table_dynamically {
 
     if ( !$results ) {
 
-        $self->error( "An unknown error occurred inserting the ${name}" );
+        $self->error( "An unknown error occurred updating the ${name}" );
         return;
     }
 
@@ -299,15 +297,47 @@ sub update_table_dynamically {
         return;
     }
 
-    my $num_rows = $self->dbq_rw()->num_rows();
+    return [{ "${name}_id" => $args{"${name}_id"} }];
 
+}
 
-    #my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
-    #                                                            total => $num_rows,
-    #                                                            );
+sub delete_table_dynamically {
 
+    my ( $self, $name, %args ) = @_;
 
-                                                                 #return $result;
+    if ( !$self->_is_dbname_valid( $name ) ) {
+        $self->error( "Invalid db name specified: $name" );
+        return;
+    }
+
+    my $remote_user = $args{'remote_user'};
+
+    # handle required ${name}_id param
+    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
+                                              field => "${name}_id" );
+
+    my @where = ();
+
+    @where = $id_param->process( args => \%args,
+                                      where => \@where );
+
+    my $from_sql = "$name ";
+
+    my $results = $self->dbq_rw()->delete( table => $from_sql,
+                                           where => [-and => \@where],
+                                         );
+
+    if ( !$results ) {
+
+        $self->error( "An unknown error occurred deleting the ${name}" );
+        return;
+    }
+
+    if ( $results == 0 ) {
+        $self->error( "No rows affected" );
+        return;
+    }
+
     return [{ "${name}_id" => $args{"${name}_id"} }];
 
 }
