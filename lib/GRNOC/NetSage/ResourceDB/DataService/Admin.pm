@@ -164,6 +164,7 @@ sub _get_ip_block_args {
     #  - country_name
     my @all_args = (
         'name',
+        'description',
         'addr_str',
         #'addr_lower',
         #'addr_upper',

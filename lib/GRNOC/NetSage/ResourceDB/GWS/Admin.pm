@@ -132,6 +132,13 @@ sub _add_ip_block_params {
                                   multiple    => 0,
                                   description => 'The name of the ip resource block');
 
+    # add the optional 'description' input param to the method
+    $method->add_input_parameter( name        => 'description',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The description of the ip resource block');
+
 
     # add the optional 'asn' input param to the  method
     $method->add_input_parameter( name        => 'asn',

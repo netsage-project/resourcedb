@@ -45,6 +45,7 @@ sub get_ip_blocks {
     my $select_fields = [
                          'ip_block.ip_block_id as ip_block_id',
                          'ip_block.name as name',
+                         'ip_block.description as description',
                          'ip_block.addr_str as addr_str',
                          'ip_block.addr_lower as addr_lower',
                          'ip_block.addr_upper as addr_upper',
