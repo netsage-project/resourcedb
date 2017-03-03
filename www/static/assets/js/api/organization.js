@@ -1,8 +1,8 @@
 // GlobalNOC 2017
 
-// Gets a resource from the backend by resource_id.
-function getResource(resourceId, onSuccess) {
-    var url = baseUrl + 'api/index.cgi?method=get_ip_blocks' + '&ip_block_id=' + resourceId.toString();
+// Gets an organization from the backend by organizationId.
+function getOrganization(organizationId, onSuccess) {
+    var url = baseUrl + 'api/index.cgi?method=get_organizations' + '&organization_id=' + organizationId.toString();
     fetch(url, {
         method: 'get'
     }).then(function(response) {
@@ -17,9 +17,9 @@ function getResource(resourceId, onSuccess) {
     });
 }
 
-// Gets a list of resources from the backend.
-function getResources(on_success) {
-    fetch(baseUrl + 'api/index.cgi?method=get_ip_blocks', {
+// Gets a list of organizations from the backend.
+function getOrganizations(on_success) {
+    fetch(baseUrl + 'api/index.cgi?method=get_organizations', {
         method: 'get'
     }).then(function(response) {
 

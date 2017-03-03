@@ -6,13 +6,14 @@
 document.addEventListener('DOMContentLoaded', function(event) {
     var url = window.location;
 
+    console.log(url.href);
     console.log(url.pathname);
 
-    if (url.pathname === baseUrl || url.pathname === baseUrl + 'index.html') {
+    if (url.pathname === basePath || url.pathname === basePath + 'index.html') {
         index();
-    } else if (url.pathname === baseUrl + 'project/index.html') {
+    } else if (url.pathname === basePath + 'project/index.html') {
         project();
-    } else if (url.pathname === baseUrl + 'resource/index.html') {
+    } else if (url.pathname === basePath + 'resource/index.html') {
         resource();
     } else {
         console.log('There is no Javascript available for this page.');
@@ -23,23 +24,45 @@ document.addEventListener('DOMContentLoaded', function(event) {
 var index = function() {
     console.log('Loading the index page.');
 
-    get_resources(function(resources) {
+    getResources(function(resources) {
         for (var i = 0; i < resources.length; i++) {
-            render_my_resource(resources[i]);
+            renderMyResourceListElement(resources[i]);
+            renderResourceListElement(resources[i]);
         }
+
+        renderResourceCount(resources.length);
     });
 
-    get_projects(function(projects) {
+    getProjects(function(projects) {
         for (var i = 0; i < projects.length; i++) {
-            render_my_project(projects[i]);
+            renderMyProjectListElement(projects[i]);
         }
     });
 }
 
-var project = function() {
-    console.log('Loading the project page.');
+function project() {
+    var searchParams = new URLSearchParams(window.location.search);
+    var id = searchParams.get('project_id')
+
+    console.log('Loading the project page for project ' + id.toString());
 }
 
-var resource = function() {
-    console.log('Loading the resource page.');
+function resource() {
+    var searchParams = new URLSearchParams(window.location.search);
+    var id = searchParams.get('resource_id')
+
+    console.log('Loading the resource page for resource ' + id.toString());
+    getResource(id, function(resource) {
+        console.log(resource);
+        renderResourceHeader(resource);
+        renderResourceRecord(resource);
+
+        getProject(resource.project_id, function(project) {
+            renderLinkedProjectListElement(project);
+        });
+
+        getOrganization(resource.organization_id, function(org) {
+            renderLinkedOrganizationListElement(org);
+        });
+    });
 }
