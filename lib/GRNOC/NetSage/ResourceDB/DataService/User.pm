@@ -76,6 +76,20 @@ sub get_ip_blocks {
     @where = $role_id_param->process( args => \%args,
                                       where => \@where );
 
+    my %addr_args = ();
+    if ( $args{'addr_str'} ) {
+        %addr_args = ( 'addr_str_like' => $args{'addr_str'} );
+
+    }
+
+    # handle optional ip_addr_str
+    my $addr_param = GRNOC::MetaParameter->new( name => 'addr_str',
+                                                field => 'ip_block.addr_str' );
+
+    @where = $addr_param->process( args => \%args,
+                                   where => \@where );
+
+
     # get the order_by value
     my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
     my $order_by = $order_by_param->parse( %args );
