@@ -35,12 +35,10 @@
                         <form class="navbar-form navbar-left" target="_self">
                             <div class="form-group">
                                 <label class="control-label" for="search-field"><i class="glyphicon glyphicon-search"></i></label>
-                                <input class="form-control input-lg search-field" type="search" name="search" placeholder="10.1.0.0/16" autocomplete="on" id="search-field">
+                                <input class="form-control input-lg search-field" type="search" name="search" placeholder="10.1.0.0/16" autocomplete="on" id="search_field">
                             </div>
                         </form>
-                        <ul class="nav navbar-nav">
-                            <li role="presentation"><a href="create.html">Create Entry</a></li>
-                        </ul>
+                        <ul class="nav navbar-nav"></ul>
                         <p class="navbar-text navbar-right"> </p>
                     </div>
                 </div>
@@ -62,7 +60,7 @@
                                     <th>Location </th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="resource_list">
                                 <tr>
                                     <td>Compute </td>
                                     <td>IU DTN </td>
@@ -166,6 +164,8 @@
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/config.js"></script>
     <script src="assets/js/project.js"></script>
+    <script src="assets/js/api/organization.js"></script>
+    <script src="assets/js/gui/organization.js"></script>
     <script src="assets/js/gui/project.js"></script>
     <script src="assets/js/api/project.js"></script>
     <script src="assets/js/gui/resource.js"></script>
