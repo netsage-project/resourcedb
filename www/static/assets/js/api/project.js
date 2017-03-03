@@ -1,7 +1,7 @@
 // GlobalNOC 2017
 
 // Gets a list of projects from the backend.
-function get_projects(on_success) {
+function getProjects(on_success) {
     fetch(baseUrl + 'api/index.cgi?method=get_projects', {
         method: 'get'
     }).then(function(response) {
