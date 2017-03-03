@@ -15,3 +15,19 @@ function renderMyProjectListElement(project) {
         window.location.href = basePath + 'project/index.html?project_id=' + id;
     });
 }
+
+// Renders a project in linked_project_list on resource/index.html.
+function renderLinkedProjectListElement(project) {
+    var table = document.getElementById('linked_project_list');
+    var row   = table.insertRow(0);
+
+    var id = project.project_id.toString();
+
+    var name = row.insertCell(0);
+
+    name.innerHTML = project.name;
+
+    row.addEventListener('click', function(e) {
+        window.location.href = basePath + 'project/index.html?project_id=' + id;
+    });
+}
