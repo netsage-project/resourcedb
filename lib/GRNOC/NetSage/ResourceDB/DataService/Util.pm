@@ -63,13 +63,18 @@ sub install_database {
         return (undef, $err);
     }
 
+    my $db_exists = 0;
+    if ($ok == 2 ) {
+        $db_exists = 1;
+    }
+
     $ok = $db->do("use resourcedb");
     if (!$ok) {
         $err = "Couldn't use resourcedb database: " . $DBI::errstr . "\n";
         return (undef, $err);
     }
 
-    ($version, $err) = $self->update_schema($db);
+    ($version, $err) = $self->update_schema($db, $db_exists);
     return ($version, $err);
 }
 
@@ -87,6 +92,7 @@ sub database_created {
         $err = $DBI::errstr;
         if (index($err, "database exists") != -1) {
             print "Database already exists\n";
+            return 2;
         } else {
             return 0;
         }
@@ -100,6 +106,7 @@ sub database_created {
 sub schema_created {
     my $self = shift;
     my $db   = shift;
+    my $db_exists   = shift;
 
     my $err;
     my $ok;
@@ -107,8 +114,11 @@ sub schema_created {
     my $version;
 
 
-    # Initialize the database from the Schema located at $path.
-    `mysql -u rdb --password=$self->{'password'} -D resourcedb < $self->{'schema'}`;
+    if ( ! $db_exists ) {
+        # Initialize the database from the Schema located at $path.
+        `mysql -u $self->{'username'} --password=$self->{'password'} -D resourcedb < $self->{'schema'}`;
+
+    }
 
     ($version, $err) = $self->version($db);
     if (defined $err) {
@@ -118,6 +128,7 @@ sub schema_created {
     if (!defined $version) {
         # The version was not set by the database schema.
         $ok = $db->do("insert into version (version) values ('0.0.1')");
+        warn "Inserting version in schema '0.0.0.1'";
         if (!$ok) {
             $err = "Couldn't set initial schema version: " . $DBI::errstr . "\n";
         }
@@ -152,22 +163,29 @@ sub version {
 sub update_schema {
     my $self = shift;
     my $db   = shift;
+    my $db_exists   = shift;
 
     my $version = undef;
     my $err = undef;
 
     ($version, $err) = $self->version($db);
-    if (defined $err) {
+    if (defined $err || not defined $version) {
         warn "Initializing database!";
-        ($version, $err) = $self->schema_created($db);
+        ($version, $err) = $self->schema_created($db, $db_exists);
         if (defined $err) {
             warn "Could not initialize_schema: $err";
+        } else {
+            warn "Schema initialized";
+
         }
     }
 
     if ($version eq '0.0.1') {
         # Place upgrade script for next schema version here.
         ($version, $err) = $self->upgrade_to_0_0_2($db, $version);
+    } else {
+        return($version, "DB already has the latest schema ($version)");
+
     }
 
     return ($version, $err);
@@ -179,9 +197,44 @@ sub upgrade_to_0_0_2 {
     my $version = shift;
 
     my $err = undef;
+    # ALTER table table_name
+    #     Add column column_name57 integer AFTER column_name56
+    my $query = "alter table `ip_block` add column `description` text after `name`";
+    my $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add column 'description': $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    } else {
+        warn "Added 'description' field";
+        $version = '0.0.2';
 
-    warn "ResourceDB's database is running the latest schema version.";
-    return ($version, $err);
+    }
+
+
+    $query = "update version set version=?";
+    my $updated_ok = $db->do($query, undef, $version);
+    if (!$updated_ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't update db version";
+        } else {
+            warn "Updated db version";
+
+        }
+
+    } else {
+        warn "db version was updated to $version";
+    }
+    
+
+    # in this case "$ok" is the # of affected records
+    return ($ok && $updated_ok, $err);
+
 }
 
 1;

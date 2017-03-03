@@ -179,11 +179,17 @@ sub get_table_dynamically {
 
     my @where = ();
 
-    # handle optional role_id param
+    # handle optional $name_id param
     my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
                                               field => "${name}.${name}_id" );
-
     @where = $id_param->process( args => \%args,
+                                 where => \@where );
+
+    # handle optional 'name' param
+    my $name_param = GRNOC::MetaParameter->new( name => "name",
+                                              field => "name" );
+
+    @where = $name_param->process( args => \%args,
                                  where => \@where );
 
     # get the order_by value

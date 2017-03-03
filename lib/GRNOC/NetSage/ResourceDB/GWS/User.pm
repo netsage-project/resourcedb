@@ -60,7 +60,7 @@ sub _init_get_methods {
 
     # add the optional 'addr_str' logic parameter
     # acccepts options such as addr_str_like=127.0
-    $method->add_logic_parameter( 
+    $method->add_logic_parameter(
                                 name => "addr_str",
                                 pattern => $TEXT,
                                 description => "The IP/CIDR address to match on",
@@ -80,9 +80,23 @@ sub _init_get_methods {
                                   multiple    => 0,
                                   description => 'The offset (pagination)');
 
+    $self->_get_dynamic_where_parameters( $method );
+
     $self->websvc()->register_method( $method );
 
+}
 
+sub _get_dynamic_where_parameters {
+    my ( $self, $method ) = @_;
+    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        # add the optional 'name_id' input param to the get_$names() method
+        $method->add_input_parameter( name        => "${name}_id",
+            pattern     => $INTEGER,
+            required    => 0,
+            multiple    => 1,
+            description => "The id of the $name");
+
+    }
 
 }
 
@@ -98,12 +112,19 @@ sub _init_dynamic_get_methods {
             #default_order_by => ['name'],
             callback => sub { $self->_get_table_dynamically( $name, @_ ) } );
 
-        # add the optional 'role_id' input param to the get_$names() method
+        # add the optional 'name_id' input param to the get_$names() method
         $method->add_input_parameter( name        => "${name}_id",
             pattern     => $INTEGER,
             required    => 0,
             multiple    => 1,
             description => "The id of the $name");
+
+        # add the optional 'name' input param to the get_$names() method
+        $method->add_input_parameter( name        => "name",
+            pattern     => $TEXT,
+            required    => 0,
+            multiple    => 1,
+            description => "The name of the $name");
 
         # add the optional 'limit' input param to the get_$names() method
         $method->add_input_parameter( name        => "limit",
