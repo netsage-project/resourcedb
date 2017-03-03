@@ -58,6 +58,20 @@ sub _init_get_methods {
                                   multiple    => 1,
                                   description => 'The id of the IP block');
 
+    # add the optional 'limit' input param to the get_ip_blocks() method
+    $method->add_input_parameter( name        => 'limit',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The limit of how many results to return');
+
+    # add the optional 'offset' input param to the get_ip_blocks() method
+    $method->add_input_parameter( name        => 'offset',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The offset (pagination)');
+
     $self->websvc()->register_method( $method );
 
 
