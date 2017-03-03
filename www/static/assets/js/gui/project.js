@@ -12,6 +12,6 @@ function renderMyProjectListElement(project) {
     name.innerHTML = project.name;
 
     row.addEventListener('click', function(e) {
-        window.location.href = '/project/index.html?project_id=' + id;
+        window.location.href = basePath + 'project/index.html?project_id=' + id;
     });
 }

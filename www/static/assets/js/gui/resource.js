@@ -14,7 +14,7 @@ function renderMyResourceListElement(resource) {
     addr.innerHTML = resource.addr_str;
 
     row.addEventListener('click', function(e) {
-        window.location.href = '/resource/index.html?resource_id=' + id;
+        window.location.href = basePath + 'resource/index.html?resource_id=' + id;
     });
 }
 
@@ -38,7 +38,7 @@ function renderResourceListElement(resource) {
     location.innerHTML = resource.country_name;
 
     row.addEventListener('click', function(e) {
-        window.location.href = '/resource/index.html?resource_id=' + id;
+        window.location.href = basePath + 'resource/index.html?resource_id=' + id;
     });
 }
 
