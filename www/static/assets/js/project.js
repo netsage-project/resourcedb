@@ -56,5 +56,13 @@ function resource() {
         console.log(resource);
         renderResourceHeader(resource);
         renderResourceRecord(resource);
+
+        getProject(resource.project_id, function(project) {
+            renderLinkedProjectListElement(project);
+        });
+
+        getOrganization(resource.organization_id, function(org) {
+            renderLinkedOrganizationListElement(org);
+        });
     });
 }
