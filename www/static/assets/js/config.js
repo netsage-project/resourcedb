@@ -1,1 +1,2 @@
-var baseUrl = '/rdb/';
+var basePath = '/rdb/';
+var baseUrl  = '/rdb/';
