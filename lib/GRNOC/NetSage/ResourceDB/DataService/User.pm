@@ -76,12 +76,6 @@ sub get_ip_blocks {
     @where = $role_id_param->process( args => \%args,
                                       where => \@where );
 
-    my %addr_args = ();
-    if ( $args{'addr_str'} ) {
-        %addr_args = ( 'addr_str_like' => $args{'addr_str'} );
-
-    }
-
     # handle optional ip_addr_str
     my $addr_param = GRNOC::MetaParameter->new( name => 'addr_str',
                                                 field => 'ip_block.addr_str' );
@@ -89,6 +83,7 @@ sub get_ip_blocks {
     @where = $addr_param->process( args => \%args,
                                    where => \@where );
 
+    $self->_add_dynamic_parameters( \%args, \@where);
 
     # get the order_by value
     my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
@@ -123,6 +118,26 @@ sub get_ip_blocks {
                                                                  offset => $offset );
 
     return $result;
+
+}
+
+sub _add_dynamic_parameters {
+    my $self = shift;
+    my $args = shift;
+    my $where = shift;
+
+    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        # handle optional $name_id param
+        my $role_id_param = GRNOC::MetaParameter->new( name => "${name}_id",
+            field => "${name}.${name}_id" );
+
+        warn "args: " . Dumper $args;
+        warn "where: " . Dumper $where;
+
+        @$where = $role_id_param->process( args => $args,
+            where => $where );
+
+    }
 
 }
 
