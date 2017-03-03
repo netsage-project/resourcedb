@@ -58,6 +58,14 @@ sub _init_get_methods {
                                   multiple    => 1,
                                   description => 'The id of the IP block');
 
+    # add the optional 'addr_str' logic parameter
+    # acccepts options such as addr_str_like=127.0
+    $method->add_logic_parameter( 
+                                name => "addr_str",
+                                pattern => $TEXT,
+                                description => "The IP/CIDR address to match on",
+    );
+
     # add the optional 'limit' input param to the get_ip_blocks() method
     $method->add_input_parameter( name        => 'limit',
                                   pattern     => $INTEGER,
