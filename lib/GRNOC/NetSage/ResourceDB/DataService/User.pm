@@ -132,9 +132,6 @@ sub _add_dynamic_parameters {
         my $role_id_param = GRNOC::MetaParameter->new( name => "${name}_id",
             field => "${name}.${name}_id" );
 
-        warn "args: " . Dumper $args;
-        warn "where: " . Dumper $where;
-
         @$where = $role_id_param->process( args => $args,
             where => $where );
 

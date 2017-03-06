@@ -38,6 +38,9 @@ sub new {
     # get/store our user data service
     $self->user_ds( GRNOC::NetSage::ResourceDB::DataService::User->new( @_ ) );
 
+    # get/store our external data service
+    $self->external_ds( GRNOC::NetSage::ResourceDB::DataService::External->new( @_ ) );
+
     # get/store our admin data service
     $self->admin_ds( GRNOC::NetSage::ResourceDB::DataService::Admin->new( @_ ) );
 
@@ -151,6 +154,15 @@ sub valid_dynamic_db_names {
     $self->{'valid_dynamic_db_names'} = $valid_dynamic_db_names if ( defined( $valid_dynamic_db_names ) );
 
     return $self->{'valid_dynamic_db_names'};
+}
+
+sub external_ds {
+
+    my ( $self, $external_ds ) = @_;
+
+    $self->{'external_ds'} = $external_ds if ( defined( $external_ds ) );
+
+    return $self->{'external_ds'};
 }
 
 sub user_ds {
