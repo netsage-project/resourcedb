@@ -32,3 +32,39 @@ function getResources(on_success) {
         console.log(err);
     });
 }
+
+// Gets a list of resources from the backend that are filtered by
+// project_id.
+function getResourcesByProjectId(projectId, onSuccess) {
+    var url = baseUrl + 'api/index.cgi?method=get_ip_blocks' + '&project_id=' + projectId.toString();
+    fetch(url, {
+        method: 'get'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            onSuccess(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
+// Gets a list of resources from the backend that are filtered by
+// organization_id.
+function getResourcesByOrganizationId(organizationId, onSuccess) {
+    var url = baseUrl + 'api/index.cgi?method=get_ip_blocks' + '&organization_id=' + organizationId.toString();
+    fetch(url, {
+        method: 'get'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            onSuccess(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
