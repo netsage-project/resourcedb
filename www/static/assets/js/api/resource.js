@@ -68,3 +68,46 @@ function getResourcesByOrganizationId(organizationId, onSuccess) {
         console.log(err);
     });
 }
+
+// Creates a new resouce using the backend api. On success, we
+// redirect to the assoicated resource/index.html page.
+function createResource(name, desc, addr, mask, asn, org_id, country_code,
+                        country_name, continent_code, continent_name,
+                        postal_code, latitude, longitude, project_id,
+                        discipline_id, role_id) {
+    var url = baseUrl + 'api/admin/index.cgi?method=add_ip_blocks';
+    url += '&name=' + name;
+    url += '&description=' + desc;
+    url += '&addr_str=' + addr;
+    url += '&mask=' + mask;
+    url += '&asn=' + asn;
+    url += '&organization_id=' + org_id;
+    url += '&country_code=' + country_code;
+    url += '&country_name='  + country_name;
+    url += '&continent_code='  + continent_code;
+    url += '&continent_name='  + continent_name;
+    url += '&postal_code='  + postal_code;
+    url += '&latitude='  + latitude.toFixed(5);
+    url += '&longitude='  + longitude.toFixed(5);
+    url += '&project_id='  + project_id;
+    url += '&discipline_id='  + discipline_id;
+    url += '&role_id='  + role_id;
+
+    function successCallback(resource) {
+        var id = resource.ip_block_id;
+        window.location.href = basePath + 'resource/index.html?resource_id=' + id;
+    };
+
+    fetch(url, {
+        method: 'get'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            successCallback(json.results[0]);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}

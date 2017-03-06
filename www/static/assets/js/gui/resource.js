@@ -56,7 +56,7 @@ function renderResourceHeader(resource) {
     var desc = document.getElementById('resource_description');
 
     name.innerHTML = resource.name;
-    desc.innerHTML = resource.addr_str;
+    desc.innerHTML = resource.description;
 }
 
 // Given a resouce record, set the innerHTML of the elements
@@ -74,9 +74,89 @@ function renderResourceRecord(resource) {
 
     cidr.innerHTML = resource.addr_str;
     country.innerHTML = resource.country_name;
-    geolocation.innerHTML = resource.latitude.toString() + ' ' + resource.longitude.toString();
+
+    if (resource.latitude == null || resource.longitude == null) {
+        geolocation.innerHTML = 'Location is not available';
+    } else {
+        geolocation.innerHTML = resource.latitude.toString() + ' ' + resource.longitude.toString();
+    }
+
     address.innerHTML = resource.postal_code.toString();
     organization.innerHTML = resource.organization_name;
     role.innerHTML = resource.role_name;
     link.href = '/resource/edit.html?resource_id=' + resource.ip_block_id.toString();
+}
+
+// Sets up submitCreateResource to be called when the create button on
+// resource/new.html is pressed.
+function setupCreateResourceForm() {
+    console.log('setupCreateResourceForm');
+
+    var submit = document.getElementById('create_resource_submit');
+    submit.onclick = submitCreateResource;
+}
+
+// Appends an option to the resource_project drop down box on
+// resource/new.html.
+function renderCreateResourceFormProjectOption(project) {
+    var dropd = document.getElementById('resource_project');
+    var opt = document.createElement('option');
+
+    opt.innerHTML = project.name;
+    opt.setAttribute('value', project.project_id);
+
+    dropd.appendChild(opt);
+}
+
+// Appends an option to the resource_organization drop down box on
+// resource/new.html.
+function renderCreateResourceFormOrganizationOption(org) {
+    var dropd = document.getElementById('resource_organization');
+    var opt = document.createElement('option');
+
+    opt.innerHTML = org.name;
+    opt.setAttribute('value', org.organization_id);
+
+    dropd.appendChild(opt);
+}
+
+// Gathers values from create_resource_form on resource/new.html when
+// the create button is pressed. Passes the collected values to
+// createResource after parameters are validated.
+function submitCreateResource(e) {
+    var form = document.getElementById('create_resource_form');
+    console.log('submitCreateResource');
+    console.log(e);
+    console.log(form.elements);
+
+    var name = form.elements['resource_name'].value;
+    var desc = form.elements['resource_description'].value;
+    var cidr = form.elements['resource_cidr'].value;
+    var args = cidr.split('/');
+    var addr = args[0];
+    var mask = args[1];
+
+    var asn = form.elements['resource_asn'].value;
+
+    var org_id = form.elements['resource_organization'].value;
+
+    var country_code = 'NA';
+    var country_name = form.elements['resource_country'].value;
+
+    var continent_code = 'NA';
+    var continent_name = form.elements['resource_continent'].value;
+
+    var postal_code = form.elements['resource_postal_code'].value;
+
+    var lat = parseFloat(form.elements['resource_latitude'].value);
+    var lon = parseFloat(form.elements['resource_longitude'].value);
+
+    var project_id = form.elements['resource_project'].value;
+
+    var discipline_id = form.elements['resource_discipline'].value;
+    var role_id = form.elements['resource_role'].value;
+
+    createResource(name, desc, addr, mask, asn, org_id, country_code,
+                   country_name, continent_code, continent_name, postal_code,
+                   lat, lon, project_id, discipline_id, role_id);
 }

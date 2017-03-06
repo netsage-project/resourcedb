@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         project();
     } else if (url.pathname === basePath + 'resource/index.html') {
         resource();
+    } else if (url.pathname === basePath + 'resource/new.html') {
+        resourceNew();
     } else if (url.pathname === basePath + 'organization/index.html') {
         organization();
     } else {
@@ -75,6 +77,23 @@ function resource() {
             renderLinkedOrganizationListElement(org);
         });
     });
+}
+
+function resourceNew() {
+    console.log('Loading the new resource page');
+    getOrganizations(function(orgs) {
+        for (var i = 0; i < orgs.length; i++) {
+            renderCreateResourceFormOrganizationOption(orgs[i]);
+        }
+    });
+
+    getProjects(function(projects) {
+        for (var i = 0; i < projects.length; i++) {
+            renderCreateResourceFormProjectOption(projects[i]);
+        }
+    });
+
+    setupCreateResourceForm();
 }
 
 function organization() {
