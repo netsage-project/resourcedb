@@ -132,9 +132,6 @@ function submitCreateResource(e) {
     var name = form.elements['resource_name'].value;
     var desc = form.elements['resource_description'].value;
     var cidr = form.elements['resource_cidr'].value;
-    var args = cidr.split('/');
-    var addr = args[0];
-    var mask = args[1];
 
     var asn = form.elements['resource_asn'].value;
 
@@ -156,7 +153,7 @@ function submitCreateResource(e) {
     var discipline_id = form.elements['resource_discipline'].value;
     var role_id = form.elements['resource_role'].value;
 
-    createResource(name, desc, addr, mask, asn, org_id, country_code,
+    createResource(name, desc, cidr, asn, org_id, country_code,
                    country_name, continent_code, continent_name, postal_code,
                    lat, lon, project_id, discipline_id, role_id);
 }
