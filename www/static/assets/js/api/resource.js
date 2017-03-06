@@ -71,15 +71,14 @@ function getResourcesByOrganizationId(organizationId, onSuccess) {
 
 // Creates a new resouce using the backend api. On success, we
 // redirect to the assoicated resource/index.html page.
-function createResource(name, desc, addr, mask, asn, org_id, country_code,
+function createResource(name, desc, cidr, asn, org_id, country_code,
                         country_name, continent_code, continent_name,
                         postal_code, latitude, longitude, project_id,
                         discipline_id, role_id) {
     var url = baseUrl + 'api/admin/index.cgi?method=add_ip_blocks';
     url += '&name=' + name;
     url += '&description=' + desc;
-    url += '&addr_str=' + addr;
-    url += '&mask=' + mask;
+    url += '&addr_str=' + cidr;
     url += '&asn=' + asn;
     url += '&organization_id=' + org_id;
     url += '&country_code=' + country_code;
@@ -97,6 +96,8 @@ function createResource(name, desc, addr, mask, asn, org_id, country_code,
         var id = resource.ip_block_id;
         window.location.href = basePath + 'resource/index.html?resource_id=' + id;
     };
+
+    console.log(url);
 
     fetch(url, {
         method: 'get'
