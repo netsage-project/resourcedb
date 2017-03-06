@@ -16,3 +16,13 @@ function renderLinkedOrganizationListElement(org) {
         window.location.href = basePath + 'organization/index.html?organization_id=' + id;
     });
 }
+
+// Given a organization record, set the innerHTML of the elements
+// identified by organization_name and organization_description.
+function renderOrganizationHeader(organization) {
+    var name = document.getElementById('organization_name');
+    var desc = document.getElementById('organization_description');
+
+    name.innerHTML = organization.name;
+    desc.innerHTML = organization.organization_id;
+}

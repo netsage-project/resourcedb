@@ -31,3 +31,13 @@ function renderLinkedProjectListElement(project) {
         window.location.href = basePath + 'project/index.html?project_id=' + id;
     });
 }
+
+// Given a project record, set the innerHTML of the elements
+// identified by project_name and project_description.
+function renderProjectHeader(project) {
+    var name = document.getElementById('project_name');
+    var desc = document.getElementById('project_description');
+
+    name.innerHTML = project.name;
+    desc.innerHTML = project.project_id;
+}
