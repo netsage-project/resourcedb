@@ -14,12 +14,16 @@ BuildRequires: perl
 BuildRequires: httpd-devel
 BuildRequires: mod_perl-devel
 
+Requires: GeoIP-GeoLite-data
+Requires: GeoIP-GeoLite-data-extra
 Requires: mariadb
 Requires: mariadb-server
+Requires: perl-Data-Validate-IP
 Requires: perl-DBD-MySQL
+Requires: perl-Geo-IP
 Requires: perl-GRNOC-Config
 Requires: perl-GRNOC-Log
-Requries: perl-MIME-Lite-TT
+Requires: perl-MIME-Lite-TT
 Requires: perl-String-MkPasswd
 
 %description
