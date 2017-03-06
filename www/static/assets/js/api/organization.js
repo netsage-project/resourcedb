@@ -18,14 +18,14 @@ function getOrganization(organizationId, onSuccess) {
 }
 
 // Gets a list of organizations from the backend.
-function getOrganizations(on_success) {
+function getOrganizations(onSuccess) {
     fetch(baseUrl + 'api/index.cgi?method=get_organizations', {
         method: 'get'
     }).then(function(response) {
 
         response.json().then(function(json) {
             console.log(json);
-            on_success(json.results);
+            onSuccess(json.results);
         });
 
     }).catch(function(err) {
