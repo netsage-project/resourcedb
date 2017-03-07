@@ -117,6 +117,16 @@ sub config_data {
     return $self->{'config_data'};
 }
 
+sub dynamic_fields {
+
+    my ( $self, $dynamic_fields ) = @_;
+
+    $self->{'dynamic_fields'} = $dynamic_fields if ( defined( $dynamic_fields ) );
+
+    return $self->{'dynamic_fields'};
+}
+
+
 sub error {
 
     my ( $self, $error ) = @_;
@@ -173,9 +183,7 @@ sub get_table_dynamically {
 
     my $remote_user = $args{'remote_user'};
 
-    my $select_fields = ["${name}.${name}_id",
-                         "$name.name",
-                         ];
+    my $select_fields = "*";
 
     my @where = ();
 
@@ -239,10 +247,17 @@ sub add_table_dynamically {
 
     my $name_val = $args{'name'};
 
+    my $field_obj = $self->dynamic_fields();
+    my @field_list = keys %{ $field_obj->{ $name } };
+    my $fields = {};
+    foreach my $field ( @field_list ) {
+        # add to field list
+        $fields->{ $field } = $args{ $field };
+    }
+
+
     my $results = $self->dbq_rw()->insert( table => $from_sql,
-                                           fields => {
-                                              'name' => $name_val
-                                           }
+                                           fields => $fields
                                          );
 
     if ( !$results ) {
@@ -374,6 +389,8 @@ sub _init {
 
     $self->config( $config );
 
+    $self->_init_dynamic_fields();
+
     # create the database handles
     my $dbq_ro = GRNOC::DatabaseQuery->new( name  => $config->get( '/config/database-name' ),
         user  => $config->get( '/config/database-readonly-username' ),
@@ -411,5 +428,44 @@ sub _init {
     return 1;
 }
 
+
+sub _init_dynamic_fields {
+    my ( $self ) = @_;
+
+    my $fields = {};
+
+    $fields->{'organization'} = {
+        'name' => 1,
+        'description' => 1,
+        'owner' => 1,
+        'email' => 1,
+        'postal_code' => 1,
+        'latitude' => 1,
+        'longitude' => 1,
+        'country_name' => 1,
+        'continent_name' => 1
+    };
+
+    $fields->{'project'} = {
+        'name' => 1,
+        'description' => 1,
+        'owner' => 1,
+        'email' => 1
+    };
+
+    $fields->{'discipline'} = {
+        'name' => 1,
+        'description' => 1
+    };
+
+    $fields->{'role'} = {
+        'name' => 1,
+        'description' => 1
+    };
+
+    $self->dynamic_fields( $fields );
+
+
+}
 
 1;

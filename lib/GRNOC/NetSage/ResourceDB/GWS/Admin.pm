@@ -238,6 +238,7 @@ sub _init_dynamic_add_methods {
             expires => "-1d",
             callback => sub { $self->_add_table_dynamically( $name, @_ ) } );
 
+
         # add the required 'name' input param to all the basic dynamic methods
         $method->add_input_parameter( 
             name        => 'name',
@@ -246,9 +247,90 @@ sub _init_dynamic_add_methods {
             multiple    => 0,
             description => "The name of the $name");
 
+        # add the optional 'description' input param to all the basic dynamic methods
+        $method->add_input_parameter( 
+            name        => 'description',
+            pattern     => $TEXT,
+            required    => 0,
+            multiple    => 0,
+            description => "The description of the $name");
+
+
+
+        # add dynamic fields here
+        my $field_obj = $self->dynamic_fields();
+        my @field_list = keys %{ $field_obj->{ $name } };
+        warn "field list " . Dumper @field_list;
+        my $fields = {};
+        foreach my $field ( @field_list ) {
+            # add optional webservice parameter
+            if ( $field eq "owner" ) {
+                # add the optional 'owner' input param to all the basic dynamic methods
+                $method->add_input_parameter(
+                    name        => $field,
+                    pattern     => $TEXT,
+                    multiple    => 0,
+                    required    => 0,
+                    description => "The owner of the $name");
+
+            } elsif ( $field eq "email" ) {
+                # add the optional 'email' input param to all the basic dynamic methods
+                $method->add_input_parameter(
+                    name        => $field,
+                    pattern     => $TEXT,
+                    multiple    => 0,
+                    required    => 0,
+                    description => "The email of the $name");
+
+            } elsif ( $field eq "postal_code" ) {
+                # add the optional 'postal code' input param to all the basic dynamic methods
+                $method->add_input_parameter(
+                    name        => $field,
+                    pattern     => $TEXT,
+                    multiple    => 0,
+                    required    => 0,
+                    description => "The postal code of the $name");
+
+            } elsif ( $field eq "latitude" ) {
+                # add the optional 'latitude' input param to all the basic dynamic methods
+                $method->add_input_parameter(
+                    name        => $field,
+                    pattern     => $FLOAT,
+                    required    => 0,
+                    multiple    => 0,
+                    description => "The latitude of the $name");
+
+
+            } elsif ( $field eq "longitude" ) {
+                # add the optional 'longitude' input param to all the basic dynamic methods
+                $method->add_input_parameter(
+                    name        => $field,
+                    pattern     => $FLOAT,
+                    required    => 0,
+                    multiple    => 0,
+                    description => "The longitude of the $name");
+
+            } elsif ( $field eq "country_name" ) {
+                # add the optional 'country name' input param to all the basic dynamic methods
+                $method->add_input_parameter(
+                    name        => $field,
+                    pattern     => $TEXT,
+                    required    => 0,
+                    multiple    => 0,
+                    description => "The country name of the $name");
+
+            } elsif ( $field eq "continent_name" ) {
+                # add the optional 'continent_name' input param to all the basic dynamic methods
+                $method->add_input_parameter(
+                    name        => $field,
+                    pattern     => $TEXT,
+                    required    => 0,
+                    multiple    => 0,
+                    description => "The continent_name of the $name");
+
+            }
+        }
         $self->websvc()->register_method( $method );
-
-
 
     }
 
