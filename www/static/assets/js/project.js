@@ -13,12 +13,18 @@ document.addEventListener('DOMContentLoaded', function(event) {
         index();
     } else if (url.pathname === basePath + 'project/index.html') {
         project();
+    } else if (url.pathname === basePath + 'project/new.html') {
+        projectNew();
     } else if (url.pathname === basePath + 'resource/index.html') {
         resource();
     } else if (url.pathname === basePath + 'resource/new.html') {
         resourceNew();
+    } else if (url.pathname === basePath + 'resource/edit.html') {
+        resourceEdit();
     } else if (url.pathname === basePath + 'organization/index.html') {
         organization();
+    } else if (url.pathname === basePath + 'organization/new.html') {
+        organizationNew();
     } else {
         console.log('There is no Javascript available for this page.');
     }
@@ -65,6 +71,11 @@ function project() {
     });
 }
 
+function projectNew() {
+    console.log('Loading the new project page');
+    setupCreateProjectForm();
+}
+
 function resource() {
     var searchParams = new URLSearchParams(window.location.search);
     var id = searchParams.get('resource_id')
@@ -74,13 +85,17 @@ function resource() {
         renderResourceHeader(resource);
         renderResourceRecord(resource);
 
-        getProject(resource.project_id, function(project) {
-            renderLinkedProjectListElement(project);
-        });
+        if (resource.project_id != null) {
+            getProject(resource.project_id, function(project) {
+                renderLinkedProjectListElement(project);
+            });
+        }
 
-        getOrganization(resource.organization_id, function(org) {
-            renderLinkedOrganizationListElement(org);
-        });
+        if (resource.organization_id != null) {
+            getOrganization(resource.organization_id, function(org) {
+                renderLinkedOrganizationListElement(org);
+            });
+        }
     });
 }
 
@@ -101,6 +116,28 @@ function resourceNew() {
     setupCreateResourceForm();
 }
 
+function resourceEdit() {
+    console.log('Loading the edit resource page');
+    var searchParams = new URLSearchParams(window.location.search);
+    var id = searchParams.get('resource_id')
+
+    getOrganizations(function(orgs) {
+        for (var i = 0; i < orgs.length; i++) {
+            renderCreateResourceFormOrganizationOption(orgs[i]);
+        }
+    });
+
+    getProjects(function(projects) {
+        for (var i = 0; i < projects.length; i++) {
+            renderCreateResourceFormProjectOption(projects[i]);
+        }
+    });
+
+    getResource(id, function(resource) {
+        setupEditResourceForm(resource);
+    });
+}
+
 function organization() {
     var searchParams = new URLSearchParams(window.location.search);
     var id = searchParams.get('organization_id')
@@ -118,4 +155,9 @@ function organization() {
             renderResourceListElement(orgs[i]);
         }
     });
+}
+
+function organizationNew() {
+    console.log('Loading the new organization page');
+    setupCreateOrganizationForm();
 }
