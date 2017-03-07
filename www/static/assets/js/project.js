@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         project();
     } else if (url.pathname === basePath + 'project/new.html') {
         projectNew();
+    } else if (url.pathname === basePath + 'project/edit.html') {
+        projectEdit();
     } else if (url.pathname === basePath + 'resource/index.html') {
         resource();
     } else if (url.pathname === basePath + 'resource/new.html') {
@@ -62,6 +64,7 @@ function project() {
     console.log('Loading the project page for project ' + id.toString());
     getProject(id, function(project) {
         renderProjectHeader(project);
+        renderProjectRecord(project);
     });
 
     getResourcesByProjectId(id, function(resources) {
@@ -74,6 +77,16 @@ function project() {
 function projectNew() {
     console.log('Loading the new project page');
     setupCreateProjectForm();
+}
+
+function projectEdit() {
+    console.log('Loading the edit project page');
+    var searchParams = new URLSearchParams(window.location.search);
+    var id = searchParams.get('project_id');
+
+    getProject(id, function(project) {
+        setupEditProjectForm(project);
+    });
 }
 
 function resource() {
@@ -119,7 +132,7 @@ function resourceNew() {
 function resourceEdit() {
     console.log('Loading the edit resource page');
     var searchParams = new URLSearchParams(window.location.search);
-    var id = searchParams.get('resource_id')
+    var id = searchParams.get('resource_id');
 
     getOrganizations(function(orgs) {
         for (var i = 0; i < orgs.length; i++) {

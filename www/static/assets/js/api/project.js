@@ -33,10 +33,17 @@ function getProjects(on_success) {
     });
 }
 
-// Creates a new resouce using the backend api. On success, we
+// Create or edit a new project using the backend api. On success, we
 // redirect to the assoicated project/index.html page.
-function createProject(name, desc, owner, email) {
-    var url = baseUrl + 'api/admin/index.cgi?method=add_projects';
+function createOrEditProject(id, name, desc, owner, email) {
+    var url = baseUrl;
+    if (id === null) {
+        url += 'api/admin/index.cgi?method=add_projects';
+    } else {
+        url += 'api/admin/index.cgi?method=update_projects';
+        url += '&project_id=' + id.toString();
+    }
+
     url += '&name=' + name;
     url += '&description=' + desc;
     url += '&owner=' + owner;
@@ -48,6 +55,28 @@ function createProject(name, desc, owner, email) {
     };
 
     console.log(url);
+
+    fetch(url, {
+        method: 'get'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            successCallback(json.results[0]);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
+function deleteProject(id) {
+    var url = baseUrl + 'api/admin/index.cgi?method=delete_projects';
+    url += '&project_id=' + id.toString();
+
+    function successCallback(resource) {
+        window.location.href = basePath + 'index.html';
+    };
 
     fetch(url, {
         method: 'get'

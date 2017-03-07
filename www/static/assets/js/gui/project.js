@@ -39,21 +39,34 @@ function renderProjectHeader(project) {
     var desc = document.getElementById('project_description');
 
     name.innerHTML = project.name;
-    desc.innerHTML = project.project_id;
+    desc.innerHTML = project.description;
+}
+
+// Given a project record, set the innerHTML of the elements
+// identified by project_owner, and project_email.
+function renderProjectRecord(project) {
+    var owner = document.getElementById('project_owner');
+    var email = document.getElementById('project_email');
+    var link = document.getElementById('project_edit_link');
+
+    owner.innerHTML = project.owner;
+    email.innerHTML = project.email;
+
+    link.href = '/project/edit.html?project_id=' + project.project_id.toString();
 }
 
 // Sets up submitCreateProject to be called when the create button on
 // project/new.html is pressed.
 function setupCreateProjectForm() {
     var submit = document.getElementById('create_project_submit');
-    submit.onclick = submitCreateProject;
+    submit.onclick = submitCreateOrUpdateProject;
 }
 
 
 // Gathers values from create_project_form on project/new.html when
 // the create button is pressed. Passes the collected values to
 // createProject after parameters are validated.
-function submitCreateProject(e) {
+function submitCreateOrUpdateProject(e) {
     var form = document.getElementById('create_project_form');
     console.log('submitCreateProject');
     console.log(form.elements);
@@ -63,5 +76,42 @@ function submitCreateProject(e) {
     var owner = form.elements['project_owner'].value;
     var email = form.elements['project_email'].value;
 
-    createProject(name, desc, owner, email);
+    // Hidden field project_id
+    var project_id = parseInt(form.elements['project_id'].value);
+    if (project_id === -1) {
+        console.log('Creating a new project');
+        createOrEditProject(null, name, desc, owner, email);
+    } else {
+        console.log('Editing project ' + project_id.toString());
+        createOrEditProject(project_id, name, desc, owner, email);
+    }
+}
+
+// Sets up submitEditProject to be called when the edit button on
+// project/edit.html is pressed.
+function setupEditProjectForm(project) {
+    var id = document.getElementById('project_id');
+    var name = document.getElementById('project_name');
+    var desc = document.getElementById('project_description');
+    var owner = document.getElementById('project_owner');
+    var email = document.getElementById('project_email');
+
+    id.value = project.project_id;
+    name.value = project.name;
+    desc.value = project.description;
+    owner.value = project.owner;
+    email.value = project.email;
+
+    var submit = document.getElementById('edit_project_submit');
+    submit.onclick = submitCreateOrUpdateProject;
+
+    var del = document.getElementById('delete_project_submit');
+    del.onclick = function(e) {
+        deleteProject(project.project_id);
+    };
+
+    var cancel = document.getElementById('cancel_project_submit');
+    cancel.onclick = function() {
+        window.location.href = basePath + 'project/index.html?project_id=' + project.project_id;
+    };
 }
