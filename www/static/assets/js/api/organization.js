@@ -32,3 +32,42 @@ function getOrganizations(onSuccess) {
         console.log(err);
     });
 }
+
+// Creates a new organization using the backend api. On success, we
+// redirect to the assoicated organization/index.html page.
+function createOrganization(name, desc, owner, email, country_code,
+                            country_name, continent_code, continent_name,
+                            postal_code, latitude, longitude) {
+    var url = baseUrl + 'api/admin/index.cgi?method=add_organizations';
+    url += '&name=' + name;
+    url += '&description=' + desc;
+    url += '&owner=' + owner;
+    url += '&email=' + email;
+    url += '&country_code=' + country_code;
+    url += '&country_name='  + country_name;
+    url += '&continent_code='  + continent_code;
+    url += '&continent_name='  + continent_name;
+    url += '&postal_code='  + postal_code;
+    url += '&latitude='  + latitude.toFixed(5);
+    url += '&longitude='  + longitude.toFixed(5);
+
+    function successCallback(organization) {
+        var id = organization.organization_id;
+        window.location.href = basePath + 'organization/index.html?organization_id=' + id;
+    };
+
+    console.log(url);
+
+    fetch(url, {
+        method: 'get'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            successCallback(json.results[0]);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}

@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         resourceNew();
     } else if (url.pathname === basePath + 'organization/index.html') {
         organization();
+    } else if (url.pathname === basePath + 'organization/new.html') {
+        organizationNew();
     } else {
         console.log('There is no Javascript available for this page.');
     }
@@ -125,4 +127,9 @@ function organization() {
             renderResourceListElement(orgs[i]);
         }
     });
+}
+
+function organizationNew() {
+    console.log('Loading the new organization page');
+    setupCreateOrganizationForm();
 }
