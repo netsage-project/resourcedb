@@ -30,12 +30,17 @@ var index = function() {
 
     getResources(function(resources) {
         for (var i = 0; i < resources.length; i++) {
-            renderMyResourceListElement(resources[i]);
             renderResourceListElement(resources[i]);
         }
 
-        renderResourceCount(resources.length);
-    });
+         renderResourceCount(resources.length);
+     });
+
+    getOrganizations(function(orgs) {
+        for (var i = 0; i < orgs.length; i++) {
+            renderMyOrganizationListElement(orgs[i]);
+        }
+     });
 
     getProjects(function(projects) {
         for (var i = 0; i < projects.length; i++) {
