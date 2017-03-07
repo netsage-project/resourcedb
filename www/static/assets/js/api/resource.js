@@ -71,11 +71,18 @@ function getResourcesByOrganizationId(organizationId, onSuccess) {
 
 // Creates a new resouce using the backend api. On success, we
 // redirect to the assoicated resource/index.html page.
-function createResource(name, desc, cidr, asn, org_id, country_code,
-                        country_name, continent_code, continent_name,
-                        postal_code, latitude, longitude, project_id,
-                        discipline_id, role_id) {
-    var url = baseUrl + 'api/admin/index.cgi?method=add_ip_blocks';
+function createOrEditResource(id, name, desc, cidr, asn, org_id, country_code,
+                              country_name, continent_code, continent_name,
+                              postal_code, latitude, longitude, project_id,
+                              discipline_id, role_id) {
+    var url = baseUrl;
+    if (id === null) {
+        url += 'api/admin/index.cgi?method=add_ip_blocks';
+    } else {
+        url += 'api/admin/index.cgi?method=update_ip_blocks';
+        url += '&ip_block_id=' + id.toString();
+    }
+
     url += '&name=' + name;
     url += '&description=' + desc;
     url += '&addr_str=' + cidr;
@@ -98,6 +105,28 @@ function createResource(name, desc, cidr, asn, org_id, country_code,
     };
 
     console.log(url);
+
+    fetch(url, {
+        method: 'get'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            successCallback(json.results[0]);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
+function deleteResource(id) {
+    var url = baseUrl + 'api/admin/index.cgi?method=delete_ip_blocks';
+    url += '&ip_block_id=' + id.toString();
+
+    function successCallback(resource) {
+        window.location.href = basePath + 'index.html';
+    };
 
     fetch(url, {
         method: 'get'

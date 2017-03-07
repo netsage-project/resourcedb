@@ -35,7 +35,7 @@
                         <form class="navbar-form navbar-left" target="_self">
                             <div class="form-group">
                                 <label class="control-label" for="search-field"><i class="glyphicon glyphicon-search"></i></label>
-                                <input class="form-control input-lg search-field" type="search" name="search" autocomplete="on" id="search-field">
+                                <input class="form-control input-lg search-field" type="search" name="search" placeholder="10.0.1.1/24" autocomplete="on" id="search-field">
                             </div>
                         </form>
                         <ul class="nav navbar-nav"></ul>
@@ -49,130 +49,51 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h3>PhysicsBigProject </h3>
-                            <p>This is a really big project. </p>
-                            <hr>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <iframe allowfullscreen="" frameborder="0" width="100%" height="250" src="https://www.google.com/maps/embed/v1/place?key=+AIzaSyAZ026nvbMG6mksWIzsEKsOWU-87PkKNhw+&amp;q=Paris%2C+France&amp;zoom=11"></iframe>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h4>Project Information</h4></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
+                    <h3 class="text-left">New Project </h3>
+                    <hr>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <iframe allowfullscreen="" frameborder="0" width="100%" height="250" src="https://www.google.com/maps/embed/v1/place?key=+AIzaSyAZ026nvbMG6mksWIzsEKsOWU-87PkKNhw+&amp;q=bloomington%2C+in&amp;zoom=6"></iframe>
+                    <h4 class="text-left">Science Registry Information</h4>
+                    <form id="create_project_form">
+                        <fieldset name="Awesome">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><strong>Project record </strong></p>
+                                    <div class="form-group">
+                                        <label class="control-label">Name </label>
+                                        <input class="form-control input-sm" type="text" value="IU DTN" placeholder="IU" id="project_name">
+                                        <p class="help-block text-left hidden">Help text for a form field.</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Project Owner</label>
+                                        <input class="form-control input-sm" type="text" value="John Doe" placeholder="1" id="project_owner">
+                                        <p class="help-block hidden">Help text for a form field.</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Project Email</label>
+                                        <input class="form-control input-sm" type="text" value="10.0.1.1.1/24" placeholder="10.1.1.1/24" id="project_email">
+                                        <p class="help-block hidden">Help text for a form field.</p>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="text-right"><a href="edit.html"><i class="glyphicon glyphicon-edit"></i></a></p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="table-responsive">
-                                        <table class="table table-condensed">
-                                            <thead>
-                                                <tr></tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>Owner </td>
-                                                    <td>Edward Balas</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Contact </td>
-                                                    <td>admin@physicsbigproject.org </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Created on</td>
-                                                    <td>Tue Feb 14, 2017</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                    <div class="form-group">
+                                        <label class="control-label">Description </label>
+                                        <textarea class="form-control input-sm" rows="5.5" cols="40" wrap="hard" id="project_description">A simple description</textarea>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <p><strong>Contributors</strong> </p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="table-responsive">
-                                        <table class="table table-condensed">
-                                            <thead>
-                                                <tr></tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>Jonathan Stout</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Edward Balas</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Michael Johnson</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Resources </strong></p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p class="text-right"><a href="../resource/new.html">Add Resource</a></p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-hover table-condensed">
-                                            <thead>
-                                                <tr></tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>IU DTN </td>
-                                                    <td>10.1.1.1/24 </td>
-                                                    <td>An IU DTN</td>
-                                                    <td>Indiana University </td>
-                                                    <td>United States of America </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="../resource/index.html">IU DTN2</a> </td>
-                                                    <td>10.1.1.2/24 </td>
-                                                    <td>An IU DTN </td>
-                                                    <td>Indiana University </td>
-                                                    <td>United States of America </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>IU DTN 3</td>
-                                                    <td>10.1.1.3/24 </td>
-                                                    <td>An IU DTN </td>
-                                                    <td>Indiana University </td>
-                                                    <td>United States of America </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="text-left">
+                        <button class="btn btn-primary" type="button" id="create_project_submit">save </button>
+                        <button class="btn btn-default" type="button">cancel </button>
+                    </p>
                 </div>
             </div>
         </div>

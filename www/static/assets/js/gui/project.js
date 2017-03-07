@@ -41,3 +41,27 @@ function renderProjectHeader(project) {
     name.innerHTML = project.name;
     desc.innerHTML = project.project_id;
 }
+
+// Sets up submitCreateProject to be called when the create button on
+// project/new.html is pressed.
+function setupCreateProjectForm() {
+    var submit = document.getElementById('create_project_submit');
+    submit.onclick = submitCreateProject;
+}
+
+
+// Gathers values from create_project_form on project/new.html when
+// the create button is pressed. Passes the collected values to
+// createProject after parameters are validated.
+function submitCreateProject(e) {
+    var form = document.getElementById('create_project_form');
+    console.log('submitCreateProject');
+    console.log(form.elements);
+
+    var name = form.elements['project_name'].value;
+    var desc = form.elements['project_description'].value;
+    var owner = form.elements['project_owner'].value;
+    var email = form.elements['project_email'].value;
+
+    createProject(name, desc, owner, email);
+}

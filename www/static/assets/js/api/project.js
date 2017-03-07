@@ -32,3 +32,33 @@ function getProjects(on_success) {
         console.log(err);
     });
 }
+
+// Creates a new resouce using the backend api. On success, we
+// redirect to the assoicated project/index.html page.
+function createProject(name, desc, owner, email) {
+    var url = baseUrl + 'api/admin/index.cgi?method=add_projects';
+    url += '&name=' + name;
+    url += '&description=' + desc;
+    url += '&owner=' + owner;
+    url += '&email=' + email;
+
+    function successCallback(project) {
+        var id = project.project_id;
+        window.location.href = basePath + 'project/index.html?project_id=' + id;
+    };
+
+    console.log(url);
+
+    fetch(url, {
+        method: 'get'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            successCallback(json.results[0]);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
