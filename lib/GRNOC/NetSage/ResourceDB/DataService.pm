@@ -252,7 +252,7 @@ sub add_table_dynamically {
     my $fields = {};
     foreach my $field ( @field_list ) {
         # add to field list
-        $fields->{ $field } = $args{ $field };
+        $fields->{ $field } = $args{ $field } if defined $args{ $field };
     }
 
 
@@ -298,12 +298,16 @@ sub update_table_dynamically {
 
     my $name_val = $args{'name'};
 
-    my %fields = (
-        'name' => $name_val,
-    );
+    my $field_obj = $self->dynamic_fields();
+    my @field_list = keys %{ $field_obj->{ $name } };
+    my $fields = {};
+    foreach my $field ( @field_list ) {
+        # add to field list
+        $fields->{ $field } = $args{ $field } if defined $args{ $field };
+    }
 
     my $results = $self->dbq_rw()->update( table => $from_sql,
-                                           fields => \%fields,
+                                           fields => $fields,
                                            where => [-and => \@where],
                                          );
 
