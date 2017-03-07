@@ -18,6 +18,7 @@ use Data::Dumper;
 use GRNOC::NetSage::ResourceDB::DataService;
 use GRNOC::NetSage::ResourceDB::DataService::User;
 use GRNOC::NetSage::ResourceDB::DataService::Admin;
+use GRNOC::NetSage::ResourceDB::DataService::External;
 
 sub new {
 

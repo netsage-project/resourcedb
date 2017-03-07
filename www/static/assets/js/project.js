@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         index();
     } else if (url.pathname === basePath + 'project/index.html') {
         project();
+    } else if (url.pathname === basePath + 'project/new.html') {
+        projectNew();
     } else if (url.pathname === basePath + 'resource/index.html') {
         resource();
     } else if (url.pathname === basePath + 'resource/new.html') {
@@ -63,6 +65,11 @@ function project() {
             renderResourceListElement(resources[i]);
         }
     });
+}
+
+function projectNew() {
+    console.log('Loading the new project page');
+    setupCreateProjectForm();
 }
 
 function resource() {
