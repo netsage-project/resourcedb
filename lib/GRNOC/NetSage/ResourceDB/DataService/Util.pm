@@ -183,6 +183,8 @@ sub update_schema {
     if ($version eq '0.0.1') {
         # Place upgrade script for next schema version here.
         ($version, $err) = $self->upgrade_to_0_0_2($db, $version);
+    } elsif ($version eq '0.0.2') {
+        ($version, $err) = $self->upgrade_to_0_0_3($db, $version);
     } else {
         return($version, "DB already has the latest schema ($version)");
 
@@ -190,6 +192,107 @@ sub update_schema {
 
     return ($version, $err);
 }
+
+sub upgrade_to_0_0_3 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+
+    # Add columns to `organization`
+    my $query = "alter table `organization`
+                 add column `description` text after `name`,
+                 add column `owner` varchar(255) after `description`,
+                 add column `email` varchar(255) after `owner`,
+                 add column `postal_code` varchar(50) after `email`,
+                 add column `latitude` decimal(9,6) after `postal_code`,
+                 add column `longitude` decimal(9,6) after `latitude`,
+                 add column `country_name` varchar(255) after `longitude`,
+                 add column `continent_name` varchar(255) after `country_name
+                ";
+    my $org_ok = $db->do( $query );
+    if ($org_ok) {
+        warn "Added columns to 'organization' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add columns to 'organization' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+    # Add columns to `project`
+    $query = "alter table `project`
+                 add column `description` text after `name`,
+                 add column `owner` varchar(255) after `description`,
+                 add column `email` varchar(255) after `owner`
+                ";
+    my $project_ok = $db->do( $query );
+    if ($project_ok) {
+        warn "Added columns to 'project' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add columns to 'project' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+    # Add column to `discipline`
+    $query = "alter table `discipline`
+                 add column `description` text after `name`
+                ";
+    my $discipline_ok = $db->do( $query );
+    if ($discipline_ok) {
+        warn "Added column to 'discipline' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add columns to 'discipline' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+    # Add column to `role`
+    $query = "alter table `role`
+                 add column `description` text after `name`
+                ";
+    my $role_ok = $db->do( $query );
+    if ($role_ok) {
+        warn "Added column to 'role' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add columns to 'role' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+
+    my $ok = $org_ok && $project_ok && $discipline_ok && $role_ok;
+
+    if ( $ok ) {
+        warn "Schema successfully updated";
+        $version = '0.0.3';
+
+    }
+
+    my $updated_ok = $self->_update_version( $db, $version );
+
+    # in this case "$ok" is the # of affected records
+    return ($ok && $updated_ok, $err);
+
+}
+
 
 sub upgrade_to_0_0_2 {
     my $self    = shift;
@@ -215,8 +318,17 @@ sub upgrade_to_0_0_2 {
 
     }
 
+    my $updated_ok = $self->_update_version( $db, $version );
 
-    $query = "update version set version=?";
+    # in this case "$ok" is the # of affected records
+    return ($ok && $updated_ok, $err);
+
+}
+
+sub _update_version {
+    my ( $self, $db, $version ) = @_;
+    my $err;
+    my $query = "update version set version=?";
     my $updated_ok = $db->do($query, undef, $version);
     if (!$updated_ok) {
         $err = $DBI::errstr;
@@ -230,11 +342,8 @@ sub upgrade_to_0_0_2 {
     } else {
         warn "db version was updated to $version";
     }
-    
 
-    # in this case "$ok" is the # of affected records
-    return ($ok && $updated_ok, $err);
-
+    return $updated_ok;
 }
 
 1;
