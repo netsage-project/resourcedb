@@ -100,6 +100,10 @@ function resource() {
         renderResourceHeader(resource);
         renderResourceRecord(resource);
 
+        getGeoIP(resource.addr_str, function(geoip) {
+            renderGeoIPTable(geoip);
+        });
+
         if (resource.project_id != null) {
             getProject(resource.project_id, function(project) {
                 renderLinkedProjectListElement(project);
