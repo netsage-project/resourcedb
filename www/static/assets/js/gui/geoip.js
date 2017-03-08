@@ -3,6 +3,7 @@
 function renderGeoIPTable(geoip) {
     document.getElementById('geoip_provider').innerHTML = 'Maxmind';
     document.getElementById('geoip_organization').innerHTML = geoip.organization;
+    document.getElementById('geoip_asn').innerHTML = geoip.asn;
     document.getElementById('geoip_country').innerHTML = geoip.country_name;
     document.getElementById('geoip_city').innerHTML = geoip.city;
     document.getElementById('geoip_region').innerHTML = geoip.region;
