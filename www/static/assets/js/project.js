@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         project();
     } else if (url.pathname === basePath + 'project/new.html') {
         projectNew();
+    } else if (url.pathname === basePath + 'project/edit.html') {
+        projectEdit();
     } else if (url.pathname === basePath + 'resource/index.html') {
         resource();
     } else if (url.pathname === basePath + 'resource/new.html') {
@@ -25,6 +27,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         organization();
     } else if (url.pathname === basePath + 'organization/new.html') {
         organizationNew();
+    } else if (url.pathname === basePath + 'organization/edit.html') {
+        organizationEdit();
     } else {
         console.log('There is no Javascript available for this page.');
     }
@@ -62,6 +66,7 @@ function project() {
     console.log('Loading the project page for project ' + id.toString());
     getProject(id, function(project) {
         renderProjectHeader(project);
+        renderProjectRecord(project);
     });
 
     getResourcesByProjectId(id, function(resources) {
@@ -74,6 +79,16 @@ function project() {
 function projectNew() {
     console.log('Loading the new project page');
     setupCreateProjectForm();
+}
+
+function projectEdit() {
+    console.log('Loading the edit project page');
+    var searchParams = new URLSearchParams(window.location.search);
+    var id = searchParams.get('project_id');
+
+    getProject(id, function(project) {
+        setupEditProjectForm(project);
+    });
 }
 
 function resource() {
@@ -119,7 +134,7 @@ function resourceNew() {
 function resourceEdit() {
     console.log('Loading the edit resource page');
     var searchParams = new URLSearchParams(window.location.search);
-    var id = searchParams.get('resource_id')
+    var id = searchParams.get('resource_id');
 
     getOrganizations(function(orgs) {
         for (var i = 0; i < orgs.length; i++) {
@@ -145,9 +160,8 @@ function organization() {
     console.log('Loading the resource page for organization ' + id.toString());
     console.log('Loading the resource page for resource ' + id.toString());
     getOrganization(id, function(org) {
-        console.log(org);
-
         renderOrganizationHeader(org);
+        renderOrganizationRecord(org);
     });
 
     getResourcesByOrganizationId(id, function(orgs) {
@@ -160,4 +174,14 @@ function organization() {
 function organizationNew() {
     console.log('Loading the new organization page');
     setupCreateOrganizationForm();
+}
+
+function organizationEdit() {
+    console.log('Loading the edit organization page');
+    var searchParams = new URLSearchParams(window.location.search);
+    var id = searchParams.get('organization_id');
+
+    getOrganization(id, function(org) {
+        setupEditOrganizationForm(org);
+    });
 }
