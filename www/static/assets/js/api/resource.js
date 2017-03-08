@@ -33,6 +33,24 @@ function getResources(on_success) {
     });
 }
 
+// Gets a list of resources from the backend.
+function getResourcesLike(text, on_success) {
+    var url = baseUrl + 'api/index.cgi?method=get_ip_blocks';
+    url += '&addr_str_like=' + text;
+    fetch(url, {
+        method: 'get'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            on_success(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Gets a list of resources from the backend that are filtered by
 // project_id.
 function getResourcesByProjectId(projectId, onSuccess) {

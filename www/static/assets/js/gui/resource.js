@@ -42,6 +42,10 @@ function renderResourceListElement(resource) {
     });
 }
 
+function renderEmptyResourceList() {
+    document.getElementById('resource_list').innerHTML = '';
+}
+
 // Renders the number of resources resource_list should contain.
 function renderResourceCount(count) {
     var text = document.getElementById('resource_list_count');
@@ -229,5 +233,19 @@ function onResourceCIDRChange(onChange) {
     var cidr = document.getElementById('resource_cidr');
     cidr.addEventListener('change', function(e) {
         onChange(e.target.value);
+    });
+}
+
+// Calls onKeyUp whenever the search box has been updated.
+function onResourceSearchKeyUp(onKeyUp) {
+    var search = document.getElementById('search_field');
+    var form = document.getElementById('search_form');
+
+    form.addEventListener('submit', function(e) {
+        return false;
+    });
+
+    search.addEventListener('keyup', function(e) {
+        onKeyUp(e.target.value);
     });
 }

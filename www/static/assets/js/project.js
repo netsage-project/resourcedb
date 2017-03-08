@@ -57,6 +57,21 @@ var index = function() {
             renderMyProjectListElement(projects[i]);
         }
     });
+
+    onResourceSearchKeyUp(function(input) {
+        if (input === '') {
+            return;
+        }
+
+        getResourcesLike(input, function(resources) {
+            renderEmptyResourceList();
+
+            for (var i = 0; i < resources.length; i++) {
+                renderResourceListElement(resources[i]);
+            }
+            renderResourceCount(resources.length);
+        });
+    });
 }
 
 function project() {
