@@ -55,6 +55,7 @@ sub _init {
 
     $self->_init_config();
     $self->_init_websvc();
+    $self->_init_dynamic_fields();
 
     $self->_init_get_methods();
     $self->_init_add_methods();
@@ -193,6 +194,20 @@ sub websvc {
     return $self->{'websvc'};
 }
 
+sub dynamic_fields {
+
+    my ( $self, $dynamic_fields ) = @_;
+
+    $self->{'dynamic_fields'} = $dynamic_fields if ( defined( $dynamic_fields ) );
+
+    return $self->{'dynamic_fields'};
+}
+
+sub _init_dynamic_fields {
+    my ( $self ) = @_;
+    my $fields = $self->user_ds()->dynamic_fields();
+    $self->dynamic_fields( $fields );
+}
 
 1;
 
