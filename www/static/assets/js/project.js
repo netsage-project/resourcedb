@@ -133,6 +133,10 @@ function resourceNew() {
     });
 
     setupCreateResourceForm();
+
+    onResourceCIDRChange(function(cidr) {
+        getGeoIP(cidr, renderGeoIPTable);
+    });
 }
 
 function resourceEdit() {
