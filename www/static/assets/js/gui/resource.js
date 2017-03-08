@@ -222,3 +222,12 @@ function submitCreateOrUpdateResource(e) {
                              lat, lon, project_id, discipline_id, role_id);
     }
 }
+
+// Calls onChange and passes the updated value of resource_cidr as the
+// first argument.
+function onResourceCIDRChange(onChange) {
+    var cidr = document.getElementById('resource_cidr');
+    cidr.addEventListener('change', function(e) {
+        onChange(e.target.value);
+    });
+}
