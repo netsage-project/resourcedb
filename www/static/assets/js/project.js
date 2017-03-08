@@ -27,6 +27,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         organization();
     } else if (url.pathname === basePath + 'organization/new.html') {
         organizationNew();
+    } else if (url.pathname === basePath + 'organization/edit.html') {
+        organizationEdit();
     } else {
         console.log('There is no Javascript available for this page.');
     }
@@ -158,9 +160,8 @@ function organization() {
     console.log('Loading the resource page for organization ' + id.toString());
     console.log('Loading the resource page for resource ' + id.toString());
     getOrganization(id, function(org) {
-        console.log(org);
-
         renderOrganizationHeader(org);
+        renderOrganizationRecord(org);
     });
 
     getResourcesByOrganizationId(id, function(orgs) {
@@ -173,4 +174,14 @@ function organization() {
 function organizationNew() {
     console.log('Loading the new organization page');
     setupCreateOrganizationForm();
+}
+
+function organizationEdit() {
+    console.log('Loading the edit organization page');
+    var searchParams = new URLSearchParams(window.location.search);
+    var id = searchParams.get('organization_id');
+
+    getOrganization(id, function(org) {
+        setupEditOrganizationForm(org);
+    });
 }
