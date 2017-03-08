@@ -221,5 +221,4 @@ function submitCreateOrUpdateResource(e) {
                              country_name, continent_code, continent_name, postal_code,
                              lat, lon, project_id, discipline_id, role_id);
     }
-
 }
