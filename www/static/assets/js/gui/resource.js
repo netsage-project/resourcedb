@@ -84,7 +84,7 @@ function renderResourceRecord(resource) {
     address.innerHTML = resource.postal_code.toString();
     organization.innerHTML = resource.organization_name;
     role.innerHTML = resource.role_name;
-    link.href = '/resource/edit.html?resource_id=' + resource.ip_block_id.toString();
+    link.href = basePath + 'resource/edit.html?resource_id=' + resource.ip_block_id.toString();
 }
 
 // Sets up submitCreateResource to be called when the create button on
