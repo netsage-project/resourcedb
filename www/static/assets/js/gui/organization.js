@@ -48,7 +48,7 @@ function renderOrganizationHeader(organization) {
 // identified by organization_owner, and organization_email.
 function renderOrganizationRecord(organization) {
     var link = document.getElementById('organization_edit_link');
-    link.href = '/organization/edit.html?organization_id=' + organization.organization_id.toString();
+    link.href = basePath + 'organization/edit.html?organization_id=' + organization.organization_id.toString();
 
     document.getElementById('organization_owner').innerHTML = organization.owner;
     document.getElementById('organization_email').innerHTML = organization.email;

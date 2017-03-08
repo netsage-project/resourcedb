@@ -42,6 +42,10 @@ function renderResourceListElement(resource) {
     });
 }
 
+function renderEmptyResourceList() {
+    document.getElementById('resource_list').innerHTML = '';
+}
+
 // Renders the number of resources resource_list should contain.
 function renderResourceCount(count) {
     var text = document.getElementById('resource_list_count');
@@ -84,7 +88,7 @@ function renderResourceRecord(resource) {
     address.innerHTML = resource.postal_code.toString();
     organization.innerHTML = resource.organization_name;
     role.innerHTML = resource.role_name;
-    link.href = '/resource/edit.html?resource_id=' + resource.ip_block_id.toString();
+    link.href = basePath + 'resource/edit.html?resource_id=' + resource.ip_block_id.toString();
 }
 
 // Sets up submitCreateResource to be called when the create button on
@@ -221,4 +225,28 @@ function submitCreateOrUpdateResource(e) {
                              country_name, continent_code, continent_name, postal_code,
                              lat, lon, project_id, discipline_id, role_id);
     }
+}
+
+// Calls onChange and passes the updated value of resource_cidr as the
+// first argument.
+function onResourceCIDRChange(onChange) {
+    var cidr = document.getElementById('resource_cidr');
+    cidr.addEventListener('change', function(e) {
+        onChange(e.target.value);
+    });
+}
+
+// Calls onKeyUp whenever the search_field has been updated, and
+// disables form submit behavior on search_form.
+function onResourceSearchKeyUp(onKeyUp) {
+    var search = document.getElementById('search_field');
+    var form = document.getElementById('search_form');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+    }, false);
+
+    search.addEventListener('keyup', function(e) {
+        onKeyUp(e.target.value);
+    });
 }

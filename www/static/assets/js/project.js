@@ -57,6 +57,21 @@ var index = function() {
             renderMyProjectListElement(projects[i]);
         }
     });
+
+    onResourceSearchKeyUp(function(input) {
+        if (input === '') {
+            return;
+        }
+
+        getResourcesLike(input, function(resources) {
+            renderEmptyResourceList();
+
+            for (var i = 0; i < resources.length; i++) {
+                renderResourceListElement(resources[i]);
+            }
+            renderResourceCount(resources.length);
+        });
+    });
 }
 
 function project() {
@@ -100,6 +115,10 @@ function resource() {
         renderResourceHeader(resource);
         renderResourceRecord(resource);
 
+        getGeoIP(resource.addr_str, function(geoip) {
+            renderGeoIPTable(geoip);
+        });
+
         if (resource.project_id != null) {
             getProject(resource.project_id, function(project) {
                 renderLinkedProjectListElement(project);
@@ -129,6 +148,10 @@ function resourceNew() {
     });
 
     setupCreateResourceForm();
+
+    onResourceCIDRChange(function(cidr) {
+        getGeoIP(cidr, renderGeoIPTable);
+    });
 }
 
 function resourceEdit() {
