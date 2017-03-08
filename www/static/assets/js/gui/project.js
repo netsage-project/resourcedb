@@ -52,7 +52,7 @@ function renderProjectRecord(project) {
     owner.innerHTML = project.owner;
     email.innerHTML = project.email;
 
-    link.href = '/project/edit.html?project_id=' + project.project_id.toString();
+    link.href = basePath + 'project/edit.html?project_id=' + project.project_id.toString();
 }
 
 // Sets up submitCreateProject to be called when the create button on

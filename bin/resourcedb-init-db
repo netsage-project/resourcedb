@@ -76,6 +76,17 @@ sub main {
   <database-host>$host</database-host>
   <database-port>$port</database-port>
   <database-query-debug>0</database-query-debug>
+
+  <geoip>
+    <config_files>
+      <country>/usr/share/GeoIP/GeoIP.dat</country>
+      <country_ipv6>/usr/share/GeoIP/GeoIPv6.dat</country_ipv6>
+      <city>/usr/share/GeoIP/GeoIPCity.dat</city>
+      <city_ipv6>/usr/share/GeoIP/GeoIPCityv6.dat</city_ipv6>
+      <asn>/usr/share/GeoIP/GeoIPASNum.dat</asn>
+      <asn_ipv6>/usr/share/GeoIP/GeoIPASNumv6.dat</asn_ipv6>
+    </config_files>
+  </geoip>
 </config>
 END
 

@@ -84,7 +84,7 @@ function renderResourceRecord(resource) {
     address.innerHTML = resource.postal_code.toString();
     organization.innerHTML = resource.organization_name;
     role.innerHTML = resource.role_name;
-    link.href = '/resource/edit.html?resource_id=' + resource.ip_block_id.toString();
+    link.href = basePath + 'resource/edit.html?resource_id=' + resource.ip_block_id.toString();
 }
 
 // Sets up submitCreateResource to be called when the create button on
@@ -221,4 +221,13 @@ function submitCreateOrUpdateResource(e) {
                              country_name, continent_code, continent_name, postal_code,
                              lat, lon, project_id, discipline_id, role_id);
     }
+}
+
+// Calls onChange and passes the updated value of resource_cidr as the
+// first argument.
+function onResourceCIDRChange(onChange) {
+    var cidr = document.getElementById('resource_cidr');
+    cidr.addEventListener('change', function(e) {
+        onChange(e.target.value);
+    });
 }
