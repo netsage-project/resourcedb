@@ -236,14 +236,15 @@ function onResourceCIDRChange(onChange) {
     });
 }
 
-// Calls onKeyUp whenever the search box has been updated.
+// Calls onKeyUp whenever the search_field has been updated, and
+// disables form submit behavior on search_form.
 function onResourceSearchKeyUp(onKeyUp) {
     var search = document.getElementById('search_field');
     var form = document.getElementById('search_form');
 
     form.addEventListener('submit', function(e) {
-        return false;
-    });
+        e.preventDefault();
+    }, false);
 
     search.addEventListener('keyup', function(e) {
         onKeyUp(e.target.value);
