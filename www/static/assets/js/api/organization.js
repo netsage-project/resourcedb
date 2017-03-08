@@ -35,10 +35,17 @@ function getOrganizations(onSuccess) {
 
 // Creates a new organization using the backend api. On success, we
 // redirect to the assoicated organization/index.html page.
-function createOrganization(name, desc, owner, email, country_code,
+function createOrganization(id, name, desc, owner, email, country_code,
                             country_name, continent_code, continent_name,
                             postal_code, latitude, longitude) {
-    var url = baseUrl + 'api/admin/index.cgi?method=add_organizations';
+    var url = baseUrl;
+    if (id === null) {
+        url += 'api/admin/index.cgi?method=add_organizations';
+    } else {
+        url += 'api/admin/index.cgi?method=update_organizations';
+        url += '&organization_id=' + id.toString();
+    }
+
     url += '&name=' + name;
     url += '&description=' + desc;
     url += '&owner=' + owner;
@@ -57,6 +64,28 @@ function createOrganization(name, desc, owner, email, country_code,
     };
 
     console.log(url);
+
+    fetch(url, {
+        method: 'get'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            successCallback(json.results[0]);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
+function deleteOrganization(id) {
+    var url = baseUrl + 'api/admin/index.cgi?method=delete_organizations';
+    url += '&organization_id=' + id.toString();
+
+    function successCallback(organization) {
+        window.location.href = basePath + 'index.html';
+    };
 
     fetch(url, {
         method: 'get'
