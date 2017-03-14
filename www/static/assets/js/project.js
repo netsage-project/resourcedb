@@ -71,18 +71,25 @@ var index = function() {
     });
 
     onResourceSearchKeyUp(function(input) {
-        if (input === '') {
-            return;
+        if (input === null || input === '') {
+            getResources(function(resources) {
+                renderEmptyResourceList();
+
+                for (var i = 0; i < resources.length; i++) {
+                    renderResourceListElement(resources[i]);
+                }
+                renderResourceCount(resources.length);
+            });
+        } else {
+            getResourcesLike(input, function(resources) {
+                renderEmptyResourceList();
+
+                for (var i = 0; i < resources.length; i++) {
+                    renderResourceListElement(resources[i]);
+                }
+                renderResourceCount(resources.length);
+            });
         }
-
-        getResourcesLike(input, function(resources) {
-            renderEmptyResourceList();
-
-            for (var i = 0; i < resources.length; i++) {
-                renderResourceListElement(resources[i]);
-            }
-            renderResourceCount(resources.length);
-        });
     });
 }
 
