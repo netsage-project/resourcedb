@@ -1,0 +1,38 @@
+=head1 NAME
+
+GRNOC::NetSage::ResourceDB::GWS::User - GlobalNOC NetSage::ResourceDB Web Services Object for User core data
+
+=head1 SYNOPSIS
+
+  use GRNOC::NetSage::ResourceDB::GWS::User;
+
+  my $websvc = GRNOC::NetSage::ResourceDB::GWS::User->new( config_file => '/etc/grnoc/netsage/resourcedb/config.xml' );
+
+  $websvc->handle_request();
+
+=head1 DESCRIPTION
+
+This library implements the base B<GRNOC::NetSage::ResourceDB::GWS> object which dispatches web
+service requests for User related data (read-write requests).  Typically all you need to do is call the
+B<handle_request()> method which will call that method in the internal
+B<GRNOC::WebService::Dispatcher> object.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( OPTIONS )
+
+Inherits the constructor from the base B<GRNOC::NetSage::ResourceDB::GWS> object.  This library will
+also create a B<GRNOC::NetSage::ResourceDB::DataService::User> object and store it internally when
+registering all of the B<GRNOC::NetSage::ResourceDB::WebService> methods.
+
+=back
+
+=head1 AUTHOR
+
+GRNOC Software Engineering <globalnoc@iu.edu>
+
+=head1 COPYRIGHT
+
+Copyright(C) 2017 The Trustees of Indiana University

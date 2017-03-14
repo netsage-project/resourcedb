@@ -1,6 +1,6 @@
 Summary:   NetSage Resource Database
 Name:      resourcedb
-Version:   0.0.2
+Version:   0.0.3
 Release:   %{_buildno}%{?dist}
 License:   Apache
 Group:     GRNOC
@@ -39,18 +39,33 @@ NetSage Resource Database (Science Registry)
 # Perl modules
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage
 %{__install} lib/GRNOC/NetSage/ResourceDB.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB.pod
 
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB/DataService.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService.pod
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB/GWS.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS.pod
 
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService
+%{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Admin.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Admin.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Admin.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Admin.pod
+%{__install} lib/GRNOC/NetSage/ResourceDB/DataService/External.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/External.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB/DataService/External.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/External.pod
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Result.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Result.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Result.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Result.pod
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/User.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/User.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB/DataService/User.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/User.pod
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Util.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Util.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Util.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Util.pod
 
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS
+%{__install} lib/GRNOC/NetSage/ResourceDB/GWS/Admin.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/Admin.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB/GWS/Admin.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/Admin.pod
+%{__install} lib/GRNOC/NetSage/ResourceDB/GWS/External.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/External.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB/GWS/External.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/External.pod
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS/User.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/User.pm
+%{__install} lib/GRNOC/NetSage/ResourceDB/GWS/User.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/User.pod
 
 # HTTP and web files
 %{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www/static
@@ -76,12 +91,27 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %{perl_vendorlib}/GRNOC/NetSage/ResourceDB.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB.pod
 %{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService.pod
 %{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Result.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Result.pod
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Admin.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Admin.pod
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/External.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/External.pod
 %{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/User.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/User.pod
 %{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Util.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Util.pod
 %{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS.pod
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/Admin.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/Admin.pod
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/External.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/External.pod
 %{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/User.pm
+%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/User.pod
 
 %{_datadir}/resourcedb/www/static/
 
