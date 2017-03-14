@@ -37,14 +37,24 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 var index = function() {
     console.log('Loading the index page.');
+    var searchParams = new URLSearchParams(window.location.search);
+    var query = searchParams.get('search');
 
-    getResources(function(resources) {
-        for (var i = 0; i < resources.length; i++) {
-            renderResourceListElement(resources[i]);
-        }
-
-         renderResourceCount(resources.length);
-     });
+    if (query === null || query === '') {
+        getResources(function(resources) {
+            for (var i = 0; i < resources.length; i++) {
+                renderResourceListElement(resources[i]);
+            }
+            renderResourceCount(resources.length);
+        });
+    } else {
+        getResourcesLike(query, function(resources) {
+            for (var i = 0; i < resources.length; i++) {
+                renderResourceListElement(resources[i]);
+            }
+            renderResourceCount(resources.length);
+        });
+    }
 
     getOrganizations(function(orgs) {
         for (var i = 0; i < orgs.length; i++) {
@@ -89,11 +99,19 @@ function project() {
             renderResourceListElement(resources[i]);
         }
     });
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
+    });
 }
 
 function projectNew() {
     console.log('Loading the new project page');
     setupCreateProjectForm();
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
+    });
 }
 
 function projectEdit() {
@@ -103,6 +121,10 @@ function projectEdit() {
 
     getProject(id, function(project) {
         setupEditProjectForm(project);
+    });
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
     });
 }
 
@@ -131,6 +153,10 @@ function resource() {
             });
         }
     });
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
+    });
 }
 
 function resourceNew() {
@@ -151,6 +177,10 @@ function resourceNew() {
 
     onResourceCIDRChange(function(cidr) {
         getGeoIP(cidr, renderGeoIPTable);
+    });
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
     });
 }
 
@@ -174,6 +204,10 @@ function resourceEdit() {
     getResource(id, function(resource) {
         setupEditResourceForm(resource);
     });
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
+    });
 }
 
 function organization() {
@@ -181,7 +215,6 @@ function organization() {
     var id = searchParams.get('organization_id')
 
     console.log('Loading the resource page for organization ' + id.toString());
-    console.log('Loading the resource page for resource ' + id.toString());
     getOrganization(id, function(org) {
         renderOrganizationHeader(org);
         renderOrganizationRecord(org);
@@ -192,11 +225,19 @@ function organization() {
             renderResourceListElement(orgs[i]);
         }
     });
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
+    });
 }
 
 function organizationNew() {
     console.log('Loading the new organization page');
     setupCreateOrganizationForm();
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
+    });
 }
 
 function organizationEdit() {
@@ -206,5 +247,9 @@ function organizationEdit() {
 
     getOrganization(id, function(org) {
         setupEditOrganizationForm(org);
+    });
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
     });
 }
