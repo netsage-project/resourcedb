@@ -59,6 +59,15 @@ function renderOrganizationRecord(organization) {
 function setupCreateOrganizationForm() {
     console.log('setupCreateOrganizationForm');
 
+    var country = document.getElementById('organization_country');
+    for (var i = 0; i < countries.length; i++) {
+        var opt = document.createElement('option');
+
+        opt.innerHTML = countries[i];
+        opt.setAttribute('value', countries[i]);
+        country.appendChild(opt);
+    }
+
     var submit = document.getElementById('create_organization_submit');
     submit.onclick = submitCreateOrUpdateOrganization;
 }
@@ -109,7 +118,17 @@ function setupEditOrganizationForm(org) {
     document.getElementById('organization_email').value = org.email;
 
     document.getElementById('organization_postal_code').value = org.postal_code;
-    document.getElementById('organization_country').value = org.country_name;
+
+    var country = document.getElementById('organization_country');
+    for (var i = 0; i < countries.length; i++) {
+        var opt = document.createElement('option');
+
+        opt.innerHTML = countries[i];
+        opt.setAttribute('value', countries[i]);
+        country.appendChild(opt);
+    }
+    country.value = org.country_name;
+
     document.getElementById('organization_continent').value = org.continent_name;
 
     document.getElementById('organization_latitude').value = org.latitude || 0.0;
