@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
     if (url.pathname === basePath || url.pathname === basePath + 'index.html') {
         index();
+    } else if (url.pathname === basePath + 'about.html') {
+        about();
     } else if (url.pathname === basePath + 'project/index.html') {
         project();
     } else if (url.pathname === basePath + 'project/new.html') {
@@ -81,6 +83,14 @@ var index = function() {
             }
             renderResourceCount(resources.length);
         });
+    });
+}
+
+function about() {
+    console.log('Loading the about page.');
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
     });
 }
 
@@ -203,6 +213,11 @@ function resourceEdit() {
 
     getResource(id, function(resource) {
         setupEditResourceForm(resource);
+        getGeoIP(resource.addr_str, renderGeoIPTable);
+    });
+
+    onResourceCIDRChange(function(cidr) {
+        getGeoIP(cidr, renderGeoIPTable);
     });
 
     onResourceSearchSubmit(function(query) {
