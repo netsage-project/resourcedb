@@ -32,10 +32,10 @@
                         <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
                     </div>
                     <div class="collapse navbar-collapse" id="navcol-1">
-                        <form class="navbar-form navbar-left" target="_self">
+                        <form class="navbar-form navbar-left" target="_self" id="search_form">
                             <div class="form-group">
                                 <label class="control-label" for="search-field"><i class="glyphicon glyphicon-search"></i></label>
-                                <input class="form-control input-lg search-field" type="search" name="search" placeholder="10.0.1.1/24" autocomplete="on" id="search-field">
+                                <input class="form-control input-lg search-field" type="search" name="search" autocomplete="on" id="search_field">
                             </div>
                         </form>
                         <ul class="nav navbar-nav"></ul>
@@ -155,6 +155,8 @@
     </div>
     <script src="../assets/js/jquery.min.js"></script>
     <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../assets/js/polyfill/urlsearchparams.js"></script>
+    <script src="../assets/js/polyfill/fetch.js"></script>
     <script src="../assets/js/api/geoip.js"></script>
     <script src="../assets/js/gui/geoip.js"></script>
     <script src="../assets/js/config.js"></script>
@@ -165,6 +167,8 @@
     <script src="../assets/js/api/project.js"></script>
     <script src="../assets/js/gui/resource.js"></script>
     <script src="../assets/js/api/resource.js"></script>
+    <script src="../assets/js/api/search.js"></script>
+    <script src="../assets/js/gui/search.js"></script>
 </body>
 
 </html>
