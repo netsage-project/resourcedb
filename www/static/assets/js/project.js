@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
     if (url.pathname === basePath || url.pathname === basePath + 'index.html') {
         index();
+    } else if (url.pathname === basePath + 'about.html') {
+        about();
     } else if (url.pathname === basePath + 'project/index.html') {
         project();
     } else if (url.pathname === basePath + 'project/new.html') {
@@ -69,18 +71,33 @@ var index = function() {
     });
 
     onResourceSearchKeyUp(function(input) {
-        if (input === '') {
-            return;
+        if (input === null || input === '') {
+            getResources(function(resources) {
+                renderEmptyResourceList();
+
+                for (var i = 0; i < resources.length; i++) {
+                    renderResourceListElement(resources[i]);
+                }
+                renderResourceCount(resources.length);
+            });
+        } else {
+            getResourcesLike(input, function(resources) {
+                renderEmptyResourceList();
+
+                for (var i = 0; i < resources.length; i++) {
+                    renderResourceListElement(resources[i]);
+                }
+                renderResourceCount(resources.length);
+            });
         }
+    });
+}
 
-        getResourcesLike(input, function(resources) {
-            renderEmptyResourceList();
+function about() {
+    console.log('Loading the about page.');
 
-            for (var i = 0; i < resources.length; i++) {
-                renderResourceListElement(resources[i]);
-            }
-            renderResourceCount(resources.length);
-        });
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
     });
 }
 
@@ -203,6 +220,11 @@ function resourceEdit() {
 
     getResource(id, function(resource) {
         setupEditResourceForm(resource);
+        getGeoIP(resource.addr_str, renderGeoIPTable);
+    });
+
+    onResourceCIDRChange(function(cidr) {
+        getGeoIP(cidr, renderGeoIPTable);
     });
 
     onResourceSearchSubmit(function(query) {
