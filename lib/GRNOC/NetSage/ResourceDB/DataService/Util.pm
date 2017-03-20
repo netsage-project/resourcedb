@@ -193,6 +193,97 @@ sub update_schema {
     return ($version, $err);
 }
 
+sub upgrade_to_0_0_4 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+
+    # Add columns to `organization`
+    my $query = "alter table `organization`
+                 add column `url` varchar(255) after `description`,
+                ";
+    my $org_ok = $db->do( $query );
+    if ($org_ok) {
+        warn "Added columns to 'organization' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add columns to 'organization' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+    # Add columns to `project`
+    $query = "alter table `project`
+                 add column `url` varchar(255) after `description`,
+                ";
+    my $project_ok = $db->do( $query );
+    if ($project_ok) {
+        warn "Added columns to 'project' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add columns to 'project' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+    # Add column to `discipline`
+    $query = "alter table `discipline`
+                 add column `url` text after `description`
+                ";
+    my $discipline_ok = $db->do( $query );
+    if ($discipline_ok) {
+        warn "Added column to 'discipline' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add columns to 'discipline' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+    # Add column to `role`
+    $query = "alter table `role`
+                 add column `url` text after `description`
+                ";
+    my $role_ok = $db->do( $query );
+    if ($role_ok) {
+        warn "Added column to 'role' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add columns to 'role' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+
+    my $ok = $org_ok && $project_ok && $discipline_ok && $role_ok;
+
+    if ( $ok ) {
+        warn "Schema successfully updated";
+        $version = '0.0.4';
+
+    }
+
+    my $updated_ok = $self->_update_version( $db, $version );
+
+    # in this case "$ok" is the # of affected records
+    return ($ok && $updated_ok, $err);
+
+}
+
 sub upgrade_to_0_0_3 {
     my $self    = shift;
     my $db      = shift;
@@ -300,8 +391,7 @@ sub upgrade_to_0_0_2 {
     my $version = shift;
 
     my $err = undef;
-    # ALTER table table_name
-    #     Add column column_name57 integer AFTER column_name56
+
     my $query = "alter table `ip_block` add column `description` text after `name`";
     my $ok = $db->do( $query );
     if (!$ok) {
