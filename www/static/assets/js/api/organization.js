@@ -4,7 +4,8 @@
 function getOrganization(organizationId, onSuccess) {
     var url = baseUrl + 'api/index.cgi?method=get_organizations' + '&organization_id=' + organizationId.toString();
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -20,7 +21,8 @@ function getOrganization(organizationId, onSuccess) {
 // Gets a list of organizations from the backend.
 function getOrganizations(onSuccess) {
     fetch(baseUrl + 'api/index.cgi?method=get_organizations', {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -66,7 +68,8 @@ function createOrganization(id, name, desc, owner, email, country_code,
     console.log(url);
 
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -88,7 +91,8 @@ function deleteOrganization(id) {
     };
 
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {

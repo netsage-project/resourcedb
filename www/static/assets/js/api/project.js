@@ -4,7 +4,8 @@
 function getProject(projectId, onSuccess) {
     var url = baseUrl + 'api/index.cgi?method=get_projects' + '&project_id=' + projectId.toString();
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -20,7 +21,8 @@ function getProject(projectId, onSuccess) {
 // Gets a list of projects from the backend.
 function getProjects(on_success) {
     fetch(baseUrl + 'api/index.cgi?method=get_projects', {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -57,7 +59,8 @@ function createOrEditProject(id, name, desc, owner, email) {
     console.log(url);
 
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -79,7 +82,8 @@ function deleteProject(id) {
     };
 
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {

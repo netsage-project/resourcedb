@@ -1,0 +1,47 @@
+=head1 NAME
+
+GRNOC::NetSage::ResourceDB::DataService::User - GlobalNOC NetSage::ResourceDB WebService User Library Private Methods
+
+=head1 SYNOPSIS
+
+ my $gws = GRNOC::NetSage::ResourceDB::DataService::User->new( config_file => '/etc/grnoc/netsage/resourcedb/config.xml' );
+
+  $gws->handle_request();
+
+=head1 DESCRIPTION
+
+This library is responsible for providing a separate "User" interface to the ResourceDB GWS methods (the read-only 
+methods). It only allows access to the methods that unauthenticated users are allowed to use. It registers GRNOC::WebService::Method 
+instances to the dispatcher object to make all of the webservice methods and their callback behavior available.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( OPTIONS )
+
+=over 4
+
+=item config_file <STRING> [optional]
+
+The location of the NetSage::ResourceDB webservice config file, typically '/etc/grnoc/netsage/resourcedb/config.xml'
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item No public methods
+
+=back
+
+=head1 AUTHOR
+GRNOC Software Engineering <globalnoc@iu.edu>
+
+=head1 COPYRIGHT
+
+Copyright(C) 2017 The Trustees of Indiana University
+
