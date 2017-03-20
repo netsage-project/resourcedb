@@ -73,9 +73,9 @@ NetSage Resource Database (Science Registry)
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS/User.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/User.pod
 
 # HTTP and web files
-%{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www/static
+%{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www
 
-cp -ar www/static/* %{buildroot}%{_datadir}/resourcedb/www/static
+cp -ar www/* %{buildroot}%{_datadir}/resourcedb/www
 
 # Configuration and schema files
 %{__install} -d -p %{buildroot}%{_sysconfdir}/grnoc/netsage/resourcedb
@@ -118,7 +118,7 @@ rm -rf $RPM_BUILD_ROOT
 %{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/User.pm
 %{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/User.pod
 
-%{_datadir}/resourcedb/www/static/
+%{_datadir}/resourcedb/www/
 
 %{_sysconfdir}/grnoc/netsage/resourcedb/resourcedb.sql
 
