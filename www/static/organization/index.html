@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../assets/css/Footer-Basic.css">
     <link rel="stylesheet" href="../assets/css/Footer-Clean.css">
     <link rel="stylesheet" href="../assets/css/Header-Dark.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css">
     <link rel="stylesheet" href="../assets/css/Map-Clean.css">
     <link rel="stylesheet" href="../assets/css/styles.css">
 <link rel="icon" href="../assets/img/logoNoShadow.png" type="image/x-icon" />
@@ -53,7 +54,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <iframe allowfullscreen="" frameborder="0" width="100%" height="250" src="https://www.google.com/maps/embed/v1/place?key=+AIzaSyAZ026nvbMG6mksWIzsEKsOWU-87PkKNhw+&amp;q=bloomington%2C+in&amp;zoom=6"></iframe>
+                            <div id="mapid" style="width:100%;height:200px;"></div>
                         </div>
                     </div>
                     <div class="row">
@@ -162,11 +163,11 @@
     </div>
     <script src="../assets/js/jquery.min.js"></script>
     <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../assets/js/config.js"></script>
     <script src="../assets/js/polyfill/urlsearchparams.js"></script>
     <script src="../assets/js/polyfill/fetch.js"></script>
     <script src="../assets/js/api/geoip.js"></script>
     <script src="../assets/js/gui/geoip.js"></script>
-    <script src="../assets/js/config.js"></script>
     <script src="../assets/js/project.js"></script>
     <script src="../assets/js/api/organization.js"></script>
     <script src="../assets/js/gui/organization.js"></script>
@@ -176,6 +177,9 @@
     <script src="../assets/js/api/resource.js"></script>
     <script src="../assets/js/api/search.js"></script>
     <script src="../assets/js/gui/search.js"></script>
+    <script src="../assets/js/api/map.js"></script>
+    <script src="../assets/js/gui/map.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 </body>
 
 </html>
