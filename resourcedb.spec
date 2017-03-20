@@ -14,7 +14,7 @@ BuildRequires: perl
 BuildRequires: httpd-devel
 BuildRequires: mod_perl-devel
 
-%if %{?dist} == "el6"
+%if 0%{?rhel} < 7
 Requires: GeoIP-GeoLite-data
 Requires: GeoIP-GeoLite-data-extra
 %else
