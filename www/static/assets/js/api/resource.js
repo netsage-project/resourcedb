@@ -4,7 +4,8 @@
 function getResource(resourceId, onSuccess) {
     var url = baseUrl + 'api/index.cgi?method=get_ip_blocks' + '&ip_block_id=' + resourceId.toString();
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -20,7 +21,8 @@ function getResource(resourceId, onSuccess) {
 // Gets a list of resources from the backend.
 function getResources(on_success) {
     fetch(baseUrl + 'api/index.cgi?method=get_ip_blocks', {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -38,7 +40,8 @@ function getResourcesLike(text, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_ip_blocks';
     url += '&addr_str_like=' + text;
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -56,7 +59,8 @@ function getResourcesLike(text, on_success) {
 function getResourcesByProjectId(projectId, onSuccess) {
     var url = baseUrl + 'api/index.cgi?method=get_ip_blocks' + '&project_id=' + projectId.toString();
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -74,7 +78,8 @@ function getResourcesByProjectId(projectId, onSuccess) {
 function getResourcesByOrganizationId(organizationId, onSuccess) {
     var url = baseUrl + 'api/index.cgi?method=get_ip_blocks' + '&organization_id=' + organizationId.toString();
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -125,7 +130,8 @@ function createOrEditResource(id, name, desc, cidr, asn, org_id, country_code,
     console.log(url);
 
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
@@ -147,7 +153,8 @@ function deleteResource(id) {
     };
 
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
