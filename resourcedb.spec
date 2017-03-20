@@ -14,8 +14,13 @@ BuildRequires: perl
 BuildRequires: httpd-devel
 BuildRequires: mod_perl-devel
 
+%if 0%{?rhel} < 7
 Requires: GeoIP-GeoLite-data
 Requires: GeoIP-GeoLite-data-extra
+%else
+Requires: GeoIP
+Requires: GeoIP-data
+%endif
 Requires: mariadb
 Requires: mariadb-server
 Requires: perl-Data-Validate-IP
