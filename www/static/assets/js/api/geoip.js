@@ -8,7 +8,8 @@ function getGeoIP(cidr, onSuccess) {
     var url = baseUrl + 'api/external.cgi?method=get_geoip';
     url += '&address=' + addr;
     fetch(url, {
-        method: 'get'
+        method: 'get',
+        credentials: 'include'
     }).then(function(response) {
 
         response.json().then(function(json) {
