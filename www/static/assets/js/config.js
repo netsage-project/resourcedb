@@ -1,4 +1,3 @@
-//var basePath = '/rdb/';
-//var baseUrl  = '/rdb/';
+var mapboxAccessToken = '';
 var basePath = '/';
-var baseUrl  = 'http://jonstout-dev7.grnoc.iu.edu/rdb/';
+var baseUrl  = '/';
