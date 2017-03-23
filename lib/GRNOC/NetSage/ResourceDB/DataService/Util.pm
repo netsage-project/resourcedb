@@ -185,7 +185,9 @@ sub update_schema {
         ($version, $err) = $self->upgrade_to_0_0_2($db, $version);
     } elsif ($version eq '0.0.2') {
         ($version, $err) = $self->upgrade_to_0_0_3($db, $version);
-    } elsif ($version eq '0.0.3') {
+    } elsif ($version eq '0.0.3.1') {
+        ($version, $err) = $self->upgrade_to_0_0_3_1($db, $version);
+    } elsif ($version eq '0.0.4') {
         ($version, $err) = $self->upgrade_to_0_0_4($db, $version);
     } else {
         return($version, "DB already has the latest schema ($version)");
@@ -195,7 +197,7 @@ sub update_schema {
     return ($version, $err);
 }
 
-sub upgrade_to_0_0_4 {
+sub upgrade_to_0_0_3_1 {
     my $self    = shift;
     my $db      = shift;
     my $version = shift;
@@ -275,7 +277,7 @@ sub upgrade_to_0_0_4 {
 
     if ( $ok ) {
         warn "Schema successfully updated";
-        $version = '0.0.4';
+        $version = '0.0.3.1';
 
     }
 

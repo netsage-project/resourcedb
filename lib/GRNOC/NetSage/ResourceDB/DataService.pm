@@ -239,6 +239,11 @@ sub get_table_dynamically {
 
 }
 
+sub get_continent_from_country_code {
+    my ( $self, $country_code ) = @_;
+
+};
+
 ### private methods ###
 
 sub _is_dbname_valid {
