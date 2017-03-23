@@ -30,6 +30,10 @@ Requires: perl-GRNOC-Config
 Requires: perl-GRNOC-Log
 Requires: perl-MIME-Lite-TT
 Requires: perl-String-MkPasswd
+Requires: perl-Data-Validate-IP
+Requires: GeoIP
+Requires: GeoIP-data
+Requires: perl-Geo-IP
 
 %description
 NetSage Resource Database (Science Registry)
