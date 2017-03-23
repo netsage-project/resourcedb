@@ -441,6 +441,7 @@ sub _init_dynamic_fields {
     $fields->{'organization'} = {
         'name' => 1,
         'description' => 1,
+        'url' => 1,
         'owner' => 1,
         'email' => 1,
         'postal_code' => 1,
@@ -453,6 +454,7 @@ sub _init_dynamic_fields {
     $fields->{'project'} = {
         'name' => 1,
         'description' => 1,
+        'url' => 1,
         'owner' => 1,
         'email' => 1
     };
