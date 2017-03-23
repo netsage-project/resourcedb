@@ -185,6 +185,8 @@ sub update_schema {
         ($version, $err) = $self->upgrade_to_0_0_2($db, $version);
     } elsif ($version eq '0.0.2') {
         ($version, $err) = $self->upgrade_to_0_0_3($db, $version);
+    } elsif ($version eq '0.0.3') {
+        ($version, $err) = $self->upgrade_to_0_0_4($db, $version);
     } else {
         return($version, "DB already has the latest schema ($version)");
 
@@ -202,7 +204,7 @@ sub upgrade_to_0_0_4 {
 
     # Add columns to `organization`
     my $query = "alter table `organization`
-                 add column `url` varchar(255) after `description`,
+                 add column `url` varchar(255) after `description`
                 ";
     my $org_ok = $db->do( $query );
     if ($org_ok) {
@@ -219,7 +221,7 @@ sub upgrade_to_0_0_4 {
 
     # Add columns to `project`
     $query = "alter table `project`
-                 add column `url` varchar(255) after `description`,
+                 add column `url` varchar(255) after `description`
                 ";
     my $project_ok = $db->do( $query );
     if ($project_ok) {
