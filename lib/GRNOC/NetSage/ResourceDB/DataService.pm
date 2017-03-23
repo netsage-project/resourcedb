@@ -183,7 +183,14 @@ sub get_table_dynamically {
 
     my $remote_user = $args{'remote_user'};
 
-    my $select_fields = "*";
+    my @select_fields = ( "${name}_id");
+
+    my $field_obj = $self->dynamic_fields();
+    my @field_list = keys %{ $field_obj->{ $name } };
+    foreach my $field ( @field_list ) {
+        # add to @select_fields list
+        push @select_fields, $field;
+    }
 
     my @where = ();
 
@@ -210,7 +217,7 @@ sub get_table_dynamically {
     my $from_sql = "$name ";
 
     my $results = $self->dbq_rw()->select( table => $from_sql,
-                                           fields => $select_fields,
+                                           fields => \@select_fields,
                                            where => [-and => \@where],
                                            order_by => $order_by,
                                            limit => $limit,
