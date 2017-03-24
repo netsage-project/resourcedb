@@ -32,7 +32,9 @@ use constant VALID_DYNAMIC_DB_NAMES => {
     'role' => 1,
     'organization' => 1,
     'project' => 1,
-    'discipline' => 1
+    'discipline' => 1,
+    'country' => 1,
+    'continent' => 1
 };
 
 ### constructor ###
@@ -344,6 +346,17 @@ sub _init_dynamic_fields {
     $fields->{'role'} = {
         'name' => 1,
         'description' => 1
+    };
+
+    $fields->{'country'} = {
+        'name' => 1,
+        'country_code' => 1,
+        'continent_code' => 1
+    };
+
+    $fields->{'continent'} = {
+        'name' => 1,
+        'continent_code' => 1
     };
 
     $self->dynamic_fields( $fields );

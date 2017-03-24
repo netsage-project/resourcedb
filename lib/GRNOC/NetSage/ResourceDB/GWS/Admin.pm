@@ -231,9 +231,10 @@ sub _init_dynamic_add_methods {
     my $self = shift;
 
     foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $plural = $self->get_plural( $name );
         my $method;
         # add
-        $method = GRNOC::WebService::Method->new( name => "add_${name}s",
+        $method = GRNOC::WebService::Method->new( name => "add_$plural",
             description => "Adds the ${name}",
             expires => "-1d",
             callback => sub { $self->_add_table_dynamically( $name, @_ ) } );
@@ -355,10 +356,11 @@ sub _init_dynamic_update_methods {
     my $self = shift;
 
     foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $plural = $self->get_plural( $name );
         my $method;
         # add
-        $method = GRNOC::WebService::Method->new( name => "update_${name}s",
-            description => "Updates the ${name}",
+        $method = GRNOC::WebService::Method->new( name => "update_$plural",
+            description => "Updates the $plural",
             expires => "-1d",
             callback => sub { $self->_update_table_dynamically( $name, @_ ) } );
 

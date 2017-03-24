@@ -94,6 +94,14 @@ sub process_args {
     return %results;
 }
 
+sub get_plural {
+    my ($self, $singular) = @_;
+    my $plural = $singular . "s";
+    # fix "countrys" to "countries" etc
+    $plural =~ s/ys$/ies/; 
+
+    return $plural;
+}
 
 sub _init_config {
     my $self = shift;
