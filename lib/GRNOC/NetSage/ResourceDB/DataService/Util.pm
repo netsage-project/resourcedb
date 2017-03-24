@@ -14,6 +14,7 @@ use strict;
 use warnings;
 
 use GRNOC::Log;
+use GRNOC::NetSage::ResourceDB::DataService::Data;
 
 use Data::Dumper;
 use DBI;
@@ -185,9 +186,9 @@ sub update_schema {
         ($version, $err) = $self->upgrade_to_0_0_2($db, $version);
     } elsif ($version eq '0.0.2') {
         ($version, $err) = $self->upgrade_to_0_0_3($db, $version);
-    } elsif ($version eq '0.0.3.1') {
+    } elsif ($version eq '0.0.3') {
         ($version, $err) = $self->upgrade_to_0_0_3_1($db, $version);
-    } elsif ($version eq '0.0.4') {
+    } elsif ($version eq '0.0.3.1') {
         ($version, $err) = $self->upgrade_to_0_0_4($db, $version);
     } else {
         return($version, "DB already has the latest schema ($version)");
@@ -196,6 +197,156 @@ sub update_schema {
 
     return ($version, $err);
 }
+
+sub upgrade_to_0_0_4 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+
+    my $data = GRNOC::NetSage::ResourceDB::DataService::Data->new;
+
+    # Create table `continent`
+    my $query = "
+            create table `continent` (
+                `continent_id` tinyint unsigned not null auto_increment,
+                `name` varchar(255), continent_code char(2) not null unique,
+                primary key (`continent_id`)
+            ) engine=InnoDB
+        ";
+
+    my $continent_ok = $db->do( $query );
+    if ($continent_ok) {
+        warn "Added 'continent' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add 'continent' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+    my $continents = $data->get_continents();
+
+    my @values = ();
+    $query = "insert into continent (name, continent_code) values (?, ?)";
+    my $sth = $db->prepare($query);
+    my @codes = keys %$continents;
+    my @names = values %$continents;
+
+    my ( $tuple, $rows ) = $sth->execute_array(undef, \@names, \@codes);
+
+    if ( !$rows ) {
+        $continent_ok = 0;
+        $err = $err . "; error inserting continents"; 
+
+    } else {
+        warn "$rows continents inserted";
+    }
+
+    # Create table `country`
+    $query = "
+            create table `country` (
+                `country_id` tinyint unsigned not null auto_increment,
+                `name` varchar(255), 
+                `country_code` char(2) not null unique,
+                `continent_code` char(2),
+                primary key (`country_id`)
+            ) engine=InnoDB
+        ";
+
+    my $country_ok = $db->do( $query );
+    if ($country_ok) {
+        warn "Added 'country' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add 'country' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+    # add foreign key constraint
+    $query = "
+            alter table country 
+                add constraint country_continent_fk 
+                foreign key(continent_code) 
+                references continent(continent_code) on delete set null on update cascade
+            ";
+
+    my $fk_ok = $db->do( $query );
+    if ($fk_ok) {
+        warn "Added foreign key to 'country' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add foreign key to 'country' table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+
+    my $countries = $data->get_countries();
+
+    @values = ();
+    $query = "insert into country (name, country_code) values (?, ?)";
+    $sth = $db->prepare($query);
+    @codes = keys %$countries;
+    @names = values %$countries;
+
+    ( $tuple, $rows ) = $sth->execute_array(undef, \@names, \@codes);
+
+    if ( !$rows ) {
+        $country_ok = 0;
+        $err = $err . "; error inserting countries"; 
+
+    } else {
+        warn "$rows countries inserted";
+    }
+
+
+    my $country_continent_ok;
+    my $codes = $data->get_country_continent_codes();
+
+    @values = ();
+    $query = "update country set continent_code=? where country_code=?";
+    $sth = $db->prepare($query);
+    my @countries = keys %$codes;
+    my @continents = values %$codes;
+
+    ( $tuple, $rows ) = $sth->execute_array(undef, \@continents, \@countries);
+
+    if ( !$rows ) {
+        $country_continent_ok = 0;
+        $err = $err . "; error setting continents for countries"; 
+
+    } else {
+        warn "$rows country/continent codes updated";
+        $country_continent_ok = 1;
+    }
+
+
+    my $ok = $continent_ok && $country_ok && $country_continent_ok && $fk_ok;
+
+    if ( $ok ) {
+        warn "Schema successfully updated";
+        $version = '0.0.4';
+
+    }
+
+    my $updated_ok = $self->_update_version( $db, $version );
+
+    # in this case "$ok" is the # of affected records
+    return ($ok && $updated_ok, $err);
+
+}
+
 
 sub upgrade_to_0_0_3_1 {
     my $self    = shift;

@@ -332,8 +332,14 @@ sub get_country_continent_codes {
     # "iso 3166 country code"' => '"continent code"
 
     my %data = (
-        'A1' => '--',
-        'A2' => '--',
+        # ADDED MANUALLY (in the country table in the country data we got, but not the data
+        # source listed above)
+        'CW' => 'NA',
+        'SX' => 'NA',
+        'BQ' => 'NA',
+        'SS' => 'AF',
+        #'A1' => '--',
+        #'A2' => '--',
         'AD' => 'EU',
         'AE' => 'AS',
         'AF' => 'AS',
@@ -507,7 +513,7 @@ sub get_country_continent_codes {
         'NR' => 'OC',
         'NU' => 'OC',
         'NZ' => 'OC',
-        'O1' => '--',
+        #'O1' => '--',
         'OM' => 'AS',
         'PA' => 'NA',
         'PE' => 'SA',
@@ -585,15 +591,7 @@ sub get_country_continent_codes {
         'ZM' => 'AF',
         'ZW' => 'AF',
     );
-    my @country_continent_codes = ();
-    while(my ( $country, $continent) = each %data ) {
-        push @country_continent_codes, {
-            'country_code' => $country,
-            'continent_code' => $continent
-        };
-
-    }
-    return \@country_continent_codes;
+    return \%data;
 }
 
 1;
