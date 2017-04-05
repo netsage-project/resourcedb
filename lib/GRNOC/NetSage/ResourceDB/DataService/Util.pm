@@ -332,7 +332,26 @@ sub upgrade_to_0_0_4 {
     }
 
 
-    my $ok = $continent_ok && $country_ok && $country_continent_ok && $fk_ok;
+    my $drop_columns_ok;
+    $query = "alter table ip_block
+                drop column country_name,
+                drop column continent_name,
+                drop column continent_code";
+    $drop_columns_ok = $db->do( $query );
+    if ($drop_columns_ok) {
+        warn "Dropped country name, continent name, continent code columns from ip_block";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't drop country name, continent name, continent code columns from ip_block table: $err";
+            return ($version, $err);
+        } else {
+            warn "Database schema version is undefined.";
+        }
+    }
+
+
+    my $ok = $continent_ok && $country_ok && $country_continent_ok && $fk_ok && $drop_columns_ok;
 
     if ( $ok ) {
         warn "Schema successfully updated";

@@ -182,28 +182,6 @@ sub _add_ip_block_params {
                                   multiple    => 0,
                                   description => 'The country code');
 
-    # add the optional 'country_name' input param to the  method
-    $method->add_input_parameter( name        => 'country_name',
-                                  pattern     => $TEXT,
-                                  required    => 0,
-                                  multiple    => 0,
-                                  description => 'The country name');
-
-
-    # add the optional 'continent_code' input param to the  method
-    $method->add_input_parameter( name        => 'continent_code',
-                                  pattern     => $TEXT,
-                                  required    => 0,
-                                  multiple    => 0,
-                                  description => 'The continent code');
-
-    # add the optional 'continent_name' input param to the  method
-    $method->add_input_parameter( name        => 'continent_name',
-                                  pattern     => $TEXT,
-                                  required    => 0,
-                                  multiple    => 0,
-                                  description => 'The continent name');
-
     # add the optional 'postal_code' input param to the  method
     $method->add_input_parameter( name        => 'postal_code',
                                   pattern     => $TEXT,

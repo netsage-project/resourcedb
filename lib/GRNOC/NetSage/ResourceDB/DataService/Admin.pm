@@ -82,6 +82,7 @@ sub add_table_dynamically {
     my $field_obj = $self->dynamic_fields();
     my @field_list = keys %{ $field_obj->{ $name } };
     my $fields = {};
+
     foreach my $field ( @field_list ) {
         # add to field list
         $fields->{ $field } = $args{ $field } if defined $args{ $field };
@@ -297,8 +298,6 @@ sub _get_ip_block_args {
     #  - addr_lower
     #  - addr_upper
     #  -  mask
-    #  - continent_name
-    #  - country_name
     my @all_args = (
         'name',
         'description',
@@ -309,9 +308,6 @@ sub _get_ip_block_args {
         'asn',
         'organization_id',
         'country_code',
-        'country_name',
-        'continent_code',
-        'continent_name',
         'postal_code',
         'latitude',
         'longitude',
