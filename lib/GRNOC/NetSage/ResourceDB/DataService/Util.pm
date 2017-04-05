@@ -210,7 +210,7 @@ sub upgrade_to_0_0_4 {
     # Create table `continent`
     my $query = "
             create table `continent` (
-                `continent_id` tinyint unsigned not null auto_increment,
+                `continent_id` smallint unsigned not null auto_increment,
                 `name` varchar(255), continent_code char(2) not null unique,
                 primary key (`continent_id`)
             ) engine=InnoDB
@@ -250,7 +250,7 @@ sub upgrade_to_0_0_4 {
     # Create table `country`
     $query = "
             create table `country` (
-                `country_id` tinyint unsigned not null auto_increment,
+                `country_id` smallint unsigned not null auto_increment,
                 `name` varchar(255), 
                 `country_code` char(2) not null unique,
                 `continent_code` char(2),
