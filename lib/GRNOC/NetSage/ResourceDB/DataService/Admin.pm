@@ -63,6 +63,51 @@ sub add_ip_blocks {
 
 }
 
+
+sub add_table_dynamically {
+
+    my ( $self, $name, %args ) = @_;
+
+    if ( !$self->_is_dbname_valid( $name ) ) {
+        $self->error( "Invalid db name specified: $name" );
+        return;
+    }
+
+    my $remote_user = $args{'remote_user'};
+
+    my $from_sql = "$name ";
+
+    my $name_val = $args{'name'};
+
+    my $field_obj = $self->dynamic_fields();
+    my @field_list = keys %{ $field_obj->{ $name } };
+    my $fields = {};
+
+    foreach my $field ( @field_list ) {
+        # add to field list
+        $fields->{ $field } = $args{ $field } if defined $args{ $field };
+    }
+
+
+    my $results = $self->dbq_rw()->insert( table => $from_sql,
+                                           fields => $fields
+                                         );
+
+    if ( !$results ) {
+
+        $self->error( "An unknown error occurred inserting the ${name}" );
+        return;
+    }
+
+    #my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
+    #                                                             total => $num_rows,
+    #                                                             );
+
+    return [{ "${name}_id" => $results }];
+
+}
+
+
 sub update_ip_blocks {
 
     my ( $self, %args ) = @_;
@@ -98,6 +143,58 @@ sub update_ip_blocks {
 
     $results = [ {'ip_block_id' => $args{'ip_block_id'} }];
     return $results;
+
+}
+
+sub update_table_dynamically {
+
+    my ( $self, $name, %args ) = @_;
+
+    if ( !$self->_is_dbname_valid( $name ) ) {
+        $self->error( "Invalid db name specified: $name" );
+        return;
+    }
+
+    my $remote_user = $args{'remote_user'};
+
+    # handle required ${name}_id param
+    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
+                                              field => "${name}_id" );
+
+    my @where = ();
+
+    @where = $id_param->process( args => \%args,
+                                      where => \@where );
+
+    my $from_sql = "$name ";
+
+    my $name_val = $args{'name'};
+
+    my $field_obj = $self->dynamic_fields();
+    my @field_list = keys %{ $field_obj->{ $name } };
+    my $fields = {};
+    foreach my $field ( @field_list ) {
+        # add to field list
+        $fields->{ $field } = $args{ $field } if defined $args{ $field };
+    }
+
+    my $results = $self->dbq_rw()->update( table => $from_sql,
+                                           fields => $fields,
+                                           where => [-and => \@where],
+                                         );
+
+    if ( !$results ) {
+
+        $self->error( "An unknown error occurred updating the ${name}" );
+        return;
+    }
+
+    if ( $results == 0 ) {
+        $self->error( "No rows affected" );
+        return;
+    }
+
+    return [{ "${name}_id" => $args{"${name}_id"} }];
 
 }
 
@@ -141,6 +238,47 @@ sub delete_ip_blocks {
 
 }
 
+sub delete_table_dynamically {
+
+    my ( $self, $name, %args ) = @_;
+
+    if ( !$self->_is_dbname_valid( $name ) ) {
+        $self->error( "Invalid db name specified: $name" );
+        return;
+    }
+
+    my $remote_user = $args{'remote_user'};
+
+    # handle required ${name}_id param
+    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
+                                              field => "${name}_id" );
+
+    my @where = ();
+
+    @where = $id_param->process( args => \%args,
+                                      where => \@where );
+
+    my $from_sql = "$name ";
+
+    my $results = $self->dbq_rw()->delete( table => $from_sql,
+                                           where => [-and => \@where],
+                                         );
+
+    if ( !$results ) {
+
+        $self->error( "An unknown error occurred deleting the ${name}" );
+        return;
+    }
+
+    if ( $results == 0 ) {
+        $self->error( "No rows affected" );
+        return;
+    }
+
+    return [{ "${name}_id" => $args{"${name}_id"} }];
+
+}
+
 
 sub _get_ip_block_args {
     my ( $self, %args_in ) = @_;
@@ -160,8 +298,6 @@ sub _get_ip_block_args {
     #  - addr_lower
     #  - addr_upper
     #  -  mask
-    #  - continent_name
-    #  - country_name
     my @all_args = (
         'name',
         'description',
@@ -172,9 +308,6 @@ sub _get_ip_block_args {
         'asn',
         'organization_id',
         'country_code',
-        'country_name',
-        'continent_code',
-        'continent_name',
         'postal_code',
         'latitude',
         'longitude',

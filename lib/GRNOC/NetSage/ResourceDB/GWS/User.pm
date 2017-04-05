@@ -104,10 +104,11 @@ sub _init_dynamic_get_methods {
     my ( $self, $method_in, $args ) = @_;
 
     foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $plural = $self->get_plural( $name );
         my $method;
         # get_$names
-        $method = GRNOC::WebService::Method->new( name => "get_${name}s",
-            description => "Returns the ${name}s",
+        $method = GRNOC::WebService::Method->new( name => "get_$plural",
+            description => "Returns the $plural",
             expires => "-1d",
             #default_order_by => ['name'],
             callback => sub { $self->_get_table_dynamically( $name, @_ ) } );

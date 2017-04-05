@@ -53,9 +53,9 @@ sub get_ip_blocks {
                          'ip_block.asn as asn',
                          'ip_block.organization_id as organization_id',
                          'ip_block.country_code as country_code',
-                         'ip_block.country_name as country_name',
-                         'ip_block.continent_code as continent_code',
-                         'ip_block.continent_name as continent_name',
+                         'country.name as country_name',
+                         'country.continent_code as continent_code',
+                         'continent.name as continent_name',
                          'ip_block.postal_code as postal_code',
                          'ip_block.latitude as latitude',
                          'ip_block.longitude as longitude',
@@ -98,6 +98,8 @@ sub get_ip_blocks {
     $from_sql .= 'left join role on ( ip_block.role_id = role.role_id ) ';
     $from_sql .= 'left join discipline on ( ip_block.discipline_id = discipline.discipline_id ) ';
     $from_sql .= 'left join project on ( ip_block.project_id = project.project_id ) ';
+    $from_sql .= 'left join country on ( country.country_code = ip_block.country_code ) ';
+    $from_sql .= 'left join continent on ( country.continent_code = continent.continent_code ) ';
 
     my $results = $self->dbq_ro()->select( table => $from_sql,
                                            fields => $select_fields,

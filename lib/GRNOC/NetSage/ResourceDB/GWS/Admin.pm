@@ -182,28 +182,6 @@ sub _add_ip_block_params {
                                   multiple    => 0,
                                   description => 'The country code');
 
-    # add the optional 'country_name' input param to the  method
-    $method->add_input_parameter( name        => 'country_name',
-                                  pattern     => $TEXT,
-                                  required    => 0,
-                                  multiple    => 0,
-                                  description => 'The country name');
-
-
-    # add the optional 'continent_code' input param to the  method
-    $method->add_input_parameter( name        => 'continent_code',
-                                  pattern     => $TEXT,
-                                  required    => 0,
-                                  multiple    => 0,
-                                  description => 'The continent code');
-
-    # add the optional 'continent_name' input param to the  method
-    $method->add_input_parameter( name        => 'continent_name',
-                                  pattern     => $TEXT,
-                                  required    => 0,
-                                  multiple    => 0,
-                                  description => 'The continent name');
-
     # add the optional 'postal_code' input param to the  method
     $method->add_input_parameter( name        => 'postal_code',
                                   pattern     => $TEXT,
@@ -231,9 +209,10 @@ sub _init_dynamic_add_methods {
     my $self = shift;
 
     foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $plural = $self->get_plural( $name );
         my $method;
         # add
-        $method = GRNOC::WebService::Method->new( name => "add_${name}s",
+        $method = GRNOC::WebService::Method->new( name => "add_$plural",
             description => "Adds the ${name}",
             expires => "-1d",
             callback => sub { $self->_add_table_dynamically( $name, @_ ) } );
@@ -282,6 +261,24 @@ sub _add_dynamic_add_update_parameters {
                 multiple    => 0,
                 required    => 0,
                 description => "The owner of the $name");
+
+        } elsif ( $field eq "country_code" || $field eq "continent_code" ) {
+            # add the optional 'url' input param to all the basic dynamic methods
+            $method->add_input_parameter(
+                name        => $field,
+                pattern     => $TEXT,
+                multiple    => 0,
+                required    => 0,
+                description => "The code of the $name");
+
+        } elsif ( $field eq "url" ) {
+            # add the optional 'url' input param to all the basic dynamic methods
+            $method->add_input_parameter(
+                name        => $field,
+                pattern     => $TEXT,
+                multiple    => 0,
+                required    => 0,
+                description => "The url of the $name");
 
         } elsif ( $field eq "email" ) {
             # add the optional 'email' input param to all the basic dynamic methods
@@ -346,10 +343,11 @@ sub _init_dynamic_update_methods {
     my $self = shift;
 
     foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $plural = $self->get_plural( $name );
         my $method;
         # add
-        $method = GRNOC::WebService::Method->new( name => "update_${name}s",
-            description => "Updates the ${name}",
+        $method = GRNOC::WebService::Method->new( name => "update_$plural",
+            description => "Updates the $plural",
             expires => "-1d",
             callback => sub { $self->_update_table_dynamically( $name, @_ ) } );
 

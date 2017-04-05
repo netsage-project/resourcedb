@@ -1,0 +1,28 @@
+=head1 GRNOC::NetSage::ResourceDB::DataService::Data
+
+=head1 SYNOPSIS
+
+  my $util = GRNOC::NetSage::ResourceDB::DataService::Data->new;
+
+  my $countries = $util->get_countries();
+
+=head1 DESCRIPTION
+
+This package contains data for the maintenance of this project's database.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( OPTIONS )
+
+=over 4
+
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=back

@@ -32,7 +32,9 @@ use constant VALID_DYNAMIC_DB_NAMES => {
     'role' => 1,
     'organization' => 1,
     'project' => 1,
-    'discipline' => 1
+    'discipline' => 1,
+    'country' => 1,
+    'continent' => 1
 };
 
 ### constructor ###
@@ -183,7 +185,14 @@ sub get_table_dynamically {
 
     my $remote_user = $args{'remote_user'};
 
-    my $select_fields = "*";
+    my @select_fields = ( "${name}_id");
+
+    my $field_obj = $self->dynamic_fields();
+    my @field_list = keys %{ $field_obj->{ $name } };
+    foreach my $field ( @field_list ) {
+        # add to @select_fields list
+        push @select_fields, $field;
+    }
 
     my @where = ();
 
@@ -210,7 +219,7 @@ sub get_table_dynamically {
     my $from_sql = "$name ";
 
     my $results = $self->dbq_rw()->select( table => $from_sql,
-                                           fields => $select_fields,
+                                           fields => \@select_fields,
                                            where => [-and => \@where],
                                            order_by => $order_by,
                                            limit => $limit,
@@ -232,140 +241,10 @@ sub get_table_dynamically {
 
 }
 
-sub add_table_dynamically {
+sub get_continent_from_country_code {
+    my ( $self, $country_code ) = @_;
 
-    my ( $self, $name, %args ) = @_;
-
-    if ( !$self->_is_dbname_valid( $name ) ) {
-        $self->error( "Invalid db name specified: $name" );
-        return;
-    }
-
-    my $remote_user = $args{'remote_user'};
-
-    my $from_sql = "$name ";
-
-    my $name_val = $args{'name'};
-
-    my $field_obj = $self->dynamic_fields();
-    my @field_list = keys %{ $field_obj->{ $name } };
-    my $fields = {};
-    foreach my $field ( @field_list ) {
-        # add to field list
-        $fields->{ $field } = $args{ $field } if defined $args{ $field };
-    }
-
-
-    my $results = $self->dbq_rw()->insert( table => $from_sql,
-                                           fields => $fields
-                                         );
-
-    if ( !$results ) {
-
-        $self->error( "An unknown error occurred inserting the ${name}" );
-        return;
-    }
-
-    #my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
-    #                                                             total => $num_rows,
-    #                                                             );
-
-    return [{ "${name}_id" => $results }];
-
-}
-
-sub update_table_dynamically {
-
-    my ( $self, $name, %args ) = @_;
-
-    if ( !$self->_is_dbname_valid( $name ) ) {
-        $self->error( "Invalid db name specified: $name" );
-        return;
-    }
-
-    my $remote_user = $args{'remote_user'};
-
-    # handle required ${name}_id param
-    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
-                                              field => "${name}_id" );
-
-    my @where = ();
-
-    @where = $id_param->process( args => \%args,
-                                      where => \@where );
-
-    my $from_sql = "$name ";
-
-    my $name_val = $args{'name'};
-
-    my $field_obj = $self->dynamic_fields();
-    my @field_list = keys %{ $field_obj->{ $name } };
-    my $fields = {};
-    foreach my $field ( @field_list ) {
-        # add to field list
-        $fields->{ $field } = $args{ $field } if defined $args{ $field };
-    }
-
-    my $results = $self->dbq_rw()->update( table => $from_sql,
-                                           fields => $fields,
-                                           where => [-and => \@where],
-                                         );
-
-    if ( !$results ) {
-
-        $self->error( "An unknown error occurred updating the ${name}" );
-        return;
-    }
-
-    if ( $results == 0 ) {
-        $self->error( "No rows affected" );
-        return;
-    }
-
-    return [{ "${name}_id" => $args{"${name}_id"} }];
-
-}
-
-sub delete_table_dynamically {
-
-    my ( $self, $name, %args ) = @_;
-
-    if ( !$self->_is_dbname_valid( $name ) ) {
-        $self->error( "Invalid db name specified: $name" );
-        return;
-    }
-
-    my $remote_user = $args{'remote_user'};
-
-    # handle required ${name}_id param
-    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
-                                              field => "${name}_id" );
-
-    my @where = ();
-
-    @where = $id_param->process( args => \%args,
-                                      where => \@where );
-
-    my $from_sql = "$name ";
-
-    my $results = $self->dbq_rw()->delete( table => $from_sql,
-                                           where => [-and => \@where],
-                                         );
-
-    if ( !$results ) {
-
-        $self->error( "An unknown error occurred deleting the ${name}" );
-        return;
-    }
-
-    if ( $results == 0 ) {
-        $self->error( "No rows affected" );
-        return;
-    }
-
-    return [{ "${name}_id" => $args{"${name}_id"} }];
-
-}
+};
 
 ### private methods ###
 
@@ -441,6 +320,7 @@ sub _init_dynamic_fields {
     $fields->{'organization'} = {
         'name' => 1,
         'description' => 1,
+        'url' => 1,
         'owner' => 1,
         'email' => 1,
         'postal_code' => 1,
@@ -453,6 +333,7 @@ sub _init_dynamic_fields {
     $fields->{'project'} = {
         'name' => 1,
         'description' => 1,
+        'url' => 1,
         'owner' => 1,
         'email' => 1
     };
@@ -465,6 +346,17 @@ sub _init_dynamic_fields {
     $fields->{'role'} = {
         'name' => 1,
         'description' => 1
+    };
+
+    $fields->{'country'} = {
+        'name' => 1,
+        'country_code' => 1,
+        'continent_code' => 1
+    };
+
+    $fields->{'continent'} = {
+        'name' => 1,
+        'continent_code' => 1
     };
 
     $self->dynamic_fields( $fields );
