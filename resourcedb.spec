@@ -17,12 +17,15 @@ BuildRequires: mod_perl-devel
 %if 0%{?rhel} < 7
 Requires: GeoIP-GeoLite-data
 Requires: GeoIP-GeoLite-data-extra
+Requires: mysql
+Requires: mysql-server
 %else
 Requires: GeoIP
 Requires: GeoIP-data
-%endif
 Requires: mariadb
 Requires: mariadb-server
+%endif
+Requires: httpd
 Requires: perl-Data-Validate-IP
 Requires: perl-DBD-MySQL
 Requires: perl-Geo-IP
