@@ -1,6 +1,6 @@
 Summary:   NetSage Resource Database
 Name:      resourcedb
-Version:   0.0.3
+Version:   0.0.4
 Release:   %{_buildno}%{?dist}
 License:   Apache
 Group:     GRNOC
