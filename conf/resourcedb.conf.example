@@ -1,53 +1,18 @@
-Alias /resourcedb/docs /usr/share/grnoc/resourcedb/docs
-Alias /resourcedb/admin/docs /usr/share/grnoc/resourcedb/admin/docs
-Alias /resourcedb/css /usr/share/grnoc/resourcedb/css
-Alias /resourcedb/webservice/admin /usr/lib/grnoc/resourcedb/cgi-bin/webservice/admin
-Alias /resourcedb/webservice /usr/lib/grnoc/resourcedb/cgi-bin/webservice
-Alias /resourcedb/admin /usr/lib/grnoc/resourcedb/cgi-bin/admin
-Alias /resourcedb /usr/lib/grnoc/resourcedb/cgi-bin
+Alias /rdb/api /usr/share/resourcedb/www/api
+Alias /rdb     /usr/share/resourcedb/www/static
 
-# css only
-<Directory /usr/share/grnoc/resourcedb/css>
-</Directory>
+<Location /rdb>
+  AuthType Basic
+  AuthName "ScienceRegistry"
+  AuthUserFile /usr/share/resourcedb/www/.htpasswd
+  Require valid-user
 
-# webservice admin section
-<Directory /usr/lib/grnoc/resourcedb/cgi-bin/webservice/admin>
-  #CosignProtected On
-  #AuthType Cosign
-  #require valid-user
-  AddHandler perl-script .cgi
-  PerlResponseHandler ModPerl::Registry
-  DirectoryIndex index.cgi
-  Options ExecCGI FollowSymlinks
-</Directory>
+#  Options +FollowSymLinks
+#  SSLRequireSSL
 
-# webservice regular user section
-<Directory /usr/lib/grnoc/resourcedb/cgi-bin/webservice>
-  AddHandler perl-script .cgi
-  PerlResponseHandler ModPerl::Registry
-  DirectoryIndex index.cgi
-  Options ExecCGI FollowSymlinks
-  RewriteEngine On
-  RequestHeader set REMOTE_USER contact_update
-</Directory>
+  DirectoryIndex index.html
 
-# frontend admin section
-<Directory /usr/lib/grnoc/resourcedb/cgi-bin/admin>
-  #CosignProtected On
-  #AuthType Cosign
-  #require valid-user
-  AddHandler perl-script .cgi
-  PerlResponseHandler ModPerl::Registry
-  DirectoryIndex index.cgi
-  Options ExecCGI FollowSymlinks
-</Directory>
+  AddHandler cgi-script .cgi
+  Options +ExecCGI
+</Location>
 
-# frontend regular user section
-<Directory /usr/lib/grnoc/resourcedb/cgi-bin>
-  AddHandler perl-script .cgi
-  PerlResponseHandler ModPerl::Registry
-  DirectoryIndex index.cgi
-  Options ExecCGI FollowSymlinks
-  RewriteEngine On
-  RequestHeader set REMOTE_USER contact_update
-</Directory>
