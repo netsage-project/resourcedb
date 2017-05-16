@@ -184,15 +184,15 @@ sub update_schema {
     if ($version eq '0.0.1') {
         # Place upgrade script for next schema version here.
         ($version, $err) = $self->upgrade_to_0_0_2($db, $version);
-    } elsif ($version eq '0.0.2') {
+    }
+    if ($version eq '0.0.2') {
         ($version, $err) = $self->upgrade_to_0_0_3($db, $version);
-    } elsif ($version eq '0.0.3') {
+    }
+    if ($version eq '0.0.3') {
         ($version, $err) = $self->upgrade_to_0_0_3_1($db, $version);
-    } elsif ($version eq '0.0.3.1') {
+    }
+    if ($version eq '0.0.3.1') {
         ($version, $err) = $self->upgrade_to_0_0_4($db, $version);
-    } else {
-        return($version, "DB already has the latest schema ($version)");
-
     }
 
     return ($version, $err);
@@ -362,8 +362,7 @@ sub upgrade_to_0_0_4 {
     my $updated_ok = $self->_update_version( $db, $version );
 
     # in this case "$ok" is the # of affected records
-    return ($ok && $updated_ok, $err);
-
+    return ($version, $err);
 }
 
 
@@ -454,8 +453,7 @@ sub upgrade_to_0_0_3_1 {
     my $updated_ok = $self->_update_version( $db, $version );
 
     # in this case "$ok" is the # of affected records
-    return ($ok && $updated_ok, $err);
-
+    return ($version, $err);
 }
 
 sub upgrade_to_0_0_3 {
@@ -554,7 +552,7 @@ sub upgrade_to_0_0_3 {
     my $updated_ok = $self->_update_version( $db, $version );
 
     # in this case "$ok" is the # of affected records
-    return ($ok && $updated_ok, $err);
+    return ($version, $err);
 
 }
 
@@ -585,8 +583,7 @@ sub upgrade_to_0_0_2 {
     my $updated_ok = $self->_update_version( $db, $version );
 
     # in this case "$ok" is the # of affected records
-    return ($ok && $updated_ok, $err);
-
+    return ($version, $err);
 }
 
 sub _update_version {

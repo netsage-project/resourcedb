@@ -69,4 +69,14 @@ version number and error if a failure occurs.
         warn "Failure occurred: $err";
     }
 
+=item update_schema ( $dbHandle, $dbExists )
+
+update_schema gets the current version number from the database and
+runs a series of upgrade methods. Each upgrade method returns the
+running version number, and an error string if a failure
+occurred. When an upgrade method succeeds it must return the new
+version number; This allows the database to be fully upgraded with a
+single invocation of the resourcedb-update-db script. Takes a database
+handle and 1 if the resourcedb database already exists.
+
 =back
