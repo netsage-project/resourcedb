@@ -45,14 +45,19 @@ function renderProjectHeader(project) {
 // Given a project record, set the innerHTML of the elements
 // identified by project_owner, and project_email.
 function renderProjectRecord(project) {
-    var owner = document.getElementById('project_owner');
-    var email = document.getElementById('project_email');
-    var link = document.getElementById('project_edit_link');
+  var link = document.getElementById('project_edit_link');
+  link.href = basePath + 'project/edit.html?project_id=' + project.project_id.toString();
 
-    owner.innerHTML = project.owner;
-    email.innerHTML = project.email;
+  if (project.url != null) {
+    var url = document.createElement('a');
+    url.setAttribute('target', '_blank');
+    url.setAttribute('href', project.url);
+    url.innerText = project.url;
+    document.getElementById('project_url').appendChild(url);
+  }
 
-    link.href = basePath + 'project/edit.html?project_id=' + project.project_id.toString();
+  document.getElementById('project_owner').innerHTML = project.owner;
+  document.getElementById('project_email').innerHTML = project.email;
 }
 
 // Sets up submitCreateProject to be called when the create button on

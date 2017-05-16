@@ -47,11 +47,19 @@ function renderOrganizationHeader(organization) {
 // Given a organization record, set the innerHTML of the elements
 // identified by organization_owner, and organization_email.
 function renderOrganizationRecord(organization) {
-    var link = document.getElementById('organization_edit_link');
-    link.href = basePath + 'organization/edit.html?organization_id=' + organization.organization_id.toString();
+  var link = document.getElementById('organization_edit_link');
+  link.href = basePath + 'organization/edit.html?organization_id=' + organization.organization_id.toString();
 
-    document.getElementById('organization_owner').innerHTML = organization.owner;
-    document.getElementById('organization_email').innerHTML = organization.email;
+  if (organization.url != null) {
+    var url = document.createElement('a');
+    url.setAttribute('target', '_blank');
+    url.setAttribute('href', organization.url);
+    url.innerText = organization.url;
+    document.getElementById('organization_url').appendChild(url);
+  }
+
+  document.getElementById('organization_owner').innerHTML = organization.owner;
+  document.getElementById('organization_email').innerHTML = organization.email;
 }
 
 // Sets up submitCreateOrganization to be called when the create button on
