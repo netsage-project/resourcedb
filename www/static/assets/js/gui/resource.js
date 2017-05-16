@@ -372,11 +372,11 @@ function setupEditResourceForm(resource) {
     var org = document.getElementById('resource_organization');
 
     var country = document.getElementById('resource_country');
-    for (var i = 0; i < countries.length; i++) {
+    for (var i in countries) {
         var opt = document.createElement('option');
 
         opt.innerHTML = countries[i];
-        opt.setAttribute('value', countries[i]);
+        opt.setAttribute('value', i);
         country.appendChild(opt);
     }
 
