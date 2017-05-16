@@ -356,6 +356,28 @@ function setupCreateResourceForm() {
         opt.setAttribute('value', i);
         country.appendChild(opt);
     }
+
+  getRoles(function(roles) {
+    var role = document.getElementById('resource_role');
+    for (var i = 0; i < roles.length; i++) {
+      var opt = document.createElement('option');
+
+      opt.innerHTML = roles[i].name;
+      opt.setAttribute('value', roles[i].role_id);
+      role.appendChild(opt);
+    }
+  });
+
+  getDisciplines(function(disciplines) {
+    var discipline = document.getElementById('resource_discipline');
+    for (var i = 0; i < disciplines.length; i++) {
+      var opt = document.createElement('option');
+
+      opt.innerHTML = disciplines[i].name;
+      opt.setAttribute('value', disciplines[i].discipline_id);
+      discipline.appendChild(opt);
+    }
+  });
 }
 
 // Sets up submitEditResource to be called when the edit button on
@@ -380,6 +402,34 @@ function setupEditResourceForm(resource) {
         country.appendChild(opt);
     }
 
+  getRoles(function(roles) {
+    var role = document.getElementById('resource_role');
+    for (var i = 0; i < roles.length; i++) {
+      var opt = document.createElement('option');
+
+      opt.innerHTML = roles[i].name;
+      opt.setAttribute('value', roles[i].role_id);
+      if (resource.role_id == roles[i].role_id) {
+        opt.setAttribute('selected', '');
+      }
+      role.appendChild(opt);
+    }
+  });
+
+  getDisciplines(function(disciplines) {
+    var discipline = document.getElementById('resource_discipline');
+    for (var i = 0; i < disciplines.length; i++) {
+      var opt = document.createElement('option');
+
+      opt.innerHTML = disciplines[i].name;
+      opt.setAttribute('value', disciplines[i].discipline_id);
+      if (discipline.role_id == disciplines[i].role_id) {
+        opt.setAttribute('selected', '');
+      }
+      discipline.appendChild(opt);
+    }
+  });
+
     var continent = document.getElementById('resource_continent');
     var postal_code = document.getElementById('resource_postal_code');
 
@@ -403,7 +453,7 @@ function setupEditResourceForm(resource) {
     lon.value = resource.longitude;
     project.value = resource.project_id;
     discipline.value = resource.discipline_id;
-    role = resource.role_id;
+    role.value = resource.role_id;
 
     var submit = document.getElementById('edit_resource_submit');
     submit.onclick = submitCreateOrUpdateResource;
