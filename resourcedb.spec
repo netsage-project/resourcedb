@@ -31,6 +31,7 @@ Requires: perl-DBD-MySQL
 Requires: perl-Geo-IP
 Requires: perl-GRNOC-Config
 Requires: perl-GRNOC-Log
+Requires: perl-GRNOC-DatabaseQuery
 Requires: perl-MIME-Lite-TT
 Requires: perl-String-MkPasswd
 
