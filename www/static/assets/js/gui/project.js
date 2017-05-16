@@ -80,15 +80,16 @@ function submitCreateOrUpdateProject(e) {
     var desc = form.elements['project_description'].value;
     var owner = form.elements['project_owner'].value;
     var email = form.elements['project_email'].value;
+    var projUrl = form.elements['project_url'].value;
 
     // Hidden field project_id
     var project_id = parseInt(form.elements['project_id'].value);
     if (project_id === -1) {
         console.log('Creating a new project');
-        createOrEditProject(null, name, desc, owner, email);
+        createOrEditProject(null, name, desc, owner, email, projUrl);
     } else {
         console.log('Editing project ' + project_id.toString());
-        createOrEditProject(project_id, name, desc, owner, email);
+        createOrEditProject(project_id, name, desc, owner, email, projUrl);
     }
 }
 
@@ -100,12 +101,14 @@ function setupEditProjectForm(project) {
     var desc = document.getElementById('project_description');
     var owner = document.getElementById('project_owner');
     var email = document.getElementById('project_email');
+    var url = document.getElementById('project_url');
 
     id.value = project.project_id;
     name.value = project.name;
     desc.value = project.description;
     owner.value = project.owner;
     email.value = project.email;
+    url.value = project.url;
 
     var submit = document.getElementById('edit_project_submit');
     submit.onclick = submitCreateOrUpdateProject;

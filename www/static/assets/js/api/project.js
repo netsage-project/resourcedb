@@ -37,7 +37,7 @@ function getProjects(on_success) {
 
 // Create or edit a new project using the backend api. On success, we
 // redirect to the assoicated project/index.html page.
-function createOrEditProject(id, name, desc, owner, email) {
+function createOrEditProject(id, name, desc, owner, email, projUrl) {
     var url = baseUrl;
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_projects';
@@ -50,6 +50,7 @@ function createOrEditProject(id, name, desc, owner, email) {
     url += '&description=' + desc;
     url += '&owner=' + owner;
     url += '&email=' + email;
+    url += '&url=' + projUrl;
 
     function successCallback(project) {
         var id = project.project_id;

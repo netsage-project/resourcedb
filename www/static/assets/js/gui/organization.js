@@ -68,11 +68,11 @@ function setupCreateOrganizationForm() {
     console.log('setupCreateOrganizationForm');
 
     var country = document.getElementById('organization_country');
-    for (var i = 0; i < countries.length; i++) {
+    for (var i in countries) {
         var opt = document.createElement('option');
 
         opt.innerHTML = countries[i];
-        opt.setAttribute('value', countries[i]);
+        opt.setAttribute('value', i);
         country.appendChild(opt);
     }
 
@@ -92,8 +92,9 @@ function submitCreateOrUpdateOrganization(e) {
     var desc = form.elements['organization_description'].value;
     var owner = form.elements['organization_owner'].value;
     var email = form.elements['organization_email'].value;
+    var orgUrl = form.elements['organization_url'].value;
 
-    var country_code = 'NA';
+    var country_code = form.elements['organization_country'].value;
     var country_name = form.elements['organization_country'].value;
 
     var continent_code = 'NA';
@@ -109,30 +110,30 @@ function submitCreateOrUpdateOrganization(e) {
     if (id === -1) {
         console.log('Creating a new organization');
         createOrganization(null, name, desc, owner, email, country_code, country_name,
-                           continent_code, continent_name, postal_code, lat, lon);
+                           continent_code, continent_name, postal_code, lat, lon, orgUrl);
     } else {
         console.log('Editing organization ' + id.toString());
         createOrganization(id, name, desc, owner, email, country_code, country_name,
-                           continent_code, continent_name, postal_code, lat, lon);
+                           continent_code, continent_name, postal_code, lat, lon, orgUrl);
     }
 }
 
 function setupEditOrganizationForm(org) {
-    document.getElementById('organization_id').value = org.organization_id
+    document.getElementById('organization_id').value = org.organization_id;
     document.getElementById('organization_name').value = org.name;
     document.getElementById('organization_description').value = org.description;
 
     document.getElementById('organization_owner').value = org.owner;
     document.getElementById('organization_email').value = org.email;
-
+    document.getElementById('organization_url').value = org.url;
     document.getElementById('organization_postal_code').value = org.postal_code;
 
     var country = document.getElementById('organization_country');
-    for (var i = 0; i < countries.length; i++) {
+    for (var i in countries) {
         var opt = document.createElement('option');
 
         opt.innerHTML = countries[i];
-        opt.setAttribute('value', countries[i]);
+        opt.setAttribute('value', i);
         country.appendChild(opt);
     }
     country.value = org.country_name;
