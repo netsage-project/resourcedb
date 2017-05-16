@@ -147,6 +147,15 @@ function projectEdit() {
         setupEditProjectForm(project);
     });
 
+    getResourcesByProjectId(id, function(resources) {
+        renderMap(function(map) {
+            for (var i = 0; i < resources.length; i++) {
+                var marker = L.marker([resources[i].latitude, resources[i].longitude]).addTo(map);
+                marker.bindPopup("<b>" + resources[i].name + "</b><br/>");
+            }
+        });
+    });
+
     onResourceSearchSubmit(function(query) {
         submitResourceSearch(query);
     });
@@ -233,6 +242,11 @@ function resourceEdit() {
     getResource(id, function(resource) {
         setupEditResourceForm(resource);
         getGeoIP(resource.addr_str, renderGeoIPTable);
+
+        renderMap(function(map) {
+            var marker = L.marker([resource.latitude, resource.longitude]).addTo(map);
+            marker.bindPopup("<b>" + resource.name + "</b><br/>");
+        });
     });
 
     onResourceCIDRChange(function(cidr) {
@@ -288,6 +302,19 @@ function organizationEdit() {
 
     getOrganization(id, function(org) {
         setupEditOrganizationForm(org);
+    });
+
+    getResourcesByOrganizationId(id, function(resources) {
+        for (var i = 0; i < resources.length; i++) {
+            renderResourceListElement(resources[i]);
+        }
+
+        renderMap(function(map) {
+            for (var i = 0; i < resources.length; i++) {
+                var marker = L.marker([resources[i].latitude, resources[i].longitude]).addTo(map);
+                marker.bindPopup("<b>" + resources[i].name + "</b><br/>");
+            }
+        });
     });
 
     onResourceSearchSubmit(function(query) {
