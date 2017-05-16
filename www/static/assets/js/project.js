@@ -305,10 +305,6 @@ function organizationEdit() {
     });
 
     getResourcesByOrganizationId(id, function(resources) {
-        for (var i = 0; i < resources.length; i++) {
-            renderResourceListElement(resources[i]);
-        }
-
         renderMap(function(map) {
             for (var i = 0; i < resources.length; i++) {
                 var marker = L.marker([resources[i].latitude, resources[i].longitude]).addTo(map);

@@ -39,7 +39,7 @@ function getOrganizations(onSuccess) {
 // redirect to the assoicated organization/index.html page.
 function createOrganization(id, name, desc, owner, email, country_code,
                             country_name, continent_code, continent_name,
-                            postal_code, latitude, longitude) {
+                            postal_code, latitude, longitude, orgUrl) {
     var url = baseUrl;
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_organizations';
@@ -59,6 +59,7 @@ function createOrganization(id, name, desc, owner, email, country_code,
     url += '&postal_code='  + postal_code;
     url += '&latitude='  + latitude.toFixed(5);
     url += '&longitude='  + longitude.toFixed(5);
+    url += '&url='  + orgUrl;
 
     function successCallback(organization) {
         var id = organization.organization_id;
