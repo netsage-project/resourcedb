@@ -116,12 +116,7 @@ function project() {
             renderResourceListElement(resources[i]);
         }
 
-        renderMap(function(map) {
-            for (var i = 0; i < resources.length; i++) {
-                var marker = L.marker([resources[i].latitude, resources[i].longitude]).addTo(map);
-                marker.bindPopup("<b>" + resources[i].name + "</b><br/>");
-            }
-        });
+        renderMap(resources);
     });
 
     onResourceSearchSubmit(function(query) {
@@ -148,12 +143,7 @@ function projectEdit() {
     });
 
     getResourcesByProjectId(id, function(resources) {
-        renderMap(function(map) {
-            for (var i = 0; i < resources.length; i++) {
-                var marker = L.marker([resources[i].latitude, resources[i].longitude]).addTo(map);
-                marker.bindPopup("<b>" + resources[i].name + "</b><br/>");
-            }
-        });
+        renderMap(resources);
     });
 
     onResourceSearchSubmit(function(query) {
@@ -170,10 +160,7 @@ function resource() {
         renderResourceHeader(resource);
         renderResourceRecord(resource);
 
-        renderMap(function(map) {
-            var marker = L.marker([resource.latitude, resource.longitude]).addTo(map);
-            marker.bindPopup("<b>" + resource.name + "</b><br/>");
-        });
+        renderMap([resource]);
 
         getGeoIP(resource.addr_str, function(geoip) {
             renderGeoIPTable(geoip);
@@ -243,10 +230,7 @@ function resourceEdit() {
         setupEditResourceForm(resource);
         getGeoIP(resource.addr_str, renderGeoIPTable);
 
-        renderMap(function(map) {
-            var marker = L.marker([resource.latitude, resource.longitude]).addTo(map);
-            marker.bindPopup("<b>" + resource.name + "</b><br/>");
-        });
+        renderMap([resource]);
     });
 
     onResourceCIDRChange(function(cidr) {
@@ -273,12 +257,7 @@ function organization() {
             renderResourceListElement(resources[i]);
         }
 
-        renderMap(function(map) {
-            for (var i = 0; i < resources.length; i++) {
-                var marker = L.marker([resources[i].latitude, resources[i].longitude]).addTo(map);
-                marker.bindPopup("<b>" + resources[i].name + "</b><br/>");
-            }
-        });
+        renderMap(resources);
     });
 
     onResourceSearchSubmit(function(query) {
@@ -305,12 +284,7 @@ function organizationEdit() {
     });
 
     getResourcesByOrganizationId(id, function(resources) {
-        renderMap(function(map) {
-            for (var i = 0; i < resources.length; i++) {
-                var marker = L.marker([resources[i].latitude, resources[i].longitude]).addTo(map);
-                marker.bindPopup("<b>" + resources[i].name + "</b><br/>");
-            }
-        });
+        renderMap(resources);
     });
 
     onResourceSearchSubmit(function(query) {
