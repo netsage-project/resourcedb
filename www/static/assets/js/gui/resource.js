@@ -71,7 +71,6 @@ function renderResourceRecord(resource) {
     var cidr = document.getElementById('resource_cidr');
     var country = document.getElementById('resource_country');
     var geolocation = document.getElementById('resource_geolocation');
-    var address = document.getElementById('resource_address');
     var organization = document.getElementById('resource_organization');
     var role = document.getElementById('resource_role');
     var link = document.getElementById('resource_edit_link');
@@ -85,7 +84,6 @@ function renderResourceRecord(resource) {
         geolocation.innerHTML = resource.latitude.toString() + ' ' + resource.longitude.toString();
     }
 
-    address.innerHTML = resource.postal_code.toString();
     organization.innerHTML = resource.organization_name;
     role.innerHTML = resource.role_name;
     link.href = basePath + 'resource/edit.html?resource_id=' + resource.ip_block_id.toString();
@@ -345,8 +343,13 @@ function setupCreateResourceForm() {
     var id = document.getElementById('resource_id');
     id.value = -1;
 
-    var submit = document.getElementById('create_resource_submit');
-    submit.onclick = submitCreateOrUpdateResource;
+    var form = document.getElementById('create_resource_form');
+    form.onsubmit = submitCreateOrUpdateResource;
+
+    var cancel = document.getElementById('cancel_resource_submit');
+    cancel.onclick = function() {
+        window.location.href = basePath + 'index.html';
+    };
 
     var country = document.getElementById('resource_country');
     for (var i in countries) {
@@ -394,44 +397,46 @@ function setupEditResourceForm(resource) {
     var org = document.getElementById('resource_organization');
 
     var country = document.getElementById('resource_country');
+
     for (var i in countries) {
         var opt = document.createElement('option');
 
         opt.innerHTML = countries[i];
         opt.setAttribute('value', i);
+        if (resource.country_code == i) {
+            console.log(i);
+            opt.setAttribute('selected', '');
+        }
         country.appendChild(opt);
     }
 
-  getRoles(function(roles) {
-    var role = document.getElementById('resource_role');
-    for (var i = 0; i < roles.length; i++) {
-      var opt = document.createElement('option');
+    getRoles(function(roles) {
+        var role = document.getElementById('resource_role');
+        for (var i = 0; i < roles.length; i++) {
+            var opt = document.createElement('option');
 
-      opt.innerHTML = roles[i].name;
-      opt.setAttribute('value', roles[i].role_id);
-      if (resource.role_id == roles[i].role_id) {
-        opt.setAttribute('selected', '');
-      }
-      role.appendChild(opt);
-    }
-  });
+            opt.innerHTML = roles[i].name;
+            opt.setAttribute('value', roles[i].role_id);
+            if (resource.role_id == roles[i].role_id) {
+                opt.setAttribute('selected', '');
+            }
+            role.appendChild(opt);
+        }
+    });
 
-  getDisciplines(function(disciplines) {
-    var discipline = document.getElementById('resource_discipline');
-    for (var i = 0; i < disciplines.length; i++) {
-      var opt = document.createElement('option');
+    getDisciplines(function(disciplines) {
+        var discipline = document.getElementById('resource_discipline');
+        for (var i = 0; i < disciplines.length; i++) {
+            var opt = document.createElement('option');
 
-      opt.innerHTML = disciplines[i].name;
-      opt.setAttribute('value', disciplines[i].discipline_id);
-      if (discipline.role_id == disciplines[i].role_id) {
-        opt.setAttribute('selected', '');
-      }
-      discipline.appendChild(opt);
-    }
-  });
-
-    var continent = document.getElementById('resource_continent');
-    var postal_code = document.getElementById('resource_postal_code');
+            opt.innerHTML = disciplines[i].name;
+            opt.setAttribute('value', disciplines[i].discipline_id);
+            if (resource.discipline_id == disciplines[i].discipline_id) {
+                opt.setAttribute('selected', '');
+            }
+            discipline.appendChild(opt);
+        }
+    });
 
     var lat = document.getElementById('resource_latitude');
     var lon = document.getElementById('resource_longitude');
@@ -446,17 +451,12 @@ function setupEditResourceForm(resource) {
     cidr.value = resource.addr_str;
     asn.value = resource.asn;
     org.value = resource.organization_id;
-    country.value = resource.country_name;
-    continent.value = resource.continent_name;
-    postal_code.value = resource.postal_code;
     lat.value = resource.latitude;
     lon.value = resource.longitude;
     project.value = resource.project_id;
-    discipline.value = resource.discipline_id;
-    role.value = resource.role_id;
 
-    var submit = document.getElementById('edit_resource_submit');
-    submit.onclick = submitCreateOrUpdateResource;
+    var form = document.getElementById('create_resource_form');
+    form.onsubmit = submitCreateOrUpdateResource;
 
     var del = document.getElementById('delete_resource_submit');
     del.onclick = function(e) {
@@ -497,6 +497,8 @@ function renderCreateResourceFormOrganizationOption(org) {
 // the create button is pressed. Passes the collected values to
 // createResource after parameters are validated.
 function submitCreateOrUpdateResource(e) {
+    e.preventDefault();
+
     var form = document.getElementById('create_resource_form');
     console.log('submitCreateResource');
     console.log(e);
@@ -511,12 +513,6 @@ function submitCreateOrUpdateResource(e) {
     var org_id = form.elements['resource_organization'].value;
 
     var country_code = form.elements['resource_country'].value;
-    var country_name = form.elements['resource_country'].value;
-
-    var continent_code = 'NA';
-    var continent_name = form.elements['resource_continent'].value;
-
-    var postal_code = form.elements['resource_postal_code'].value;
 
     var lat = parseFloat(form.elements['resource_latitude'].value);
     var lon = parseFloat(form.elements['resource_longitude'].value);
@@ -532,12 +528,10 @@ function submitCreateOrUpdateResource(e) {
     if (resource_id === -1) {
         console.log('Creating a new resource');
         createOrEditResource(null, name, desc, cidr, asn, org_id, country_code,
-                       country_name, continent_code, continent_name, postal_code,
                        lat, lon, project_id, discipline_id, role_id);
     } else {
         console.log('Editing resource ' + resource_id.toString());
         createOrEditResource(resource_id, name, desc, cidr, asn, org_id, country_code,
-                             country_name, continent_code, continent_name, postal_code,
                              lat, lon, project_id, discipline_id, role_id);
     }
 }
