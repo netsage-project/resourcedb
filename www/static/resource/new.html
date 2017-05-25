@@ -63,69 +63,48 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Name </label>
-                                        <input class="form-control input-sm" type="text" placeholder="resource name" id="resource_name">
+                                        <input class="form-control input-sm" type="text" required="" placeholder="Resource name" id="resource_name">
                                         <p class="help-block text-left hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">ASN </label>
-                                        <input class="form-control input-sm" type="text" placeholder="autonomous system number" id="resource_asn">
+                                        <input class="form-control input-sm" type="number" required="" placeholder="117" id="resource_asn">
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Prefix </label>
-                                        <input class="form-control input-sm" type="text" value="8.8.8.8/24" placeholder="8.8.8.8/24" id="resource_cidr">
+                                        <input class="form-control input-sm" type="text" value="8.8.8.8/24" required="" placeholder="8.8.8.8/24" id="resource_cidr">
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label">Organization Name</label>
-                                        <select class="form-control" id="resource_organization">
-                                            <option value="" selected="">Unknown</option>
-                                        </select>
+                                        <label class="control-label">Organization</label>
+                                        <select class="form-control input-sm" required="" id="resource_organization"></select>
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Project </label>
-                                        <select class="form-control" id="resource_project">
-                                            <option value="" selected="">Unknown</option>
-                                        </select>
+                                        <select class="form-control input-sm" required="" id="resource_project"></select>
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Role </label>
-                                        <select class="form-control" id="resource_role"></select>
+                                        <select class="form-control input-sm" required="" id="resource_role"></select>
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Discipline </label>
-                                        <select class="form-control" id="resource_discipline"></select>
+                                        <select class="form-control input-sm" required="" id="resource_discipline"></select>
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label">Description </label>
-                                        <textarea class="form-control input-sm" rows="5.5" cols="40" wrap="hard" placeholder="a simple description" id="resource_description"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label">Postal Code</label>
-                                        <input class="form-control input-sm" type="text" value="63021" id="resource_postal_code">
-                                        <p class="help-block hidden">Help text for a form field.</p>
+                                        <textarea class="form-control input-sm" rows="5.5" cols="40" wrap="hard" placeholder="A simple description" id="resource_description"></textarea>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Country </label>
-                                        <select class="form-control" id="resource_country"></select>
-                                        <p class="help-block hidden">Help text for a form field.</p>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label">Continent </label>
-                                        <select class="form-control" id="resource_continent">
-                                            <optgroup label="Continent">
-                                                <option value="North America">North America</option>
-                                                <option value="South America" selected="">South America</option>
-                                                <option value="Asia">Asia</option>
-                                                <option value="Africa">Africa</option>
-                                            </optgroup>
-                                        </select>
+                                        <select class="form-control input-sm" required="" id="resource_country"></select>
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group has-feedback">
@@ -140,60 +119,60 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <h4>External data sources</h4>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered table-condensed">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Provider </td>
+                                                    <td id="geoip_provider">Maxmind </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Organization </td>
+                                                    <td id="geoip_organization"> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>ASN </td>
+                                                    <td id="geoip_asn"> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Country </td>
+                                                    <td id="geoip_country"> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>City </td>
+                                                    <td id="geoip_city"> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Region </td>
+                                                    <td id="geoip_region"> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Latitude </td>
+                                                    <td id="geoip_latitude"> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Longitude </td>
+                                                    <td id="geoip_longitude"> </td>
+                                                </tr>
+                                            </tbody>
+                                            <caption>GeoLocation Data</caption>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <p class="text-right">
+                                        <button class="btn btn-primary" type="submit" id="create_resource_submit">save </button>
+                                        <button class="btn btn-default" type="button" id="cancel_resource_submit">cancel </button>
+                                    </p>
+                                </div>
+                            </div>
                         </fieldset>
                     </form>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <h4>External data sources</h4>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-condensed">
-                            <tbody>
-                                <tr>
-                                    <td>Provider </td>
-                                    <td id="geoip_provider">Maxmind </td>
-                                </tr>
-                                <tr>
-                                    <td>Organization </td>
-                                    <td id="geoip_organization"> </td>
-                                </tr>
-                                <tr>
-                                    <td>ASN </td>
-                                    <td id="geoip_asn"> </td>
-                                </tr>
-                                <tr>
-                                    <td>Country </td>
-                                    <td id="geoip_country"> </td>
-                                </tr>
-                                <tr>
-                                    <td>City </td>
-                                    <td id="geoip_city"> </td>
-                                </tr>
-                                <tr>
-                                    <td>Region </td>
-                                    <td id="geoip_region"> </td>
-                                </tr>
-                                <tr>
-                                    <td>Latitude </td>
-                                    <td id="geoip_latitude"> </td>
-                                </tr>
-                                <tr>
-                                    <td>Longitude </td>
-                                    <td id="geoip_longitude"> </td>
-                                </tr>
-                            </tbody>
-                            <caption>GeoLocation Data</caption>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <p class="text-right">
-                        <button class="btn btn-primary" type="button" id="create_resource_submit">save </button>
-                        <button class="btn btn-default" type="button">cancel </button>
-                    </p>
                 </div>
             </div>
         </div>
