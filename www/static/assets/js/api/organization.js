@@ -37,9 +37,7 @@ function getOrganizations(onSuccess) {
 
 // Creates a new organization using the backend api. On success, we
 // redirect to the assoicated organization/index.html page.
-function createOrganization(id, name, desc, owner, email, country_code,
-                            country_name, continent_code, continent_name,
-                            postal_code, latitude, longitude, orgUrl) {
+function createOrganization(id, name, desc, owner, email, country_code, lat, lon, orgUrl) {
     var url = baseUrl;
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_organizations';
@@ -53,12 +51,8 @@ function createOrganization(id, name, desc, owner, email, country_code,
     url += '&owner=' + owner;
     url += '&email=' + email;
     url += '&country_code=' + country_code;
-    url += '&country_name='  + country_name;
-    url += '&continent_code='  + continent_code;
-    url += '&continent_name='  + continent_name;
-    url += '&postal_code='  + postal_code;
-    url += '&latitude='  + latitude.toFixed(5);
-    url += '&longitude='  + longitude.toFixed(5);
+    url += '&latitude='  + lat.toFixed(5);
+    url += '&longitude='  + lon.toFixed(5);
     url += '&url='  + orgUrl;
 
     function successCallback(organization) {

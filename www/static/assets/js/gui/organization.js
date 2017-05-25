@@ -76,17 +76,23 @@ function setupCreateOrganizationForm() {
         country.appendChild(opt);
     }
 
-    var submit = document.getElementById('create_organization_submit');
-    submit.onclick = submitCreateOrUpdateOrganization;
+    var form = document.getElementById('create_organization_form');
+    form.onsubmit = submitCreateOrUpdateOrganization;
+
+    var cancel = document.getElementById('cancel_organization_submit');
+    cancel.onclick = function() {
+        window.location.href = basePath + 'index.html';
+    };
 }
 
 // Gathers values from create_organization_form on organization/new.html when
 // the create button is pressed. Passes the collected values to
 // createOrganization after parameters are validated.
 function submitCreateOrUpdateOrganization(e) {
+    e.preventDefault();
+
     var form = document.getElementById('create_organization_form');
     console.log('submitCreateOrganization');
-    console.log(form.elements);
 
     var name = form.elements['organization_name'].value;
     var desc = form.elements['organization_description'].value;
@@ -95,26 +101,21 @@ function submitCreateOrUpdateOrganization(e) {
     var orgUrl = form.elements['organization_url'].value;
 
     var country_code = form.elements['organization_country'].value;
-    var country_name = form.elements['organization_country'].value;
-
-    var continent_code = 'NA';
-    var continent_name = form.elements['organization_continent'].value;
-
-    var postal_code = form.elements['organization_postal_code'].value;
 
     var lat = parseFloat(form.elements['organization_latitude'].value);
     var lon = parseFloat(form.elements['organization_longitude'].value);
 
     // Hidden field organization_id
     var id = parseInt(form.elements['organization_id'].value);
+
     if (id === -1) {
         console.log('Creating a new organization');
-        createOrganization(null, name, desc, owner, email, country_code, country_name,
-                           continent_code, continent_name, postal_code, lat, lon, orgUrl);
+        createOrganization(null, name, desc, owner, email, country_code,
+                           lat, lon, orgUrl);
     } else {
         console.log('Editing organization ' + id.toString());
-        createOrganization(id, name, desc, owner, email, country_code, country_name,
-                           continent_code, continent_name, postal_code, lat, lon, orgUrl);
+        createOrganization(id, name, desc, owner, email, country_code,
+                           lat, lon, orgUrl);
     }
 }
 
@@ -126,7 +127,6 @@ function setupEditOrganizationForm(org) {
     document.getElementById('organization_owner').value = org.owner;
     document.getElementById('organization_email').value = org.email;
     document.getElementById('organization_url').value = org.url;
-    document.getElementById('organization_postal_code').value = org.postal_code;
 
     var country = document.getElementById('organization_country');
     for (var i in countries) {
@@ -138,13 +138,11 @@ function setupEditOrganizationForm(org) {
     }
     country.value = org.country_name;
 
-    document.getElementById('organization_continent').value = org.continent_name;
-
     document.getElementById('organization_latitude').value = org.latitude || 0.0;
     document.getElementById('organization_longitude').value = org.longitude || 0.0;
 
-    var submit = document.getElementById('edit_organization_submit');
-    submit.onclick = submitCreateOrUpdateOrganization;
+    var form = document.getElementById('create_organization_form');
+    form.onsubmit = submitCreateOrUpdateOrganization;
 
     var del = document.getElementById('delete_organization_submit');
     del.onclick = function(e) {

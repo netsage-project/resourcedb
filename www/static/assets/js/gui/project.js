@@ -63,15 +63,21 @@ function renderProjectRecord(project) {
 // Sets up submitCreateProject to be called when the create button on
 // project/new.html is pressed.
 function setupCreateProjectForm() {
-    var submit = document.getElementById('create_project_submit');
-    submit.onclick = submitCreateOrUpdateProject;
-}
+    var form = document.getElementById('create_project_form');
+    form.onsubmit = submitCreateOrUpdateProject;
 
+    var cancel = document.getElementById('cancel_project_submit');
+    cancel.onclick = function() {
+        window.location.href = basePath + 'index.html';
+    };
+}
 
 // Gathers values from create_project_form on project/new.html when
 // the create button is pressed. Passes the collected values to
 // createProject after parameters are validated.
 function submitCreateOrUpdateProject(e) {
+    e.preventDefault();
+
     var form = document.getElementById('create_project_form');
     console.log('submitCreateProject');
     console.log(form.elements);
@@ -110,8 +116,8 @@ function setupEditProjectForm(project) {
     email.value = project.email;
     url.value = project.url;
 
-    var submit = document.getElementById('edit_project_submit');
-    submit.onclick = submitCreateOrUpdateProject;
+    var form = document.getElementById('create_project_form');
+    form.onsubmit = submitCreateOrUpdateProject;
 
     var del = document.getElementById('delete_project_submit');
     del.onclick = function(e) {
