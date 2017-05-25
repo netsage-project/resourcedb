@@ -64,22 +64,22 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Name </label>
-                                        <input class="form-control input-sm" type="text" placeholder="Organization name" id="organization_name">
+                                        <input class="form-control input-sm" type="text" required="" placeholder="Organization Name" id="organization_name">
                                         <p class="help-block text-left hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Owner </label>
-                                        <input class="form-control input-sm" type="text" placeholder="John Doe" id="organization_owner">
+                                        <input class="form-control input-sm" type="text" required="" placeholder="John Doe" id="organization_owner">
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Email </label>
-                                        <input class="form-control input-sm" type="text" placeholder="admin@organization.org" id="organization_email">
+                                        <input class="form-control input-sm" type="email" placeholder="jdoe@organization.org" id="organization_email">
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label"> Homepage</label>
-                                        <input class="form-control input-sm" type="text" placeholder="www.organization.org" id="organization_url">
+                                        <input class="form-control input-sm" type="url" placeholder="https://www.organization.org" id="organization_url">
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
@@ -89,50 +89,33 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label">Postal Code</label>
-                                        <input class="form-control input-sm" type="text" placeholder="63021" id="organization_postal_code">
-                                        <p class="help-block hidden">Help text for a form field.</p>
-                                    </div>
-                                    <div class="form-group">
                                         <label class="control-label">Country </label>
-                                        <select class="form-control" id="organization_country"></select>
-                                        <p class="help-block hidden">Help text for a form field.</p>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label">Continent </label>
-                                        <select class="form-control" id="organization_continent">
-                                            <optgroup label="Continent">
-                                                <option value="North America">North America</option>
-                                                <option value="South America" selected="">South America</option>
-                                                <option value="Asia">Asia</option>
-                                                <option value="Africa">Africa</option>
-                                            </optgroup>
-                                        </select>
+                                        <select class="form-control" required="" id="organization_country"></select>
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group has-feedback">
                                         <label class="control-label">Latitude </label>
-                                        <input class="form-control input-sm" type="number" value="0" min="-90" max="90" step=".0001" id="organization_latitude"><i class="form-control-feedback fa fa-exclamation-circle hidden" aria-hidden="true"></i>
+                                        <input class="form-control input-sm" type="number" value="0" required="" min="-90" max="90" step=".0001" id="organization_latitude"><i class="form-control-feedback fa fa-exclamation-circle hidden" aria-hidden="true"></i>
                                         <p class="help-block hidden">Lattitude must be in range of -90 to 90 </p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Longitude </label>
-                                        <input class="form-control input-sm" type="number" value="0" min="-180" max="180" step=".001" id="organization_longitude">
+                                        <input class="form-control input-sm" type="number" value="0" required="" min="-180" max="180" step=".001" id="organization_longitude">
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <p class="text-right">
+                                        <button class="btn btn-primary" type="submit" id="edit_organization_submit">update </button>
+                                        <button class="btn btn-danger" type="button" id="delete_organization_submit">delete </button>
+                                        <button class="btn btn-default" type="button" id="cancel_organization_submit">cancel </button>
+                                    </p>
+                                </div>
+                            </div>
                         </fieldset>
                     </form>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <p class="text-right">
-                        <button class="btn btn-primary" type="button" id="edit_organization_submit">update </button>
-                        <button class="btn btn-danger" type="button" id="delete_organization_submit">delete </button>
-                        <button class="btn btn-default" type="button" id="cancel_organization_submit">cancel </button>
-                    </p>
                 </div>
             </div>
         </div>
