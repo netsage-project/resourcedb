@@ -441,7 +441,6 @@ function setupEditResourceForm(resource) {
     var lat = document.getElementById('resource_latitude');
     var lon = document.getElementById('resource_longitude');
 
-    var project = document.getElementById('resource_project');
     var discipline = document.getElementById('resource_discipline');
     var role = document.getElementById('resource_role');
 
@@ -453,7 +452,6 @@ function setupEditResourceForm(resource) {
     org.value = resource.organization_id;
     lat.value = resource.latitude;
     lon.value = resource.longitude;
-    project.value = resource.project_id;
 
     var form = document.getElementById('create_resource_form');
     form.onsubmit = submitCreateOrUpdateResource;
@@ -469,8 +467,8 @@ function setupEditResourceForm(resource) {
     };
 }
 
-// Appends an option to the resource_project drop down box on
-// resource/new.html.
+// Appends an project option to the drop down box with id
+// resource_project.
 function renderCreateResourceFormProjectOption(project) {
     var dropd = document.getElementById('resource_project');
     var opt = document.createElement('option');
@@ -517,8 +515,6 @@ function submitCreateOrUpdateResource(e) {
     var lat = parseFloat(form.elements['resource_latitude'].value);
     var lon = parseFloat(form.elements['resource_longitude'].value);
 
-    var project_id = form.elements['resource_project'].value;
-
     var discipline_id = form.elements['resource_discipline'].value;
     var role_id = form.elements['resource_role'].value;
 
@@ -528,11 +524,11 @@ function submitCreateOrUpdateResource(e) {
     if (resource_id === -1) {
         console.log('Creating a new resource');
         createOrEditResource(null, name, desc, cidr, asn, org_id, country_code,
-                       lat, lon, project_id, discipline_id, role_id);
+                       lat, lon, discipline_id, role_id);
     } else {
         console.log('Editing resource ' + resource_id.toString());
         createOrEditResource(resource_id, name, desc, cidr, asn, org_id, country_code,
-                             lat, lon, project_id, discipline_id, role_id);
+                             lat, lon, discipline_id, role_id);
     }
 }
 

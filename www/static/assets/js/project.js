@@ -192,12 +192,6 @@ function resourceNew() {
         }
     });
 
-    getProjects(function(projects) {
-        for (var i = 0; i < projects.length; i++) {
-            renderCreateResourceFormProjectOption(projects[i]);
-        }
-    });
-
     setupCreateResourceForm();
 
     onResourceCIDRChange(function(cidr) {
@@ -217,12 +211,6 @@ function resourceEdit() {
     getOrganizations(function(orgs) {
         for (var i = 0; i < orgs.length; i++) {
             renderCreateResourceFormOrganizationOption(orgs[i]);
-        }
-    });
-
-    getProjects(function(projects) {
-        for (var i = 0; i < projects.length; i++) {
-            renderCreateResourceFormProjectOption(projects[i]);
         }
     });
 
