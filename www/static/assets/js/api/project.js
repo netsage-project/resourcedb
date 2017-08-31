@@ -42,7 +42,7 @@ function createOrEditProject(id, name, desc, owner, email, projUrl) {
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_projects';
     } else {
-        url += 'api/admin/index.cgi?method=update_projects';
+        url += 'api/index.cgi?method=update_project';
         url += '&project_id=' + id.toString();
     }
 

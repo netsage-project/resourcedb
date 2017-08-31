@@ -81,9 +81,89 @@ sub _init_get_methods {
                                   description => 'The offset (pagination)');
 
     $self->_get_dynamic_where_parameters( $method );
-
     $self->websvc()->register_method( $method );
 
+    $method = GRNOC::WebService::Method->new(
+        name => 'get_projects',
+        description => "Returns the projects of IP block.",
+        expires => "-1d",
+        callback => sub { $self->_get_projects( @_ ) } );
+
+    $method->add_input_parameter(
+        name        => 'ip_block_id',
+        pattern     => $INTEGER,
+        required    => 0,
+        multiple    => 0,
+        description => 'The id of the IP block'
+    );
+
+    $method->add_input_parameter(
+        name        => 'project_id',
+        pattern     => $INTEGER,
+        required    => 0,
+        multiple    => 0,
+        description => 'The id of the IP block'
+    );
+
+    $self->_get_dynamic_where_parameters($method);
+    $self->websvc()->register_method($method);
+
+    $method = GRNOC::WebService::Method->new(
+        name => 'update_project',
+        description => "Updates project project_id.",
+        expires => "-1d",
+        callback => sub { $self->_update_project( @_ ) } );
+
+    $method->add_input_parameter(
+        name        => 'project_id',
+        pattern     => $INTEGER,
+        required    => 1,
+        multiple    => 0,
+        description => 'The id of the IP block'
+    );
+
+    $method->add_input_parameter(
+        name        => 'name',
+        pattern     => $TEXT,
+        required    => 1,
+        multiple    => 0,
+        description => 'The id of the IP block'
+    );
+
+    $method->add_input_parameter(
+        name        => 'description',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'The id of the IP block'
+    );
+
+    $method->add_input_parameter(
+        name        => 'owner',
+        pattern     => $TEXT,
+        required    => 1,
+        multiple    => 0,
+        description => 'The id of the IP block'
+    );
+
+    $method->add_input_parameter(
+        name        => 'email',
+        pattern     => $TEXT,
+        required    => 1,
+        multiple    => 0,
+        description => 'The id of the IP block'
+    );
+
+    $method->add_input_parameter(
+        name        => 'url',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'The id of the IP block'
+    );
+
+    $self->_get_dynamic_where_parameters($method);
+    $self->websvc()->register_method($method);
 }
 
 sub _get_dynamic_where_parameters {
@@ -144,8 +224,6 @@ sub _init_dynamic_get_methods {
         $self->websvc()->register_method( $method );
 
     }
-
-
 }
 
 
@@ -190,6 +268,33 @@ sub _get_ip_blocks {
             'warning' => $result->warning()};
 }
 
+sub _get_projects {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->user_ds()->get_projects( $self->process_args( $args ) );
+    if (!$result) {
+        $method->set_error( $self->user_ds()->error() );
+        return;
+    }
+
+    return {
+        'results' => $result->results(),
+        'total' => $result->total(),
+        'offset' => $result->offset(),
+        'warning' => $result->warning()
+    };
+}
+
+sub _update_project {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->user_ds()->update_project( $self->process_args( $args ) );
+    if (!$result) {
+        $method->set_error( $self->user_ds()->error() );
+        return;
+    }
+
+    return $result;
+}
 
 1;
-

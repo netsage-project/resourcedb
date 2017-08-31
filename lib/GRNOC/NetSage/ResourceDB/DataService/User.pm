@@ -59,12 +59,10 @@ sub get_ip_blocks {
                          'ip_block.postal_code as postal_code',
                          'ip_block.latitude as latitude',
                          'ip_block.longitude as longitude',
-                         'ip_block.project_id as project_id',
                          'ip_block.discipline_id as discipline_id',
                          'ip_block.role_id as role_id',
                          'role.name as role_name',
                          'organization.name as organization_name',
-                         'project.name as project_name',
                          'discipline.name as discipline_name',
                          ];
 
@@ -97,7 +95,6 @@ sub get_ip_blocks {
     $from_sql .= 'left join organization on ( ip_block.organization_id = organization.organization_id ) ';
     $from_sql .= 'left join role on ( ip_block.role_id = role.role_id ) ';
     $from_sql .= 'left join discipline on ( ip_block.discipline_id = discipline.discipline_id ) ';
-    $from_sql .= 'left join project on ( ip_block.project_id = project.project_id ) ';
     $from_sql .= 'left join country on ( country.country_code = ip_block.country_code ) ';
     $from_sql .= 'left join continent on ( country.continent_code = continent.continent_code ) ';
 
@@ -121,7 +118,93 @@ sub get_ip_blocks {
                                                                  offset => $offset );
 
     return $result;
+}
 
+sub update_project {
+    my ($self, %args) = @_;
+
+    my @where = ();
+
+    my $param = GRNOC::MetaParameter->new(
+        name  => 'project_id',
+        field => 'project.project_id'
+    );
+
+    @where = $param->process(args => \%args, where => \@where);
+
+    my $project_id = $args{'project_id'};
+    delete $args{'project_id'};
+
+    my $result = $self->dbq_rw()->update(
+        table => 'project',
+        fields => \%args,
+        where => [-and => \@where]
+    );
+
+    if (!defined $result || $result != 1) {
+        return { error => $self->dbq_rw()->get_error() };
+    }
+
+    return { results => [{ project_id => $project_id }] };
+}
+
+sub get_projects {
+    my ($self, %args) = @_;
+
+    my $remote_user = $args{'remote_user'};
+
+    my $fields = [
+        'project.project_id as project_id',
+        'project.name as name',
+        'project.description as description',
+        'project.url as url',
+        'project.email as email'
+    ];
+
+    my @where = ();
+
+    my $param = undef;
+    my $table = '';
+    if (defined $args{'ip_block_id'}) {
+        $param = GRNOC::MetaParameter->new(
+            name  => 'ip_block_id',
+            field => 'ip_block_project.ip_block_id'
+        );
+
+        @where = $param->process(args => \%args, where => \@where);
+
+        $table .= 'ip_block_project ';
+        $table .= 'join project on (ip_block_project.project_id = project.project_id)';
+    } elsif (defined $args{'project_id'}) {
+        $param = GRNOC::MetaParameter->new(
+            name  => 'project_id',
+            field => 'project_id'
+        );
+
+        @where = $param->process(args => \%args, where => \@where);
+
+        $table .= 'project';
+    } else {
+        $table .= 'project';
+    }
+
+    my $results = $self->dbq_ro()->select(
+        table  => $table,
+        fields => $fields,
+        where  => [-and => \@where]
+    );
+    if (!$results) {
+        $self->error('An unknown error occurred getting the ip blocks.');
+        return undef;
+    }
+
+    my $num_rows = $self->dbq_ro()->num_rows();
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
+        results => $results,
+        total => $num_rows
+    );
+
+    return $result;
 }
 
 sub _add_dynamic_parameters {

@@ -31,7 +31,6 @@ use constant COOKIE_FILE => '/tmp/netsage_resourcedb_cookies';
 use constant VALID_DYNAMIC_DB_NAMES => {
     'role' => 1,
     'organization' => 1,
-    'project' => 1,
     'discipline' => 1,
     'country' => 1,
     'continent' => 1
