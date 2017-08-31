@@ -84,6 +84,18 @@ sub get_ip_blocks {
     @where = $addr_param->process( args => \%args,
                                    where => \@where );
 
+    my $name_param = GRNOC::MetaParameter->new( name => 'addr_str',
+                                                field => 'ip_block.name' );
+
+    @where = $name_param->process( args => \%args,
+                                   where => \@where );
+
+    my $org_name_param = GRNOC::MetaParameter->new( name => 'addr_str',
+                                                    field => 'organization.name' );
+
+    @where = $org_name_param->process( args => \%args,
+                                       where => \@where );
+
     $self->_add_dynamic_parameters( \%args, \@where);
 
     # get the order_by value
@@ -103,7 +115,7 @@ sub get_ip_blocks {
 
     my $results = $self->dbq_ro()->select( table => $from_sql,
                                            fields => $select_fields,
-                                           where => [-and => \@where],
+                                           where => [-or => \@where],
                                            order_by => $order_by,
                                            limit => $limit,
                                            offset => $offset );
