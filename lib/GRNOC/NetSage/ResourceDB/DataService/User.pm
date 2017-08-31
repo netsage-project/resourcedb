@@ -76,6 +76,12 @@ sub get_ip_blocks {
     my $addr_param = GRNOC::MetaParameter->new(name => 'addr_str', field => 'ip_block.addr_str');
     @where = $addr_param->process(args => \%args, where => \@where);
 
+    my $name_param = GRNOC::MetaParameter->new( name => 'addr_str', field => 'ip_block.name' );
+    @where = $name_param->process(args => \%args, where => \@where);
+
+    my $org_name_param = GRNOC::MetaParameter->new(name => 'addr_str', field => 'organization.name');
+    @where = $org_name_param->process(args => \%args, where => \@where);
+
     # get the order_by value
     my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
     my $order_by = $order_by_param->parse( %args );
@@ -104,7 +110,7 @@ sub get_ip_blocks {
 
     my $results = $self->dbq_ro()->select( table => $from_sql,
                                            fields => $select_fields,
-                                           where => [-and => \@where],
+                                           where => [-or => \@where],
                                            order_by => $order_by,
                                            limit => $limit,
                                            offset => $offset );
