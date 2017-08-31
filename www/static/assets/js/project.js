@@ -166,11 +166,11 @@ function resource() {
             renderGeoIPTable(geoip);
         });
 
-        if (resource.project_id != null) {
-            getProject(resource.project_id, function(project) {
-                renderLinkedProjectListElement(project);
-            });
-        }
+        getProjectsByResourceID(id, function(projects) {
+            for (var i = 0; i < projects.length; i++) {
+                renderLinkedProjectListElement(projects[i]);
+            }
+        });
 
         if (resource.organization_id != null) {
             getOrganization(resource.organization_id, function(org) {
