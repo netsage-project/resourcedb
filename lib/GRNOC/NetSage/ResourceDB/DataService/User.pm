@@ -63,26 +63,18 @@ sub get_ip_blocks {
                          'ip_block.role_id as role_id',
                          'role.name as role_name',
                          'organization.name as organization_name',
-                         'discipline.name as discipline_name',
+                         'discipline.name as discipline_name'
                          ];
 
     my @where = ();
 
     # handle optional ip_block_id param
-    my $role_id_param = GRNOC::MetaParameter->new( name => 'ip_block_id',
-                                                   field => 'ip_block.ip_block_id' );
-
-    @where = $role_id_param->process( args => \%args,
-                                      where => \@where );
+    my $role_id_param = GRNOC::MetaParameter->new(name => 'ip_block_id', field => 'ip_block.ip_block_id');
+    @where = $role_id_param->process(args => \%args, where => \@where);
 
     # handle optional ip_addr_str
-    my $addr_param = GRNOC::MetaParameter->new( name => 'addr_str',
-                                                field => 'ip_block.addr_str' );
-
-    @where = $addr_param->process( args => \%args,
-                                   where => \@where );
-
-    $self->_add_dynamic_parameters( \%args, \@where);
+    my $addr_param = GRNOC::MetaParameter->new(name => 'addr_str', field => 'ip_block.addr_str');
+    @where = $addr_param->process(args => \%args, where => \@where);
 
     # get the order_by value
     my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
@@ -92,11 +84,23 @@ sub get_ip_blocks {
     my $offset = $args{'offset'};
 
     my $from_sql = 'ip_block ';
+
+    # Filters ip_blocks by optional project_id
+    if (defined $args{'project_id'}) {
+        my $project_param = GRNOC::MetaParameter->new(name => 'project_id', field => 'project.project_id');
+        @where = $project_param->process(args => \%args, where => \@where);
+
+        $from_sql .= 'join ip_block_project on (ip_block.ip_block_id = ip_block_project.ip_block_id) ';
+        $from_sql .= 'join project on (ip_block_project.project_id = project.project_id) ';
+    }
+
     $from_sql .= 'left join organization on ( ip_block.organization_id = organization.organization_id ) ';
     $from_sql .= 'left join role on ( ip_block.role_id = role.role_id ) ';
     $from_sql .= 'left join discipline on ( ip_block.discipline_id = discipline.discipline_id ) ';
     $from_sql .= 'left join country on ( country.country_code = ip_block.country_code ) ';
     $from_sql .= 'left join continent on ( country.continent_code = continent.continent_code ) ';
+
+    $self->_add_dynamic_parameters(\%args, \@where);
 
     my $results = $self->dbq_ro()->select( table => $from_sql,
                                            fields => $select_fields,
@@ -104,9 +108,7 @@ sub get_ip_blocks {
                                            order_by => $order_by,
                                            limit => $limit,
                                            offset => $offset );
-
-    if ( !$results ) {
-
+    if (!$results) {
         $self->error( 'An unknown error occurred getting the ip blocks.' );
         return;
     }
