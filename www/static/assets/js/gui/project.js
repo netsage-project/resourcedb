@@ -58,6 +58,9 @@ function renderProjectRecord(project) {
 
   document.getElementById('project_owner').innerHTML = project.owner;
   document.getElementById('project_email').innerHTML = project.email;
+
+  var edit_link = document.getElementById('project_edit_resources');
+  edit_link.href = basePath + 'project/link.html?project_id=' + project.project_id.toString();
 }
 
 // Sets up submitCreateProject to be called when the create button on
@@ -69,6 +72,27 @@ function setupCreateProjectForm() {
     var cancel = document.getElementById('cancel_project_submit');
     cancel.onclick = function() {
         window.location.href = basePath + 'index.html';
+    };
+}
+
+function setupProjectLinkResourceForm(project) {
+    var link = document.getElementById('link_project');
+    var cancel = document.getElementById('cancel_link_project');
+
+    link.onclick = function() {
+        var table = document.getElementById('selected_resource_list');
+        var resourceIDs = [];
+
+        for (var i = 0; i < table.rows.length; i++) {
+            var id = table.rows[i].getAttribute('data-id');
+            resourceIDs.push(id);
+        }
+
+        setProjectResourceLinks(project.project_id, resourceIDs);
+    };
+
+    cancel.onclick = function() {
+        window.location.href = basePath + 'project/index.html?project_id=' + project.project_id.toString();
     };
 }
 

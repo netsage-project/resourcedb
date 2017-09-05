@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         projectNew();
     } else if (url.pathname === basePath + 'project/edit.html') {
         projectEdit();
+    } else if (url.pathname === basePath + 'project/link.html') {
+        projectLink();
     } else if (url.pathname === basePath + 'resource/index.html') {
         resource();
     } else if (url.pathname === basePath + 'resource/new.html') {
@@ -144,6 +146,52 @@ function projectEdit() {
 
     getResourcesByProjectId(id, function(resources) {
         renderMap(resources);
+    });
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
+    });
+}
+
+function projectLink() {
+    console.log('Loading the link project page');
+
+    var searchParams = new URLSearchParams(window.location.search);
+    var id = searchParams.get('project_id');
+
+    getProject(id, function(project) {
+        renderProjectHeader(project);
+        setupProjectLinkResourceForm(project);
+    });
+
+    getResources(function(resources) {
+        for (var i = 0; i < resources.length; i++) {
+            renderResourceListSelectableElement(resources[i]);
+        }
+    });
+
+    getResourcesByProjectId(id, function(resources) {
+        for (var i = 0; i < resources.length; i++) {
+            addResourceListSelectableElement(resources[i]);
+        }
+    });
+
+    onProjectLinkResourceSearchKeyUp(function(input) {
+        if (input === null || input === '') {
+            getResources(function(resources) {
+                renderEmptyResourceList();
+                for (var i = 0; i < resources.length; i++) {
+                    renderResourceListSelectableElement(resources[i]);
+                }
+            });
+        } else {
+            getResourcesLike(input, function(resources) {
+                renderEmptyResourceList();
+                for (var i = 0; i < resources.length; i++) {
+                    renderResourceListSelectableElement(resources[i]);
+                }
+            });
+        }
     });
 
     onResourceSearchSubmit(function(query) {
