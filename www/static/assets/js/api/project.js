@@ -53,6 +53,26 @@ function getProjectsByResourceID(resourceID, on_success) {
     });
 }
 
+// Adds each of resourceIDs to projectID. Redirects to the project
+// page for projectID on success.
+function setProjectResourceLinks(projectID, resourceIDs) {
+    var url = baseUrl + 'api/index.cgi?method=set_project_ip_block_links&project_id=' + projectID.toString();
+    for (var i = 0; i < resourceIDs.length; i++) {
+        url += '&ip_block_id=' + resourceIDs[i];
+    }
+
+    fetch(url, {
+        credentials: 'include',
+        method:      'get'
+    }).then(function(response) {
+        response.json().then(function(json) {
+            window.location.href = basePath + 'project/index.html?project_id=' + projectID;
+        });
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Create or edit a new project using the backend api. On success, we
 // redirect to the assoicated project/index.html page.
 function createOrEditProject(id, name, desc, owner, email, projUrl) {

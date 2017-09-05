@@ -232,5 +232,42 @@ sub _add_dynamic_parameters {
 
 }
 
-1;
+sub set_project_ip_block_links {
+    my ($self, %args) = @_;
 
+    my @where = ();
+
+    my $param = GRNOC::MetaParameter->new(
+        name  => 'project_id',
+        field => 'project_id'
+    );
+
+    @where = $param->process(args => \%args, where => \@where);
+
+    my $result = undef;
+    $result = $self->dbq_rw()->delete(
+        table => 'ip_block_project',
+        where => [-and => \@where]
+    );
+
+    warn Dumper($result);
+    if (!defined $result) {
+        return { error => $self->dbq_rw()->get_error() };
+    }
+
+    $result = undef;
+    foreach my $ip_block_id (@{$args{'ip_block_id'}}) {
+        $result = $self->dbq_rw()->insert(
+            table  => 'ip_block_project',
+            fields => { project_id => $args{'project_id'}, ip_block_id => $ip_block_id }
+        );
+    }
+
+    if (!defined $result || $result < 1) {
+        return { error => $self->dbq_rw()->get_error() };
+    }
+
+    return { results => [ int($result) ] };
+}
+
+1;

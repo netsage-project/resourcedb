@@ -170,6 +170,31 @@ sub _init_get_methods {
 
     $self->_get_dynamic_where_parameters($method);
     $self->websvc()->register_method($method);
+
+    $method = GRNOC::WebService::Method->new(
+        name => 'set_project_ip_block_links',
+        description => "Updates project project_id.",
+        expires => "-1d",
+        callback => sub { $self->_set_project_ip_block_links( @_ ) } );
+
+    $method->add_input_parameter(
+        name        => 'project_id',
+        pattern     => $INTEGER,
+        required    => 1,
+        multiple    => 0,
+        description => 'The id of the project'
+    );
+
+    $method->add_input_parameter(
+        name        => 'ip_block_id',
+        pattern     => $INTEGER,
+        required    => 1,
+        multiple    => 1,
+        description => 'The id of the IP blocks to add'
+    );
+
+    $self->_get_dynamic_where_parameters($method);
+    $self->websvc()->register_method($method);
 }
 
 sub _get_dynamic_where_parameters {
@@ -181,9 +206,7 @@ sub _get_dynamic_where_parameters {
             required    => 0,
             multiple    => 1,
             description => "The id of the $name");
-
     }
-
 }
 
 sub _init_dynamic_get_methods {
@@ -295,6 +318,18 @@ sub _update_project {
     my ( $self, $method, $args ) = @_;
 
     my $result = $self->user_ds()->update_project( $self->process_args( $args ) );
+    if (!$result) {
+        $method->set_error( $self->user_ds()->error() );
+        return;
+    }
+
+    return $result;
+}
+
+sub _set_project_ip_block_links {
+    my ($self, $method, $args) = @_;
+
+    my $result = $self->user_ds()->set_project_ip_block_links( $self->process_args( $args ) );
     if (!$result) {
         $method->set_error( $self->user_ds()->error() );
         return;
