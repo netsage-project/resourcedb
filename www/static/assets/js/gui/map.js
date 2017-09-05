@@ -26,12 +26,13 @@ function renderMap(resources, onRender) {
 
     var bounds = L.latLngBounds(latlngPoints);
 
-    var zoom   = map.getBoundsZoom(bounds);
-    var center = bounds.getCenter();
-
     // Sets an arbitrary zoom level for a single point.
-    if (latlngPoints.length <= 1) {
-        zoom = 5;
+    var zoom   = 5;
+    var center = [40, -90];
+
+    if (latlngPoints.length > 1) {
+        zoom = map.getBoundsZoom(bounds);
+        center = bounds.getCenter();
     }
 
     map.setView(center, zoom);
