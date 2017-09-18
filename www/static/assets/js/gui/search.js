@@ -16,6 +16,14 @@ function onResourceSearchKeyUp(onKeyUp) {
     });
 }
 
+function onProjectLinkResourceSearchKeyUp(onKeyUp) {
+    var search = document.getElementById('link_search_field');
+
+    search.addEventListener('keyup', function(e) {
+        onKeyUp(e.target.value);
+    });
+}
+
 // Called when enter is pressed and search_form is in focus.
 function onResourceSearchSubmit(onSubmit) {
     var search = document.getElementById('search_form');

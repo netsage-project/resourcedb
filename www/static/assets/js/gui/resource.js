@@ -42,6 +42,67 @@ function renderResourceListElement(resource) {
     });
 }
 
+// Renders a resource in resource_list on index.html.
+function renderResourceListSelectableElement(resource) {
+    var table = document.getElementById('resource_list');
+    var row   = table.insertRow(0);
+
+    var id = resource.ip_block_id.toString();
+
+    var type = row.insertCell(0);
+    var name = row.insertCell(1);
+    var addr = row.insertCell(2);
+    var ownr = row.insertCell(3);
+    var location = row.insertCell(4);
+
+    type.innerHTML = resource.role_name;
+    name.innerHTML = resource.name;
+    addr.innerHTML = resource.addr_str;
+    ownr.innerHTML = resource.organization_name;
+    location.innerHTML = resource.country_name;
+
+    row.addEventListener('click', function(e) {
+        addResourceListSelectableElement(resource);
+    });
+}
+
+// Adds a resource to #selected_resource_list. An onClick event
+// listener is added to remove the item from the list once
+// selected. The `data-id` attribute on the table row is set to the id
+// of resource.
+function addResourceListSelectableElement(resource) {
+    var table = document.getElementById('selected_resource_list');
+    for (var i = 0; i < table.rows.length; i++) {
+        if (table.rows[i].cells[2].innerHTML === resource.addr_str) {
+            return 1;
+        }
+    }
+
+    var row   = table.insertRow(0);
+    row.setAttribute('data-id', resource.ip_block_id);
+
+    var type = row.insertCell(0);
+    var name = row.insertCell(1);
+    var addr = row.insertCell(2);
+    var ownr = row.insertCell(3);
+    var location = row.insertCell(4);
+
+    type.innerHTML = resource.role_name;
+    name.innerHTML = resource.name;
+    addr.innerHTML = resource.addr_str;
+    ownr.innerHTML = resource.organization_name;
+    location.innerHTML = resource.country_name;
+
+    row.addEventListener('click', function(e) {
+        for (var i = 0; i < table.rows.length; i++) {
+            if (table.rows[i].cells[2].innerHTML === resource.addr_str) {
+                table.deleteRow(i);
+                return 1;
+            }
+        }
+    });
+}
+
 function renderEmptyResourceList() {
     document.getElementById('resource_list').innerHTML = '';
 }
