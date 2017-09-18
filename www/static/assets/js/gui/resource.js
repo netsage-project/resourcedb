@@ -360,6 +360,15 @@ function setupCreateResourceForm() {
         country.appendChild(opt);
     }
 
+    var cidr = document.getElementById('resource_cidr');
+    cidr.addEventListener('input', function(event) {
+        if (cidr.validity.patternMismatch) {
+            cidr.setCustomValidity('Expects a comma separated list of IPv4 CIDR addresses');
+        } else {
+            cidr.setCustomValidity("");
+        }
+    });
+
   getRoles(function(roles) {
     var role = document.getElementById('resource_role');
     for (var i = 0; i < roles.length; i++) {
@@ -391,6 +400,13 @@ function setupEditResourceForm(resource) {
     var name = document.getElementById('resource_name');
     var desc = document.getElementById('resource_description');
     var cidr = document.getElementById('resource_cidr');
+    cidr.addEventListener('input', function(event) {
+        if (cidr.validity.patternMismatch) {
+            cidr.setCustomValidity('Expects a comma separated list of IPv4 CIDR addresses');
+        } else {
+            cidr.setCustomValidity("");
+        }
+    });
 
     var asn = document.getElementById('resource_asn');
 
