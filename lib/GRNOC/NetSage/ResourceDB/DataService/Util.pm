@@ -197,7 +197,36 @@ sub update_schema {
     if ($version eq '0.0.4') {
         ($version, $err) = $self->upgrade_to_0_0_5($db, $version);
     }
+    if ($version eq '0.0.5') {
+        ($version, $err) = $self->upgrade_to_0_0_6($db, $version);
+    }
 
+    return ($version, $err);
+}
+
+sub upgrade_to_0_0_6 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+    my $ok  = undef;
+
+    my $query = "alter table ip_block modify addr_str varchar(1024)";
+
+    $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't update ip_block.addr_str's size: $err";
+            return ($version, $err);
+        }
+        warn "Database schema version is undefined.";
+    }
+    warn "Updated ip_block.addr_str's size";
+
+    $version = '0.0.6';
+    my $updated_ok = $self->_update_version($db, $version);
     return ($version, $err);
 }
 
