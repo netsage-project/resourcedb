@@ -194,7 +194,86 @@ sub update_schema {
     if ($version eq '0.0.3.1') {
         ($version, $err) = $self->upgrade_to_0_0_4($db, $version);
     }
+    if ($version eq '0.0.4') {
+        ($version, $err) = $self->upgrade_to_0_0_5($db, $version);
+    }
 
+    return ($version, $err);
+}
+
+sub upgrade_to_0_0_5 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+    my $ok  = undef;
+
+    my $query = "
+create table `ip_block_project` (
+    `id` int(6) unsigned auto_increment primary key,
+    `ip_block_id` int(6) unsigned not null,
+    `project_id` int(6) unsigned not null,
+    constraint `fk_ip_block_project_ip_block_id` foreign key (`ip_block_id`) references `ip_block` (`ip_block_id`),
+    constraint `fk_ip_block_project_project_id` foreign key (`project_id`) references `project` (`project_id`)
+) engine=InnoDB default charset=latin1
+";
+    $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't create ip_block_project table: $err";
+            return ($version, $err);
+        }
+        warn "Database schema version is undefined.";
+    }
+    warn "Created ip_block_project table";
+
+
+    $query ="
+insert into ip_block_project (ip_block_id, project_id)
+select ip_block.ip_block_id, ip_block.project_id
+from ip_block
+";
+    $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't migrate data into ip_block_project: $err";
+            return ($version, $err);
+        }
+        warn "Database schema version is undefined.";
+    }
+    warn "Migrated data into ip_block_project";
+
+    $query = "
+alter table ip_block drop foreign key FK_project
+";
+    $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't drop foreign key: $err";
+            return ($version, $err);
+        }
+        warn "Database schema version is undefined.";
+    }
+
+    $query = "
+alter table ip_block drop column project_id
+";
+    $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't drop column: $err";
+            return ($version, $err);
+        }
+        warn "Database schema version is undefined.";
+    }
+
+    $version = '0.0.5';
+    my $updated_ok = $self->_update_version($db, $version);
     return ($version, $err);
 }
 

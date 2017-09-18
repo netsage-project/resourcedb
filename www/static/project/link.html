@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>registry</title>
+    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bitter:400,700">
+    <link rel="stylesheet" href="../assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../assets/css/Footer-Basic.css">
+    <link rel="stylesheet" href="../assets/css/Footer-Clean.css">
+    <link rel="stylesheet" href="../assets/css/Header-Dark.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css">
+    <link rel="stylesheet" href="../assets/css/Map-Clean.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+<link rel="icon" href="../assets/img/logoNoShadow.png" type="image/x-icon" />
+</head>
+
+<body>
+    <div>
+        <div class="header-dark">
+            <nav class="navbar navbar-default navigation-clean-search">
+                <div class="container">
+                    <div class="navbar-header">
+                        <a class="navbar-brand navbar-link" href="../index.html"> <img class="img-rounded" src="../assets/img/logo_text.png"> </a>
+                        <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navcol-1">
+                        <form class="navbar-form navbar-left" target="_self" id="search_form">
+                            <div class="form-group">
+                                <label class="control-label" for="search-field"><i class="glyphicon glyphicon-search"></i></label>
+                                <input class="form-control input-lg search-field" type="search" name="search" autocomplete="on" id="search_field">
+                            </div>
+                        </form>
+                        <ul class="nav navbar-nav"></ul>
+                        <p class="navbar-text navbar-right"> </p>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 id="project_name">Project</h3>
+                    <p id="project_description">Link selected resources to this project.</p>
+                    <hr>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <form>
+                        <div class="form-group">
+                            <label class="control-label"><strong>Resource search</strong></label>
+                            <input class="form-control" type="text" id="link_search_field">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <p><strong>Results </strong></p>
+                        </div>
+                        <div class="col-md-5">
+                            <p class="text-right"> </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-condensed">
+                                    <thead>
+                                        <tr></tr>
+                                    </thead>
+                                    <tbody id="resource_list"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p><strong>Selected </strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-condensed">
+                                    <thead>
+                                        <tr></tr>
+                                    </thead>
+                                    <tbody id="selected_resource_list"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="text-right">
+                                <button class="btn btn-primary" type="button" id="link_project">link resources</button>
+                                <button class="btn btn-default" type="button" id="cancel_link_project">cancel </button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-basic">
+        <footer>
+            <ul class="list-inline">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="http://www.netsage.global/home/netsage-privacy-policy">Privacy Policy</a></li>
+            </ul>
+            <p class="copyright">Indiana University © 2016</p>
+        </footer>
+    </div>
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/polyfill/urlsearchparams.js"></script>
+    <script src="../assets/js/polyfill/fetch.js"></script>
+    <script src="../assets/js/api/geoip.js"></script>
+    <script src="../assets/js/gui/geoip.js"></script>
+    <script src="../assets/js/project.js"></script>
+    <script src="../assets/js/api/organization.js"></script>
+    <script src="../assets/js/gui/organization.js"></script>
+    <script src="../assets/js/gui/project.js"></script>
+    <script src="../assets/js/api/project.js"></script>
+    <script src="../assets/js/api/role.js"></script>
+    <script src="../assets/js/api/discipline.js"></script>
+    <script src="../assets/js/gui/resource.js"></script>
+    <script src="../assets/js/api/resource.js"></script>
+    <script src="../assets/js/api/search.js"></script>
+    <script src="../assets/js/gui/search.js"></script>
+    <script src="../assets/js/api/map.js"></script>
+    <script src="../assets/js/gui/map.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+</body>
+
+</html>

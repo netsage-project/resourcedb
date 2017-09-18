@@ -35,6 +35,44 @@ function getProjects(on_success) {
     });
 }
 
+// Gets a list of projects from the backend filtered by resourceID.
+function getProjectsByResourceID(resourceID, on_success) {
+    var url = baseUrl + 'api/index.cgi?method=get_projects' + '&ip_block_id=' + resourceID.toString();
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            on_success(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
+// Adds each of resourceIDs to projectID. Redirects to the project
+// page for projectID on success.
+function setProjectResourceLinks(projectID, resourceIDs) {
+    var url = baseUrl + 'api/index.cgi?method=set_project_ip_block_links&project_id=' + projectID.toString();
+    for (var i = 0; i < resourceIDs.length; i++) {
+        url += '&ip_block_id=' + resourceIDs[i];
+    }
+
+    fetch(url, {
+        credentials: 'include',
+        method:      'get'
+    }).then(function(response) {
+        response.json().then(function(json) {
+            window.location.href = basePath + 'project/index.html?project_id=' + projectID;
+        });
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Create or edit a new project using the backend api. On success, we
 // redirect to the assoicated project/index.html page.
 function createOrEditProject(id, name, desc, owner, email, projUrl) {
@@ -42,7 +80,7 @@ function createOrEditProject(id, name, desc, owner, email, projUrl) {
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_projects';
     } else {
-        url += 'api/admin/index.cgi?method=update_projects';
+        url += 'api/index.cgi?method=update_project';
         url += '&project_id=' + id.toString();
     }
 

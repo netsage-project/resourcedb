@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         projectNew();
     } else if (url.pathname === basePath + 'project/edit.html') {
         projectEdit();
+    } else if (url.pathname === basePath + 'project/link.html') {
+        projectLink();
     } else if (url.pathname === basePath + 'resource/index.html') {
         resource();
     } else if (url.pathname === basePath + 'resource/new.html') {
@@ -151,6 +153,52 @@ function projectEdit() {
     });
 }
 
+function projectLink() {
+    console.log('Loading the link project page');
+
+    var searchParams = new URLSearchParams(window.location.search);
+    var id = searchParams.get('project_id');
+
+    getProject(id, function(project) {
+        renderProjectHeader(project);
+        setupProjectLinkResourceForm(project);
+    });
+
+    getResources(function(resources) {
+        for (var i = 0; i < resources.length; i++) {
+            renderResourceListSelectableElement(resources[i]);
+        }
+    });
+
+    getResourcesByProjectId(id, function(resources) {
+        for (var i = 0; i < resources.length; i++) {
+            addResourceListSelectableElement(resources[i]);
+        }
+    });
+
+    onProjectLinkResourceSearchKeyUp(function(input) {
+        if (input === null || input === '') {
+            getResources(function(resources) {
+                renderEmptyResourceList();
+                for (var i = 0; i < resources.length; i++) {
+                    renderResourceListSelectableElement(resources[i]);
+                }
+            });
+        } else {
+            getResourcesLike(input, function(resources) {
+                renderEmptyResourceList();
+                for (var i = 0; i < resources.length; i++) {
+                    renderResourceListSelectableElement(resources[i]);
+                }
+            });
+        }
+    });
+
+    onResourceSearchSubmit(function(query) {
+        submitResourceSearch(query);
+    });
+}
+
 function resource() {
     var searchParams = new URLSearchParams(window.location.search);
     var id = searchParams.get('resource_id')
@@ -166,11 +214,11 @@ function resource() {
             renderGeoIPTable(geoip);
         });
 
-        if (resource.project_id != null) {
-            getProject(resource.project_id, function(project) {
-                renderLinkedProjectListElement(project);
-            });
-        }
+        getProjectsByResourceID(id, function(projects) {
+            for (var i = 0; i < projects.length; i++) {
+                renderLinkedProjectListElement(projects[i]);
+            }
+        });
 
         if (resource.organization_id != null) {
             getOrganization(resource.organization_id, function(org) {
@@ -189,12 +237,6 @@ function resourceNew() {
     getOrganizations(function(orgs) {
         for (var i = 0; i < orgs.length; i++) {
             renderCreateResourceFormOrganizationOption(orgs[i]);
-        }
-    });
-
-    getProjects(function(projects) {
-        for (var i = 0; i < projects.length; i++) {
-            renderCreateResourceFormProjectOption(projects[i]);
         }
     });
 
@@ -217,12 +259,6 @@ function resourceEdit() {
     getOrganizations(function(orgs) {
         for (var i = 0; i < orgs.length; i++) {
             renderCreateResourceFormOrganizationOption(orgs[i]);
-        }
-    });
-
-    getProjects(function(projects) {
-        for (var i = 0; i < projects.length; i++) {
-            renderCreateResourceFormProjectOption(projects[i]);
         }
     });
 
