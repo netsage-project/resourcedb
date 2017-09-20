@@ -113,6 +113,10 @@ function project() {
         renderProjectRecord(project);
     });
 
+    getProjectEvents(id, function(events) {
+        events.map(renderProjectEventListElement);
+    });
+
     getResourcesByProjectId(id, function(resources) {
         for (var i = 0; i < resources.length; i++) {
             renderResourceListElement(resources[i]);
@@ -215,16 +219,15 @@ function resource() {
         });
 
         getProjectsByResourceID(id, function(projects) {
+            console.log(projects);
             for (var i = 0; i < projects.length; i++) {
                 renderLinkedProjectListElement(projects[i]);
             }
         });
 
-        if (resource.organization_id != null) {
-            getOrganization(resource.organization_id, function(org) {
-                renderLinkedOrganizationListElement(org);
-            });
-        }
+        getResourceEvents(id, function(events) {
+            events.map(renderResourceEventListElement);
+        });
     });
 
     onResourceSearchSubmit(function(query) {
@@ -286,6 +289,10 @@ function organization() {
     getOrganization(id, function(org) {
         renderOrganizationHeader(org);
         renderOrganizationRecord(org);
+    });
+
+    getOrganizationEvents(id, function(events) {
+        events.map(renderOrganizationEventListElement);
     });
 
     getResourcesByOrganizationId(id, function(resources) {

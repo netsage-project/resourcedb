@@ -34,6 +34,20 @@ function renderMyOrganizationListElement(org) {
     });
 }
 
+// Renders events as list items under orgnization_event_list on
+// organization/index.html
+function renderOrganizationEventListElement(event) {
+    var eventText = document.createElement('span');
+    eventText.innerHTML = '<b>' + event.date + '</b> - ' + event.message;
+
+    var entry = document.createElement('li');
+    entry.setAttribute('class', 'list-group-item');
+    entry.appendChild(eventText);
+
+    var listGroup = document.getElementById('organization_event_list');
+    listGroup.appendChild(entry);
+}
+
 // Given a organization record, set the innerHTML of the elements
 // identified by organization_name and organization_description.
 function renderOrganizationHeader(organization) {

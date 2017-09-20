@@ -53,6 +53,23 @@ function getProjectsByResourceID(resourceID, on_success) {
     });
 }
 
+
+// Gets an project's events from the backend by projectId.
+function getProjectEvents(projectId, onSuccess) {
+    var url = baseUrl + 'api/index.cgi?method=get_events' + '&project_id=' + projectId.toString();
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+        response.json().then(function(json) {
+            console.log(json);
+            onSuccess(json.results);
+        });
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Adds each of resourceIDs to projectID. Redirects to the project
 // page for projectID on success.
 function setProjectResourceLinks(projectID, resourceIDs) {

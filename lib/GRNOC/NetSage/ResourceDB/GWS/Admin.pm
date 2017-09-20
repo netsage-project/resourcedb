@@ -55,8 +55,39 @@ sub _init_add_methods {
 
     $self->_add_ip_block_params( $method );
 
-    $self->websvc()->register_method( $method );
 
+    $method = GRNOC::WebService::Method->new( name => 'add_events',
+                                                   description => "Adds the specified events.",
+                                                   expires => "-1d",
+                                                   callback => sub { $self->_add_events( @_ ) } );
+
+    $method->add_input_parameter( name        => 'message',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The event message');
+    $method->add_input_parameter( name        => 'ip_block_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event ip_block_id');
+    $method->add_input_parameter( name        => 'project_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event project_id');
+    $method->add_input_parameter( name        => 'organization_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event organization_id');
+    $method->add_input_parameter( name        => 'user_id',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event user_id');
+
+    $self->websvc()->register_method( $method );
 }
 
 sub _init_update_methods {
@@ -489,6 +520,22 @@ sub _add_ip_blocks {
     my ( $self, $method, $args ) = @_;
 
     my $result = $self->admin_ds()->add_ip_blocks( $self->process_args( $args ) );
+
+    # handle error
+    if ( !$result ) {
+
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return { 'results' => $result };
+}
+
+sub _add_events {
+
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->add_events( $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {

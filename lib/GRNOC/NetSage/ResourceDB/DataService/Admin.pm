@@ -63,6 +63,36 @@ sub add_ip_blocks {
 
 }
 
+sub add_events {
+
+    my ( $self, %args ) = @_;
+
+    my $remote_user = $args{'remote_user'};
+
+    my $from_sql = 'event ';
+
+    if (!defined $args{'user_id'}) {
+        $args{'user_id'} = $remote_user;
+    }
+    warn Dumper(%args);
+    my $fields = $self->_get_event_args( %args );
+
+    my $results = $self->dbq_rw()->insert( table => $from_sql,
+                                           fields => $fields
+                                       );
+
+    if ( !$results ) {
+
+        $self->error( 'An unknown error occurred adding the events.' );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    return [{'event_id' => $results}];
+
+}
+
 
 sub add_table_dynamically {
 
@@ -326,6 +356,30 @@ sub _get_ip_block_args {
 
     return \%args;
 
+}
+
+sub _get_event_args {
+    my ( $self, %args_in ) = @_;
+
+    my %args = ();
+
+    my @all_args = (
+        'message',
+        'organization_id',
+        'project_id',
+        'ip_block_id',
+        'user_id'
+    );
+
+    foreach my $arg( @all_args ) {
+        if ( not defined $args_in{ $arg } ) {
+            next;
+        }
+        $args{ $arg } = $args_in{ $arg };
+
+    }
+
+    return \%args;
 }
 
 1;
