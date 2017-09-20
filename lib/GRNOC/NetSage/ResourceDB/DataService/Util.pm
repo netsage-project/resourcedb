@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS event (
     event_id int AUTO_INCREMENT PRIMARY KEY,
     date timestamp,
     message varchar(140),
-    user_id int,
+    user_id varchar(32),
     ip_block_id int,
     project_id int,
     organization_id int
