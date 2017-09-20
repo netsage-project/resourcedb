@@ -167,8 +167,6 @@ sub _init_get_methods {
         multiple    => 0,
         description => 'The id of the IP block'
     );
-
-    $self->_get_dynamic_where_parameters($method);
     $self->websvc()->register_method($method);
 
     $method = GRNOC::WebService::Method->new(
@@ -367,7 +365,7 @@ sub _get_events {
 sub _update_project {
     my ( $self, $method, $args ) = @_;
 
-    my $result = $self->user_ds()->update_project( $self->process_args( $args ) );
+    my $result = $self->user_ds()->update_project($self->process_args( $args ));
     if (!$result) {
         $method->set_error( $self->user_ds()->error() );
         return;

@@ -54,13 +54,12 @@ sub _init_add_methods {
                                   description => 'The address string (CIDR)');
 
     $self->_add_ip_block_params( $method );
-
+    $self->websvc()->register_method( $method );
 
     $method = GRNOC::WebService::Method->new( name => 'add_events',
                                                    description => "Adds the specified events.",
                                                    expires => "-1d",
                                                    callback => sub { $self->_add_events( @_ ) } );
-
     $method->add_input_parameter( name        => 'message',
                                   pattern     => $TEXT,
                                   required    => 1,
@@ -86,8 +85,38 @@ sub _init_add_methods {
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The event user_id');
-
     $self->websvc()->register_method( $method );
+
+    $method = GRNOC::WebService::Method->new( name => 'add_projects',
+                                              description => "Adds the specified projects.",
+                                              expires => "-1d",
+                                              callback => sub { $self->_add_projects( @_ ) } );
+    $method->add_input_parameter( name        => 'name',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The event message');
+    $method->add_input_parameter( name        => 'description',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event ip_block_id');
+    $method->add_input_parameter( name        => 'url',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event project_id');
+    $method->add_input_parameter( name        => 'owner',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The event organization_id');
+    $method->add_input_parameter( name        => 'email',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The event user_id');
+    $self->websvc()->register_method($method);
 }
 
 sub _init_update_methods {
@@ -121,9 +150,7 @@ sub _init_update_methods {
                                   description => 'The address string (CIDR)');
 
     $self->_add_ip_block_params( $method );
-
     $self->websvc()->register_method( $method );
-
 }
 
 sub _init_delete_methods {
@@ -516,14 +543,10 @@ sub _get_ip_blocks {
 ### CALLBACKS - add methods
 
 sub _add_ip_blocks {
-
     my ( $self, $method, $args ) = @_;
 
     my $result = $self->admin_ds()->add_ip_blocks( $self->process_args( $args ) );
-
-    # handle error
     if ( !$result ) {
-
         $method->set_error( $self->admin_ds()->error() );
         return;
     }
@@ -532,14 +555,10 @@ sub _add_ip_blocks {
 }
 
 sub _add_events {
-
     my ( $self, $method, $args ) = @_;
 
     my $result = $self->admin_ds()->add_events( $self->process_args( $args ) );
-
-    # handle error
     if ( !$result ) {
-
         $method->set_error( $self->admin_ds()->error() );
         return;
     }
@@ -547,24 +566,30 @@ sub _add_events {
     return { 'results' => $result };
 }
 
-
-### CALLBACKS - update methods
-
-sub _update_ip_blocks {
-
+sub _add_projects {
     my ( $self, $method, $args ) = @_;
 
-    my $result = $self->admin_ds()->update_ip_blocks( $self->process_args( $args ) );
-
-    # handle error
+    my $result = $self->admin_ds()->add_projects( $self->process_args( $args ) );
     if ( !$result ) {
-
         $method->set_error( $self->admin_ds()->error() );
         return;
     }
 
     return { 'results' => $result };
+}
 
+### CALLBACKS - update methods
+
+sub _update_ip_blocks {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->update_ip_blocks( $self->process_args( $args ) );
+    if ( !$result ) {
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return { 'results' => $result };
 }
 
 ### CALLBACKS - delete methods

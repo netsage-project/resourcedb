@@ -153,6 +153,11 @@ sub update_project {
         return { error => $self->dbq_rw()->get_error() };
     }
 
+    $self->add_events(
+        project_id => $project_id,
+        message => "$ENV{'REMOTE_USER'} updated this project."
+    );
+
     return { results => [{ project_id => $project_id }] };
 }
 
@@ -166,7 +171,8 @@ sub get_projects {
         'project.name as name',
         'project.description as description',
         'project.url as url',
-        'project.email as email'
+        'project.email as email',
+        'project.owner as owner'
     ];
 
     my @where = ();
@@ -243,7 +249,9 @@ sub get_events {
     my $results = $self->dbq_ro()->select(
         table  => 'event',
         fields => $fields,
-        where  => [-and => \@where]
+        where  => [-and => \@where],
+        order_by => [{-desc => 'date'}],
+        limit => 10
     );
     if (!$results) {
         $self->error('An unknown error occurred getting the ip blocks.');
