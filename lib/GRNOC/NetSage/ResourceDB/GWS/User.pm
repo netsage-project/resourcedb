@@ -167,8 +167,6 @@ sub _init_get_methods {
         multiple    => 0,
         description => 'The id of the IP block'
     );
-
-    $self->_get_dynamic_where_parameters($method);
     $self->websvc()->register_method($method);
 
     $method = GRNOC::WebService::Method->new(
@@ -194,6 +192,39 @@ sub _init_get_methods {
     );
 
     $self->_get_dynamic_where_parameters($method);
+    $self->websvc()->register_method($method);
+
+    $method = GRNOC::WebService::Method->new(
+        name        => 'get_events',
+        description => 'Get all events.',
+        expires     => '-1d',
+        callback    => sub { $self->_get_events(@_) }
+    );
+    $method->add_input_parameter( name        => 'event_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event_id');
+    $method->add_input_parameter( name        => 'ip_block_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event ip_block_id');
+    $method->add_input_parameter( name        => 'project_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event project_id');
+    $method->add_input_parameter( name        => 'organization_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event organization_id');
+    $method->add_input_parameter( name        => 'user_id',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event user_id');
     $self->websvc()->register_method($method);
 }
 
@@ -314,10 +345,27 @@ sub _get_projects {
     };
 }
 
+sub _get_events {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->user_ds()->get_events( $self->process_args( $args ) );
+    if (!$result) {
+        $method->set_error( $self->user_ds()->error() );
+        return;
+    }
+
+    return {
+        'results' => $result->results(),
+        'total' => $result->total(),
+        'offset' => $result->offset(),
+        'warning' => $result->warning()
+    };
+}
+
 sub _update_project {
     my ( $self, $method, $args ) = @_;
 
-    my $result = $self->user_ds()->update_project( $self->process_args( $args ) );
+    my $result = $self->user_ds()->update_project($self->process_args( $args ));
     if (!$result) {
         $method->set_error( $self->user_ds()->error() );
         return;

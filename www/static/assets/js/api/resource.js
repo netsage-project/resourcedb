@@ -54,6 +54,22 @@ function getResourcesLike(text, on_success) {
     });
 }
 
+// Gets an resource's events from the backend by resourceId.
+function getResourceEvents(resourceId, onSuccess) {
+    var url = baseUrl + 'api/index.cgi?method=get_events' + '&ip_block_id=' + resourceId.toString();
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+        response.json().then(function(json) {
+            console.log(json);
+            onSuccess(json.results);
+        });
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Gets a list of resources from the backend that are filtered by
 // project_id.
 function getResourcesByProjectId(projectId, onSuccess) {

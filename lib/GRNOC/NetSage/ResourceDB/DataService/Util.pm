@@ -200,7 +200,45 @@ sub update_schema {
     if ($version eq '0.0.5') {
         ($version, $err) = $self->upgrade_to_0_0_6($db, $version);
     }
+    if ($version eq '0.0.6') {
+        ($version, $err) = $self->upgrade_to_0_0_7($db, $version);
+    }
 
+    return ($version, $err);
+}
+
+sub upgrade_to_0_0_7 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+    my $ok  = undef;
+
+    my $query = "
+CREATE TABLE IF NOT EXISTS event (
+    event_id int AUTO_INCREMENT PRIMARY KEY,
+    date timestamp,
+    message varchar(140),
+    user_id varchar(32),
+    ip_block_id int,
+    project_id int,
+    organization_id int
+)";
+
+    $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't create event table: $err";
+            return ($version, $err);
+        }
+        warn "Database schema version is undefined.";
+    }
+    warn "Table event created";
+
+    $version = '0.0.7';
+    my $updated_ok = $self->_update_version($db, $version);
     return ($version, $err);
 }
 

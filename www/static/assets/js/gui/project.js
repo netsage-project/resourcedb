@@ -18,18 +18,34 @@ function renderMyProjectListElement(project) {
 
 // Renders a project in linked_project_list on resource/index.html.
 function renderLinkedProjectListElement(project) {
-    var table = document.getElementById('linked_project_list');
+    var table = document.getElementById('project_list');
     var row   = table.insertRow(0);
 
     var id = project.project_id.toString();
 
     var name = row.insertCell(0);
-
     name.innerHTML = project.name;
+
+    var desc = row.insertCell(1);
+    desc.innerHTML = project.description;
 
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'project/index.html?project_id=' + id;
     });
+}
+
+// Renders events as list items under project_event_list on
+// project/index.html
+function renderProjectEventListElement(event) {
+    var eventText = document.createElement('span');
+    eventText.innerHTML = '<b>' + event.date + '</b> - ' + event.message;
+
+    var entry = document.createElement('li');
+    entry.setAttribute('class', 'list-group-item');
+    entry.appendChild(eventText);
+
+    var listGroup = document.getElementById('project_event_list');
+    listGroup.appendChild(entry);
 }
 
 // Given a project record, set the innerHTML of the elements

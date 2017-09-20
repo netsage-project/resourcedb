@@ -153,6 +153,11 @@ sub update_project {
         return { error => $self->dbq_rw()->get_error() };
     }
 
+    $self->add_events(
+        project_id => $project_id,
+        message => "$ENV{'REMOTE_USER'} updated this project."
+    );
+
     return { results => [{ project_id => $project_id }] };
 }
 
@@ -166,7 +171,8 @@ sub get_projects {
         'project.name as name',
         'project.description as description',
         'project.url as url',
-        'project.email as email'
+        'project.email as email',
+        'project.owner as owner'
     ];
 
     my @where = ();
@@ -200,6 +206,52 @@ sub get_projects {
         table  => $table,
         fields => $fields,
         where  => [-and => \@where]
+    );
+    if (!$results) {
+        $self->error('An unknown error occurred getting the ip blocks.');
+        return undef;
+    }
+
+    my $num_rows = $self->dbq_ro()->num_rows();
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
+        results => $results,
+        total => $num_rows
+    );
+
+    return $result;
+}
+
+sub get_events {
+    my ($self, %args) = @_;
+
+    my $remote_user = $args{'remote_user'};
+
+    my $fields = [
+        'event.event_id as event_id',
+        'event.message as message',
+        'event.date as date',
+        'event.project_id as project_id',
+        'event.ip_block_id as ip_block_id',
+        'event.organization_id as organization_id',
+        'event.user_id as user_id'
+    ];
+
+    my @where = ();
+    foreach my $name (keys %args) {
+        my $param = GRNOC::MetaParameter->new(
+            name  => $name,
+            field => "event.$name"
+        );
+
+        @where = $param->process(args => \%args, where => \@where);
+    }
+
+    my $results = $self->dbq_ro()->select(
+        table  => 'event',
+        fields => $fields,
+        where  => [-and => \@where],
+        order_by => [{-desc => 'date'}],
+        limit => 10
     );
     if (!$results) {
         $self->error('An unknown error occurred getting the ip blocks.');

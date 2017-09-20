@@ -52,20 +52,48 @@ sub add_ip_blocks {
                                        );
 
     if ( !$results ) {
-
         $self->error( 'An unknown error occurred adding the ip blocks.' );
         return;
     }
+    $self->add_events(
+        ip_block_id => $results,
+        message => "$ENV{'REMOTE_USER'} created this resource."
+    );
 
     my $num_rows = $self->dbq_rw()->num_rows();
 
     return [{'ip_block_id' => $results}];
-
 }
 
+sub add_projects {
+
+    my ( $self, %args ) = @_;
+
+    my $remote_user = $args{'remote_user'};
+
+    my $from_sql = 'project ';
+
+    my $fields = $self->_get_project_args( %args );
+
+    my $results = $self->dbq_rw()->insert( table => $from_sql,
+                                           fields => $fields
+                                       );
+
+    if ( !$results ) {
+        $self->error( 'An unknown error occurred adding the ip blocks.' );
+        return;
+    }
+    $self->add_events(
+        project_id => $results,
+        message => "$ENV{'REMOTE_USER'} created this resource."
+    );
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    return [{'project_id' => $results}];
+}
 
 sub add_table_dynamically {
-
     my ( $self, $name, %args ) = @_;
 
     if ( !$self->_is_dbname_valid( $name ) ) {
@@ -92,19 +120,17 @@ sub add_table_dynamically {
     my $results = $self->dbq_rw()->insert( table => $from_sql,
                                            fields => $fields
                                          );
-
     if ( !$results ) {
-
         $self->error( "An unknown error occurred inserting the ${name}" );
         return;
     }
 
-    #my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
-    #                                                             total => $num_rows,
-    #                                                             );
+    $self->add_events(
+        "${name}_id" => $results,
+        message => "$ENV{'REMOTE_USER'} created this $name."
+    );
 
     return [{ "${name}_id" => $results }];
-
 }
 
 
@@ -134,10 +160,13 @@ sub update_ip_blocks {
                                        );
 
     if ( !$results ) {
-
         $self->error( 'An unknown error occurred updating the ip blocks.' );
         return;
     }
+    $self->add_events(
+        ip_block_id => $args{'ip_block_id'},
+        message => "$ENV{'REMOTE_USER'} updated this resource."
+    );
 
     my $num_rows = $self->dbq_rw()->num_rows();
 
@@ -193,6 +222,11 @@ sub update_table_dynamically {
         $self->error( "No rows affected" );
         return;
     }
+
+    $self->add_events(
+        "${name}_id" => $args{"${name}_id"},
+        message => "$ENV{'REMOTE_USER'} updated this $name."
+    );
 
     return [{ "${name}_id" => $args{"${name}_id"} }];
 
@@ -279,20 +313,33 @@ sub delete_table_dynamically {
 
 }
 
+sub _get_project_args {
+    my ( $self, %args_in ) = @_;
+
+    my %args = ();
+
+    my @all_args = (
+        'name',
+        'description',
+        'url',
+        'owner',
+        'email'
+    );
+
+    foreach my $arg( @all_args ) {
+        if ( not defined $args_in{ $arg } ) {
+            next;
+        }
+        $args{ $arg } = $args_in{ $arg };
+    }
+
+    return \%args;
+}
 
 sub _get_ip_block_args {
     my ( $self, %args_in ) = @_;
 
     my %args = ();
-
-
-    ## iterate over all keys (not doing this currently)
-    #while( my ($key, $val) = each %args_in ) {
-    #    if ( ! defined ( $val ) ) {
-    #        next;
-    #    }
-    #    $args{ $key } = $val;
-    #}
 
     # TODO: figure out how to set these derived fields:
     #  - addr_lower
@@ -329,4 +376,3 @@ sub _get_ip_block_args {
 }
 
 1;
-

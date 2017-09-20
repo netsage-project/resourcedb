@@ -42,6 +42,20 @@ function renderResourceListElement(resource) {
     });
 }
 
+// Renders events as list items under resource_event_list on
+// resource/index.html
+function renderResourceEventListElement(event) {
+    var eventText = document.createElement('span');
+    eventText.innerHTML = '<b>' + event.date + '</b> - ' + event.message;
+
+    var entry = document.createElement('li');
+    entry.setAttribute('class', 'list-group-item');
+    entry.appendChild(eventText);
+
+    var listGroup = document.getElementById('resource_event_list');
+    listGroup.appendChild(entry);
+}
+
 // Renders a resource in resource_list on index.html.
 function renderResourceListSelectableElement(resource) {
     var table = document.getElementById('resource_list');

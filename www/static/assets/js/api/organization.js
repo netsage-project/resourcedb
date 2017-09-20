@@ -18,6 +18,22 @@ function getOrganization(organizationId, onSuccess) {
     });
 }
 
+// Gets an organization's events from the backend by organizationId.
+function getOrganizationEvents(organizationId, onSuccess) {
+    var url = baseUrl + 'api/index.cgi?method=get_events' + '&organization_id=' + organizationId.toString();
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+        response.json().then(function(json) {
+            console.log(json);
+            onSuccess(json.results);
+        });
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Gets a list of organizations from the backend.
 function getOrganizations(onSuccess) {
     fetch(baseUrl + 'api/index.cgi?method=get_organizations', {
