@@ -82,14 +82,18 @@ function setupCreateOrganizationForm() {
     console.log('setupCreateOrganizationForm');
 
     var country = document.getElementById('organization_country');
+    var sel = -1;
     for (var i in countries) {
         var opt = document.createElement('option');
 
         opt.innerHTML = countries[i];
         opt.setAttribute('value', i);
         country.appendChild(opt);
+        if (opt.innerHTML == "United States") {  // default selection
+            opt.selected = true;
+        }
     }
-
+    
     var form = document.getElementById('create_organization_form');
     form.onsubmit = submitCreateOrUpdateOrganization;
 
