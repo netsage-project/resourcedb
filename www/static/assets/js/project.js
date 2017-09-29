@@ -246,7 +246,7 @@ function resourceNew() {
     setupCreateResourceForm();
 
     onResourceCIDRChange(function(cidr) {
-        getGeoIP(cidr, renderGeoIPTable);
+        getGeoIP(cidr, renderGeoIPTable_autopop);
     });
 
     onResourceSearchSubmit(function(query) {
