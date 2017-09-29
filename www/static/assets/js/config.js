@@ -1,3 +1,3 @@
 var mapboxAccessToken = '';
-var basePath = '';
-var baseUrl  = '';
+var basePath = '/';
+var baseUrl  = '/';
