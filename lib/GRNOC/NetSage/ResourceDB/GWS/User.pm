@@ -44,7 +44,7 @@ sub _init_get_methods {
     $self->_init_dynamic_get_methods( @_ );
 
 
-    # get_ip_blocks
+    # --get_ip_blocks
     $method = GRNOC::WebService::Method->new( name => 'get_ip_blocks',
                                                    description => "Returns the IP blocks.",
                                                    expires => "-1d",
@@ -89,6 +89,7 @@ sub _init_get_methods {
     $self->_get_dynamic_where_parameters( $method );
     $self->websvc()->register_method( $method );
 
+    #-- get_projects
     $method = GRNOC::WebService::Method->new(
         name => 'get_projects',
         description => "Returns the projects of IP block.",
@@ -114,6 +115,7 @@ sub _init_get_methods {
     $self->_get_dynamic_where_parameters($method);
     $self->websvc()->register_method($method);
 
+    #-- update_project 
     $method = GRNOC::WebService::Method->new(
         name => 'update_project',
         description => "Updates project project_id.",
@@ -169,6 +171,7 @@ sub _init_get_methods {
     );
     $self->websvc()->register_method($method);
 
+    #-- set_project_ip_block_links
     $method = GRNOC::WebService::Method->new(
         name => 'set_project_ip_block_links',
         description => "Updates project project_id.",
@@ -194,6 +197,7 @@ sub _init_get_methods {
     $self->_get_dynamic_where_parameters($method);
     $self->websvc()->register_method($method);
 
+    #-- get_events
     $method = GRNOC::WebService::Method->new(
         name        => 'get_events',
         description => 'Get all events.',
@@ -246,7 +250,7 @@ sub _init_dynamic_get_methods {
     foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
         my $plural = $self->get_plural( $name );
         my $method;
-        # get_$names
+        #-- get_$names
         $method = GRNOC::WebService::Method->new( name => "get_$plural",
             description => "Returns the $plural",
             expires => "-1d",
@@ -307,7 +311,6 @@ sub _get_table_dynamically {
             'offset' => $result->offset(),
             'warning' => $result->warning()};
 }
-
 
 sub _get_ip_blocks {
 

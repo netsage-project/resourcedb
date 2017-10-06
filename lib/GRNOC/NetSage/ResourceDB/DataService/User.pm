@@ -302,7 +302,6 @@ sub set_project_ip_block_links {
         where => [-and => \@where]
     );
 
-    warn Dumper($result);
     if (!defined $result) {
         return { error => $self->dbq_rw()->get_error() };
     }

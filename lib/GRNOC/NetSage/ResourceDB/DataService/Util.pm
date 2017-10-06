@@ -203,7 +203,40 @@ sub update_schema {
     if ($version eq '0.0.6') {
         ($version, $err) = $self->upgrade_to_0_0_7($db, $version);
     }
+    if ($version eq '0.0.7') {
+        ($version, $err) = $self->upgrade_to_0_0_8($db, $version);
+    }
 
+    return ($version, $err);
+}
+
+sub upgrade_to_0_0_8 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+    my $ok  = undef;
+
+    my $query = "
+CREATE TABLE IF NOT EXISTS user (
+    user_id varchar(32) PRIMARY KEY,
+    name varchar(50)
+)";
+
+    $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't create users table: $err";
+            return ($version, $err);
+        }
+        warn "Database schema version is undefined.";
+    }
+    warn "Table users created";
+
+    $version = '0.0.8';
+    my $updated_ok = $self->_update_version($db, $version);
     return ($version, $err);
 }
 

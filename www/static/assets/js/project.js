@@ -6,6 +6,15 @@
 document.addEventListener('DOMContentLoaded', function(event) {
     var url = window.location;
 
+    // first get info about the logged-in user. Adds them to the db if they are not in it.
+    getUserInfo(function(info) {
+        console.log("Getting user info");
+        console.log("username = " + info['user_id']);
+        //for(key in info) {
+        //    console.log(key + " " + info[key]);    
+        //}
+    });
+
     console.log(url.href);
     console.log(url.pathname);
 
@@ -38,6 +47,10 @@ document.addEventListener('DOMContentLoaded', function(event) {
     }
 
 });
+
+// Below, call functions in js/api/* that use api/webservices to get things like organizations, 
+// then on success, run the anonymous function() on the results,
+// eg, getOrganizations(function to run on success) uses api/index.cgi?method=get_organizations.
 
 var index = function() {
     console.log('Loading the index page.');
