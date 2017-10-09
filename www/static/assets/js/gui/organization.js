@@ -152,9 +152,14 @@ function setupEditOrganizationForm(org) {
 
         opt.innerHTML = countries[i];
         opt.setAttribute('value', i);
+
+        // select current country
+        if (i == org.country_code) {
+            opt.selected = "true"; 
+        }
+
         country.appendChild(opt);
     }
-    country.value = org.country_name;
 
     document.getElementById('organization_latitude').value = org.latitude || 0.0;
     document.getElementById('organization_longitude').value = org.longitude || 0.0;
