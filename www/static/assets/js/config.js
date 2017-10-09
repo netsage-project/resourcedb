@@ -1,3 +1,3 @@
-var mapboxAccessToken = 'pk.eyJ1Ijoib3ZlcjkwMDAiLCJhIjoiY2owYTFxdzN3MGVwNDMzczQyMGx5NmpkdSJ9.tqyiSUSEvn4NSregR7tNfg';
+var mapboxAccessToken = '';
 var basePath = '/';
 var baseUrl  = '/';

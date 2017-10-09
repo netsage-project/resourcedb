@@ -374,7 +374,7 @@ sub _add_dynamic_add_update_parameters {
                 description => "The owner of the $name");
 
         } elsif ( $field eq "country_code" || $field eq "continent_code" ) {
-            # add the optional 'url' input param to all the basic dynamic methods
+            # add the optional 'country_code' or 'continent_code' input param to all the basic dynamic methods
             $method->add_input_parameter(
                 name        => $field,
                 pattern     => $TEXT,

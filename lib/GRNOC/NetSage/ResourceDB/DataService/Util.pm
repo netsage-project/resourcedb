@@ -206,7 +206,37 @@ sub update_schema {
     if ($version eq '0.0.7') {
         ($version, $err) = $self->upgrade_to_0_0_8($db, $version);
     }
+    if ($version eq '0.0.8') {
+        ($version, $err) = $self->upgrade_to_0_0_9($db, $version);
+    }
 
+    return ($version, $err);
+}
+
+sub upgrade_to_0_0_9 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+    my $ok  = undef;
+
+    # change country_name to country_code in table 'organization'
+    my $query = "alter table organization change country_name country_code char(2)";
+
+    $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't change organization.country_name to country_code: $err";
+            return ($version, $err);
+        }
+        warn "Database schema version is undefined.";
+    }
+    warn "Changed organization.country_name to country_code ";
+
+    $version = '0.0.9';
+    my $updated_ok = $self->_update_version($db, $version);
     return ($version, $err);
 }
 
@@ -218,6 +248,7 @@ sub upgrade_to_0_0_8 {
     my $err = undef;
     my $ok  = undef;
 
+    # create table 'user'
     my $query = "
 CREATE TABLE IF NOT EXISTS user (
     user_id varchar(32) PRIMARY KEY,
@@ -248,6 +279,7 @@ sub upgrade_to_0_0_7 {
     my $err = undef;
     my $ok  = undef;
 
+    # create table 'event'
     my $query = "
 CREATE TABLE IF NOT EXISTS event (
     event_id int AUTO_INCREMENT PRIMARY KEY,
@@ -283,6 +315,7 @@ sub upgrade_to_0_0_6 {
     my $err = undef;
     my $ok  = undef;
 
+    # increase chars in ip_block.addr_str 
     my $query = "alter table ip_block modify addr_str varchar(1024)";
 
     $ok = $db->do( $query );
@@ -309,6 +342,7 @@ sub upgrade_to_0_0_5 {
     my $err = undef;
     my $ok  = undef;
 
+    # create table 'ip_block_project'
     my $query = "
 create table `ip_block_project` (
     `id` int(6) unsigned auto_increment primary key,

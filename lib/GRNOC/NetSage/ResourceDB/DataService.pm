@@ -380,7 +380,7 @@ sub _init_dynamic_fields {
         'postal_code' => 1,
         'latitude' => 1,
         'longitude' => 1,
-        'country_name' => 1,
+        'country_code' => 1,
         'continent_name' => 1
     };
 
