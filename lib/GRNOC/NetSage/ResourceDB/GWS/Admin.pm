@@ -30,6 +30,36 @@ sub new {
     return $self;
 }
 
+sub _init_get_methods {
+    my $self = shift;
+
+    my $method;
+
+    # --get_users
+    $method = GRNOC::WebService::Method->new( name => 'get_users',
+                                                   description => "Returns info about users.",
+                                                   expires => "-1d",
+                                                   #default_order_by => ['name'],
+                                                   callback => sub { $self->_get_users( @_ ) } );
+
+    # add the optional 'user_id' input param to the get_users() method
+    $method->add_input_parameter( name        => 'user_id',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 1,
+                                  description => 'The id (username) of the user');
+
+    $self->websvc()->register_method($method);
+
+    # --get_loggedin_user
+    $method = GRNOC::WebService::Method->new( name => 'get_loggedin_user',
+                                                   description => "Returns info about the user that is currently logged in and adds them to the database if they are not there.",
+                                                   expires => "-1d",
+                                                   callback => sub { $self->_get_loggedin_user( @_ ) } );
+
+    $self->websvc()->register_method($method);
+}
+
 sub _init_add_methods {
     my $self = shift;
 
@@ -39,8 +69,29 @@ sub _init_add_methods {
 
     $self->_init_dynamic_add_methods( @_ );
 
+    # --add_user
+    $method = GRNOC::WebService::Method->new( name => 'add_user',
+                                                   description => "Adds a user to the database.",
+                                                   expires => "-1d",
+                                                   callback => sub { $self->_add_user( @_ ) } );
 
-    # add_ip_blocks
+    # add the required user_id (ie, username from .htaccess file) input param to the  method
+    $method->add_input_parameter( name        => 'user_id',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The user_id (ie, username)');
+
+    # add the optional name input param to the  method
+    $method->add_input_parameter( name        => 'name',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The name of the user (first and last)');
+
+    $self->websvc()->register_method( $method );
+
+    # --add_ip_blocks
     $method = GRNOC::WebService::Method->new( name => 'add_ip_blocks',
                                                    description => "Adds the specified IP blocks.",
                                                    expires => "-1d",
@@ -56,6 +107,7 @@ sub _init_add_methods {
     $self->_add_ip_block_params( $method );
     $self->websvc()->register_method( $method );
 
+    # --add_events
     $method = GRNOC::WebService::Method->new( name => 'add_events',
                                                    description => "Adds the specified events.",
                                                    expires => "-1d",
@@ -87,6 +139,7 @@ sub _init_add_methods {
                                   description => 'The event user_id');
     $self->websvc()->register_method( $method );
 
+    # --add_projects
     $method = GRNOC::WebService::Method->new( name => 'add_projects',
                                               description => "Adds the specified projects.",
                                               expires => "-1d",
@@ -129,7 +182,7 @@ sub _init_update_methods {
     $self->_init_dynamic_update_methods( @_ );
 
 
-    # update_ip_blocks
+    # --update_ip_blocks
     $method = GRNOC::WebService::Method->new( name => 'update_ip_blocks',
                                                    description => "Updates the specified IP blocks.",
                                                    expires => "-1d",
@@ -163,7 +216,7 @@ sub _init_delete_methods {
     $self->_init_dynamic_delete_methods( @_ );
 
 
-    # delete_ip_blocks
+    # --delete_ip_blocks
     $method = GRNOC::WebService::Method->new( name => 'delete_ip_blocks',
                                                    description => "Deletes the specified IP blocks.",
                                                    expires => "-1d",
@@ -540,8 +593,53 @@ sub _get_ip_blocks {
 }
 
 
+### CALLBACKS - get methods
+
+sub _get_users {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->get_users( $self->process_args( $args ) );
+    if ( !$result ) {
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return {'results' => $result->results(),
+            'total' => $result->total(),
+            'offset' => $result->offset(),
+            'warning' => $result->warning()};
+}
+
+sub _get_loggedin_user {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->get_loggedin_user( $self->process_args( $args ) );
+
+    if ( !$result ) {
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return {'results' => $result->results(),
+            'total' => $result->total(),
+            'offset' => $result->offset(),
+            'warning' => $result->warning()};
+}
+
 ### CALLBACKS - add methods
 
+sub _add_user {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->add_user( $self->process_args( $args ) );
+    if ( !$result ) {
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return { 'results' => $result };
+
+}
 sub _add_ip_blocks {
     my ( $self, $method, $args ) = @_;
 

@@ -36,6 +36,123 @@ sub new {
     return $self;
 }
 
+sub get_users {
+
+    my ( $self, %args ) = @_;
+
+    my $from_sql = 'user';
+
+    my $select_fields = [ 'user_id', 'name' ];
+
+    my @where = ();
+
+    # handle optional user_id param
+    my $user_id_param = GRNOC::MetaParameter->new(name => 'user_id', field => 'user.user_id');
+    @where = $user_id_param->process(args => \%args, where => \@where);
+
+    my $results = $self->dbq_ro()->select( table => $from_sql,
+                                           fields => $select_fields,
+                                           where => [-or => \@where],
+                                           );
+    if (!$results) {
+        $self->error( 'An unknown error occurred getting users.' );
+        return;
+    }
+
+    my $num_rows = $self->dbq_ro()->num_rows();
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
+        results => $results,
+        total => $num_rows
+    );
+
+    return $result;
+}
+
+sub get_loggedin_user {
+
+    my ( $self, %args ) = @_;
+
+    my $from_sql = 'user ';
+
+    my $select_fields = [ 'user_id', 'name' ];
+
+    my @where = ();
+
+    # handle required user_id param - always the username in .htpasswd
+    $args{'user_id'} = $ENV{'REMOTE_USER'};
+
+    my $id_param = GRNOC::MetaParameter->new( name => 'user_id',
+                                              field =>  'user.user_id');
+    @where = $id_param->process( args => \%args,
+                                 where => \@where );
+
+    my $results = $self->dbq_ro()->select( table => $from_sql,
+                                           fields => $select_fields,
+                                           where => [-or => \@where],
+                                           );
+    if (!$results) {
+        $self->error( 'An unknown error occurred getting users.' );
+        return;
+    }
+
+    my $num_rows = $self->dbq_ro()->num_rows();
+
+    # if user was not found, add them to the db with user_id=name=username, and no other info.
+    if ($num_rows == 0) {
+        warn("LOGGED IN USER $ENV{'REMOTE_USER'} NOT FOUND. ADDING TO DB.");
+        my $add_result = $self->add_user(
+                           user_id => $ENV{'REMOTE_USER'},
+                           name => $ENV{'REMOTE_USER'}
+        );
+
+        if (!$add_result) {
+            $self->error( 'An unknown error occurred adding the user to the db.' );
+            return;  
+        }
+        # if ok, set $results to return the same info we put in the db instead of querying.
+        $results = [ {
+                    "user_id" => $ENV{'REMOTE_USER'},
+                    "name" => $ENV{'REMOTE_USER'}
+                    } ];
+        $num_rows = 1;
+    } 
+
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
+        results => $results,
+        total => $num_rows
+    );
+
+    return $result;
+}
+
+sub add_user {
+
+    my ( $self, %args ) = @_;
+
+    my $remote_user = $args{'remote_user'};
+    # TODO: check remote_user, what should this be?
+
+    my $from_sql = 'user ';
+
+    my $fields = $self->_get_user_args( %args );
+
+    my $results = $self->dbq_rw()->insert( table => $from_sql,
+                                           fields => $fields
+                                       );
+
+    if ( !$results ) {
+        $self->error( 'An unknown error occurred adding the user.' );
+        return;
+    }
+    $self->add_events(
+        message => "User $ENV{'REMOTE_USER'} was added to the database on login."
+    );
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    return [{'rows_added' => $results}];
+}
+
 sub add_ip_blocks {
 
     my ( $self, %args ) = @_;
@@ -311,6 +428,26 @@ sub delete_table_dynamically {
 
     return [{ "${name}_id" => $args{"${name}_id"} }];
 
+}
+
+sub _get_user_args {
+    my ( $self, %args_in ) = @_;
+
+    my %args = ();
+
+    my @all_args = (
+        'user_id',
+        'name',
+    );
+
+    foreach my $arg( @all_args ) {
+        if ( not defined $args_in{ $arg } ) {
+            next;
+        }
+        $args{ $arg } = $args_in{ $arg };
+    }
+
+    return \%args;
 }
 
 sub _get_project_args {
