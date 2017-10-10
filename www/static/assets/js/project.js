@@ -302,18 +302,18 @@ function organization() {
     getOrganization(id, function(org) {
         renderOrganizationHeader(org);
         renderOrganizationRecord(org);
+
+        // put this here to be sure org exists before calling renderMap, in case getting org takes too long.
+        getResourcesByOrganizationId(id, function(resources) {
+            for (var i = 0; i < resources.length; i++) {
+                renderResourceListElement(resources[i]);
+            }
+            renderMap(resources,[org]);
+        });
     });
 
     getOrganizationEvents(id, function(events) {
         events.map(renderOrganizationEventListElement);
-    });
-
-    getResourcesByOrganizationId(id, function(resources) {
-        for (var i = 0; i < resources.length; i++) {
-            renderResourceListElement(resources[i]);
-        }
-
-        renderMap(resources);
     });
 
     onResourceSearchSubmit(function(query) {
@@ -337,10 +337,10 @@ function organizationEdit() {
 
     getOrganization(id, function(org) {
         setupEditOrganizationForm(org);
-    });
 
-    getResourcesByOrganizationId(id, function(resources) {
-        renderMap(resources);
+        getResourcesByOrganizationId(id, function(resources) {
+            renderMap(resources, [org]);
+        });
     });
 
     onResourceSearchSubmit(function(query) {
