@@ -8,12 +8,15 @@ use DBI;
 use GRNOC::CLI;
 
 sub main {
+    print "\nThis script will connect to your database, create a couple of users to be named shortly, and write a config file.\n";
+    print "You may hit enter to use the default values shown.\n";
+
     my $cli = GRNOC::CLI->new();
 
-    my $user = $cli->get_input("Database username", default => "root");
-    my $pass = $cli->get_password("Database password");
-    my $host = $cli->get_input("Database host address", default => "127.0.0.1");
-    my $port = $cli->get_input("Database Port number", default => 3306);
+    my $user = $cli->get_input("   MySQL/MariaDB user", default => "root");
+    my $pass = $cli->get_password("   Password");
+    my $host = $cli->get_input("   Database host address", default => "127.0.0.1");
+    my $port = $cli->get_input("   Database port number", default => 3306);
 
     my $handle = DBI->connect("DBI:mysql:dbname=mysql;host=$host;port=$port",
                               $user,
@@ -23,16 +26,17 @@ sub main {
         warn "Couldn't connect to database: " . $DBI::errstr . "\n";
         exit 1;
     }
-
     print "Connected to database.\n";
-
+   
+    print "Next, create read/write and read-only users for the Science Registry to use.\n"; # resourcedb need not exist yet
+    
     my $rw_alpha = undef;
     my $rw_bravo = undef;
-    my $rw_user  = $cli->get_input("Read/Write Username", default => "rdb");
+    my $rw_user  = $cli->get_input("   Read/Write Username", default => "rdb");
 
     while (1) {
-        $rw_alpha = $cli->get_password("$rw_user Password:");
-        $rw_bravo = $cli->get_password("$rw_user Password Confirmation:");
+        $rw_alpha = $cli->get_password("   $rw_user Password:");
+        $rw_bravo = $cli->get_password("   $rw_user Password confirmation:");
 
         last if ($rw_alpha eq $rw_bravo);
         print "Passwords do not match. Please try again.\n";
@@ -44,21 +48,22 @@ sub main {
 
     my $ro_alpha = undef;
     my $ro_bravo = undef;
-    my $ro_user  = $cli->get_input("Read Only Username", default => "rdb_ro");
+    my $ro_user  = $cli->get_input("   Read-Only Username", default => "rdb_ro");
 
     while (1) {
-        $ro_alpha = $cli->get_password("$ro_user Password:");
-        $ro_bravo = $cli->get_password("$ro_user Password Confirmation:");
+        $ro_alpha = $cli->get_password("   $ro_user Password");
+        $ro_bravo = $cli->get_password("   $ro_user Password confirmation:");
 
         last if ($ro_alpha eq $ro_bravo);
         print "Passwords do not match. Please try again.\n";
     }
 
-    $handle->do("GRANT ALL ON resourcedb.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
-    $handle->do("GRANT ALL ON resourcedbtest.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
+    $handle->do("GRANT SELECT ON resourcedb.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
+    $handle->do("GRANT SELECT ON resourcedbtest.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
     $handle->do("flush privileges");
 
-    print "ResourceDB's database users were created.\n";
+    print "Users were created for the resourcedb database.\n";
+    print "Writing /etc/grnoc/netsage/resourcedb/config.xml.\n";
 
     `/bin/mkdir -p /etc/grnoc/netsage/resourcedb/`;
     open(FILE, "> /etc/grnoc/netsage/resourcedb/config.xml");
@@ -89,6 +94,8 @@ sub main {
   </geoip>
 </config>
 END
+
+    print("You now need to run 'sudo resourcedb-update-db' to create and update the resourcedb database. \n\n");
 
     return 1;
 }
