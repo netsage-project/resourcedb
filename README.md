@@ -1,7 +1,7 @@
 # resourcedb
-NetSage Resource Database (Science Registry)
+NetSage Resource Database (Science Registry or ResourceDB)
 
-Registry for pairing CIDR ranges with discipline, role, project, etc.
+Registry for pairing IP addresses or CIDR ranges with discipline, role, project, etc.
 
 ## Installation
 
@@ -17,8 +17,8 @@ make rpm
 sudo yum install resourcedb-0.0.1-1.el7.centos.noarch.rpm
 ```
 
-If this is your first time running ResourceDB use the database init
-script to create the database configuration. The generated
+If this is your first time running ResourceDB, use the database init
+script to create database users and the config file. The generated
 configuration file will be stored at
 `/etc/grnoc/resourcedb/config.xml`.
 
@@ -26,8 +26,9 @@ configuration file will be stored at
 sudo resourcedb-init-db
 ```
 
-Run the database upgrade script every time you upgrade resourcedb.
+Then, and after every upgrade of ResourceDB, run the database upgrade script 
+to set up the database and/or make any changes needed.
 
 ```
-resourcedb-update-db
+sudo resourcedb-update-db
 ```
