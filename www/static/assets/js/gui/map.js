@@ -43,7 +43,7 @@ function renderMap(resources, orgs, onRender) {
     var zoom;
     if (latlngPoints.length == 1) {
         zoom   = 5;
-        center = [resources[0].latitude, resources[0].longitude];
+        center = [latlngPoints[0].lat, latlngPoints[0].lng];
     }
     else if (latlngPoints.length > 1) {
         zoom = map.getBoundsZoom(bounds);

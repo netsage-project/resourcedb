@@ -3,7 +3,7 @@
 // Renders a project in my_project_list on index.html.
 function renderMyProjectListElement(project) {
     var table = document.getElementById('my_project_list');
-    var row   = table.insertRow(0);
+    var row   = table.insertRow(-1);
 
     var id = project.project_id.toString();
 
@@ -19,7 +19,7 @@ function renderMyProjectListElement(project) {
 // Renders a project in linked_project_list on resource/index.html.
 function renderLinkedProjectListElement(project) {
     var table = document.getElementById('project_list');
-    var row   = table.insertRow(0);
+    var row   = table.insertRow(-1);
 
     var id = project.project_id.toString();
 

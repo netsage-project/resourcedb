@@ -3,7 +3,7 @@
 // Renders a resource in my_resource_list on index.html.
 function renderMyResourceListElement(resource) {
     var table = document.getElementById('my_resource_list');
-    var row   = table.insertRow(0);
+    var row   = table.insertRow(-1);
 
     var id = resource.ip_block_id.toString();
 
@@ -21,7 +21,7 @@ function renderMyResourceListElement(resource) {
 // Renders a resource in resource_list on index.html.
 function renderResourceListElement(resource) {
     var table = document.getElementById('resource_list');
-    var row   = table.insertRow(0);
+    var row   = table.insertRow(-1);
 
     var id = resource.ip_block_id.toString();
 
@@ -59,7 +59,7 @@ function renderResourceEventListElement(event) {
 // Renders a resource in resource_list on index.html.
 function renderResourceListSelectableElement(resource) {
     var table = document.getElementById('resource_list');
-    var row   = table.insertRow(0);
+    var row   = table.insertRow(-1);
 
     var id = resource.ip_block_id.toString();
 
@@ -92,7 +92,7 @@ function addResourceListSelectableElement(resource) {
         }
     }
 
-    var row   = table.insertRow(0);
+    var row   = table.insertRow(-1);
     row.setAttribute('data-id', resource.ip_block_id);
 
     var type = row.insertCell(0);

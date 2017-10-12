@@ -39,7 +39,6 @@ sub _init_get_methods {
     $method = GRNOC::WebService::Method->new( name => 'get_users',
                                                    description => "Returns info about users.",
                                                    expires => "-1d",
-                                                   #default_order_by => ['name'],
                                                    callback => sub { $self->_get_users( @_ ) } );
 
     # add the optional 'user_id' input param to the get_users() method
