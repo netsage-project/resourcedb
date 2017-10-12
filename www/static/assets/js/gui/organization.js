@@ -4,7 +4,7 @@
 // resource/index.html.
 function renderLinkedOrganizationListElement(org) {
     var table = document.getElementById('linked_organization_list');
-    var row   = table.insertRow(0);
+    var row   = table.insertRow(-1);
 
     var id = org.organization_id.toString();
 
@@ -21,7 +21,7 @@ function renderLinkedOrganizationListElement(org) {
 // resource/index.html.
 function renderMyOrganizationListElement(org) {
     var table = document.getElementById('my_organization_list');
-    var row   = table.insertRow(0);
+    var row   = table.insertRow(-1);
 
     var id = org.organization_id.toString();
 

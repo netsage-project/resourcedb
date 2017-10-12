@@ -85,6 +85,7 @@ sub get_ip_blocks {
     # get the order_by value
     my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
     my $order_by = $order_by_param->parse( %args );
+    if (! $order_by) { $order_by = 'ip_block.name'; }
 
     my $limit = $args{'limit'};
     my $offset = $args{'offset'};
@@ -124,7 +125,6 @@ sub get_ip_blocks {
     my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
                                                                  total => $num_rows,
                                                                  offset => $offset );
-
     return $result;
 }
 
@@ -189,6 +189,7 @@ sub get_projects {
 
         $table .= 'ip_block_project ';
         $table .= 'join project on (ip_block_project.project_id = project.project_id)';
+
     } elsif (defined $args{'project_id'}) {
         $param = GRNOC::MetaParameter->new(
             name  => 'project_id',
@@ -198,14 +199,20 @@ sub get_projects {
         @where = $param->process(args => \%args, where => \@where);
 
         $table .= 'project';
+
     } else {
         $table .= 'project';
     }
 
+    my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
+    my $order_by = $order_by_param->parse( %args );
+    if (! $order_by) { $order_by = 'project.name'; }
+
     my $results = $self->dbq_ro()->select(
         table  => $table,
         fields => $fields,
-        where  => [-and => \@where]
+        where  => [-and => \@where],
+        order_by => $order_by
     );
     if (!$results) {
         $self->error('An unknown error occurred getting the ip blocks.');

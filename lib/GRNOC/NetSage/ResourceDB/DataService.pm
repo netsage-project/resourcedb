@@ -211,6 +211,7 @@ sub get_table_dynamically {
     # get the order_by value
     my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
     my $order_by = $order_by_param->parse( %args );
+    if (! $order_by) { $order_by = "name"; }
 
     my $limit = $args{'limit'};
     my $offset = $args{'offset'};

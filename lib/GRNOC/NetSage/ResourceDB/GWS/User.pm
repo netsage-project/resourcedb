@@ -48,7 +48,6 @@ sub _init_get_methods {
     $method = GRNOC::WebService::Method->new( name => 'get_ip_blocks',
                                                    description => "Returns the IP blocks.",
                                                    expires => "-1d",
-                                                   #default_order_by => ['name'],
                                                    callback => sub { $self->_get_ip_blocks( @_ ) } );
 
     # add the optional 'ip_block_id' input param to the get_ip_blocks() method
@@ -254,7 +253,6 @@ sub _init_dynamic_get_methods {
         $method = GRNOC::WebService::Method->new( name => "get_$plural",
             description => "Returns the $plural",
             expires => "-1d",
-            #default_order_by => ['name'],
             callback => sub { $self->_get_table_dynamically( $name, @_ ) } );
 
         # add the optional 'name_id' input param to the get_$names() method
