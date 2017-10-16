@@ -444,37 +444,51 @@ function setupCreateResourceForm() {
         }
     });
 
-  getRoles(function(roles) {
-    var role = document.getElementById('resource_role');
-    for (var i = 0; i < roles.length; i++) {
-      var opt = document.createElement('option');
+    getOrganizations(function(orgs) {
+        var organization = document.getElementById('resource_organization');
+        for (var i = 0; i < orgs.length; i++) {
+            var opt = document.createElement('option');
+    
+            opt.innerHTML = orgs[i].name;
+            opt.setAttribute('value', orgs[i].organization_id);
+            organization.appendChild(opt);
+        }
+    });
 
-      opt.innerHTML = roles[i].name;
-      opt.setAttribute('value', roles[i].role_id);
-      role.appendChild(opt);
-    }
-  });
+    getRoles(function(roles) {
+        var role = document.getElementById('resource_role');
+        for (var i = 0; i < roles.length; i++) {
+          var opt = document.createElement('option');
 
-  getDisciplines(function(disciplines) {
-    var discipline = document.getElementById('resource_discipline');
-    for (var i = 0; i < disciplines.length; i++) {
-      var opt = document.createElement('option');
+          opt.innerHTML = roles[i].name;
+          opt.setAttribute('value', roles[i].role_id);
+          role.appendChild(opt);
+        }
+    });
 
-      opt.innerHTML = disciplines[i].name;
-      opt.setAttribute('value', disciplines[i].discipline_id);
-      discipline.appendChild(opt);
-    }
-  });
+    getDisciplines(function(disciplines) {
+        var discipline = document.getElementById('resource_discipline');
+        for (var i = 0; i < disciplines.length; i++) {
+          var opt = document.createElement('option');
+
+          opt.innerHTML = disciplines[i].name;
+          opt.setAttribute('value', disciplines[i].discipline_id);
+          discipline.appendChild(opt);
+        }
+    });
 }
 
 // Sets up submitEditResource to be called when the edit button on
-// resource/edit.html is pressed.
+// resource/edit.html is pressed.  Adds options to dropdowns.
 function setupEditResourceForm(resource) {
     var id = document.getElementById('resource_id');
-
     var name = document.getElementById('resource_name');
     var desc = document.getElementById('resource_description');
     var cidr = document.getElementById('resource_cidr');
+    var asn = document.getElementById('resource_asn');
+    var lat = document.getElementById('resource_latitude');
+    var lon = document.getElementById('resource_longitude');
+
     cidr.addEventListener('input', function(event) {
         if (cidr.validity.patternMismatch) {
             cidr.setCustomValidity('Expects a comma separated list of IPv4 CIDR addresses');
@@ -483,13 +497,30 @@ function setupEditResourceForm(resource) {
         }
     });
 
-    var asn = document.getElementById('resource_asn');
+    id.value = resource.ip_block_id;
+    name.value = resource.name;
+    desc.value = resource.description;
+    cidr.value = resource.addr_str;
+    asn.value = resource.asn;
+    lat.value = resource.latitude;
+    lon.value = resource.longitude;
 
-    var org = document.getElementById('resource_organization');
-
-    var country = document.getElementById('resource_country');
+    getOrganizations(function(orgs) {
+        var organization = document.getElementById('resource_organization');
+        for (var i = 0; i < orgs.length; i++) {
+            var opt = document.createElement('option');
+    
+            opt.innerHTML = orgs[i].name;
+            opt.setAttribute('value', orgs[i].organization_id);
+            if (resource.organization_id == orgs[i].organization_id) {
+                opt.setAttribute('selected', '');
+            }
+            organization.appendChild(opt);
+        }
+    });
 
     for (var i in countries) {
+        var country = document.getElementById('resource_country');
         var opt = document.createElement('option');
 
         opt.innerHTML = countries[i];
@@ -529,21 +560,6 @@ function setupEditResourceForm(resource) {
         }
     });
 
-    var lat = document.getElementById('resource_latitude');
-    var lon = document.getElementById('resource_longitude');
-
-    var discipline = document.getElementById('resource_discipline');
-    var role = document.getElementById('resource_role');
-
-    id.value = resource.ip_block_id;
-    name.value = resource.name;
-    desc.value = resource.description;
-    cidr.value = resource.addr_str;
-    asn.value = resource.asn;
-    org.value = resource.organization_id;
-    lat.value = resource.latitude;
-    lon.value = resource.longitude;
-
     var form = document.getElementById('create_resource_form');
     form.onsubmit = submitCreateOrUpdateResource;
 
@@ -572,15 +588,15 @@ function renderCreateResourceFormProjectOption(project) {
 
 // Appends an option to the resource_organization drop down box on
 // resource/new.html.
-function renderCreateResourceFormOrganizationOption(org) {
-    var dropd = document.getElementById('resource_organization');
-    var opt = document.createElement('option');
+////function renderCreateResourceFormOrganizationOption(org) {
+   //// var dropd = document.getElementById('resource_organization');
+    ////var opt = document.createElement('option');
 
-    opt.innerHTML = org.name;
-    opt.setAttribute('value', org.organization_id);
-
-    dropd.appendChild(opt);
-}
+    ////opt.innerHTML = org.name;
+    ////opt.setAttribute('value', org.organization_id);
+////
+    ////dropd.appendChild(opt);
+////}
 
 // Gathers values from create_resource_form on resource/new.html when
 // the create button is pressed. Passes the collected values to
