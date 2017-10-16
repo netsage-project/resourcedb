@@ -62,40 +62,42 @@
                                         <p class="help-block text-left hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label">Name </label>
-                                        <input class="form-control input-sm" type="text" required="" placeholder="Resource name" id="resource_name">
-                                        <p class="help-block text-left hidden">Help text for a form field.</p>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label">ASN </label>
-                                        <input class="form-control input-sm" type="number" required="" placeholder="117" id="resource_asn">
-                                        <p class="help-block hidden">Help text for a form field.</p>
-                                    </div>
-                                    <div class="form-group">
                                         <label class="control-label">CIDR Address</label>
                                         <input class="form-control input-sm" type="text" value="8.8.8.8/24" required="" placeholder="8.8.8.8/24" id="resource_cidr" pattern="((((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){3}\/([1-2][0-9]|[0-9]|3[0-2]))+,)*(((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){3}\/(3[0-2]|[1-2][0-9]|[0-9]))">
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Organization</label>
-                                        <select class="form-control input-sm" required="" id="resource_organization"></select>
+                                        <select class="form-control input-sm" required="" id="resource_organization" style="padding-top:4px;padding-right:10px;padding-bottom:4px;padding-left:10px;"></select>
                                         <p class="help-block hidden">Help text for a form field.</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Resource Name </label>
+                                        <input class="form-control input-sm" type="text" required="" placeholder="Resource name" id="resource_name">
+                                        <p class="help-block text-left hidden">Help text for a form field.</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Description </label>
+                                        <textarea class="form-control input-sm" rows="5.5" cols="40" wrap="hard" placeholder="A simple description" id="resource_description"></textarea>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Role </label>
-                                        <select class="form-control input-sm" required="" id="resource_role"></select>
-                                        <p class="help-block hidden">Help text for a form field.</p>
+                                        <select class="form-control input-sm" required="" id="resource_role" style="padding-top:4px;padding-right:10px;padding-bottom:4px;padding-left:10px;"></select>
                                     </div>
+                                    <p class="help-block hidden">Help text for a form field.</p>
                                     <div class="form-group">
                                         <label class="control-label">Discipline </label>
-                                        <select class="form-control input-sm" required="" id="resource_discipline"></select>
+                                        <select class="form-control input-sm" required="" id="resource_discipline" style="padding-top:4px;padding-right:10px;padding-bottom:4px;padding-left:10px;"></select>
                                         <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label">Description </label>
-                                        <textarea class="form-control input-sm" rows="5.5" cols="40" wrap="hard" placeholder="A simple description" id="resource_description"></textarea>
+                                    <div class="form-group"></div><em style="margin:0px;margin-top:0px;margin-bottom:0px;">Default values for the following come from the External Data Source once the IP address is entered. Check and correct as needed:</em>
+                                    <div class="form-group"
+                                    style="margin-top:10px;">
+                                        <label class="control-label">ASN </label>
+                                        <input class="form-control input-sm" type="number" required="" placeholder="117" id="resource_asn">
+                                        <p class="help-block hidden">Help text for a form field.</p>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label">Country </label>
