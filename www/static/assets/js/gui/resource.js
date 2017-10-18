@@ -434,6 +434,7 @@ function setupCreateResourceForm() {
         opt.setAttribute('value', i);
         country.appendChild(opt);
     }
+    country.selectedIndex = -1;
 
     var cidr = document.getElementById('resource_cidr');
     cidr.addEventListener('input', function(event) {
@@ -453,6 +454,7 @@ function setupCreateResourceForm() {
             opt.setAttribute('value', orgs[i].organization_id);
             organization.appendChild(opt);
         }
+        organization.selectedIndex = -1;
     });
 
     getRoles(function(roles) {
