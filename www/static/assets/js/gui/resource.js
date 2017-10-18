@@ -11,7 +11,7 @@ function renderMyResourceListElement(resource) {
     var addr = row.insertCell(1);
 
     name.innerHTML = resource.name;
-    addr.innerHTML = resource.addr_str;
+    addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
 
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'resource/index.html?resource_id=' + id;
@@ -33,7 +33,7 @@ function renderResourceListElement(resource) {
 
     type.innerHTML = resource.role_name;
     name.innerHTML = resource.name;
-    addr.innerHTML = resource.addr_str;
+    addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
     ownr.innerHTML = resource.organization_name;
     location.innerHTML = resource.country_name;
 
@@ -56,7 +56,7 @@ function renderResourceEventListElement(event) {
     listGroup.appendChild(entry);
 }
 
-// Renders a resource in resource_list on index.html.
+// Renders a resource on the page linking resources to projects
 function renderResourceListSelectableElement(resource) {
     var table = document.getElementById('resource_list');
     var row   = table.insertRow(-1);
@@ -71,7 +71,7 @@ function renderResourceListSelectableElement(resource) {
 
     type.innerHTML = resource.role_name;
     name.innerHTML = resource.name;
-    addr.innerHTML = resource.addr_str;
+    addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
     ownr.innerHTML = resource.organization_name;
     location.innerHTML = resource.country_name;
 
@@ -103,7 +103,7 @@ function addResourceListSelectableElement(resource) {
 
     type.innerHTML = resource.role_name;
     name.innerHTML = resource.name;
-    addr.innerHTML = resource.addr_str;
+    addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
     ownr.innerHTML = resource.organization_name;
     location.innerHTML = resource.country_name;
 
@@ -150,7 +150,7 @@ function renderResourceRecord(resource) {
     var role = document.getElementById('resource_role');
     var link = document.getElementById('resource_edit_link');
 
-    cidr.innerHTML = resource.addr_str;
+    cidr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
     country.innerHTML = resource.country_name;
 
     if (resource.latitude == null || resource.longitude == null) {
@@ -438,7 +438,7 @@ function setupCreateResourceForm() {
     var cidr = document.getElementById('resource_cidr');
     cidr.addEventListener('input', function(event) {
         if (cidr.validity.patternMismatch) {
-            cidr.setCustomValidity('Expects a comma separated list of IPv4 CIDR addresses');
+            cidr.setCustomValidity('Expects a comma separated list of IPv4 CIDR addresses.');
         } else {
             cidr.setCustomValidity("");
         }
@@ -538,7 +538,7 @@ function setupEditResourceForm(resource) {
     id.value = resource.ip_block_id;
     name.value = resource.name;
     desc.value = resource.description;
-    cidr.value = resource.addr_str;
+    cidr.value = resource.addr_str.replace(/,/g, ", ");  // add spaces for viewing
     asn.value = resource.asn;
     org.value = resource.organization_id;
     lat.value = resource.latitude;
@@ -595,7 +595,7 @@ function submitCreateOrUpdateResource(e) {
 
     var name = form.elements['resource_name'].value;
     var desc = form.elements['resource_description'].value;
-    var cidr = form.elements['resource_cidr'].value;
+    var cidr = form.elements['resource_cidr'].value.replace(/ /g, ""); // remove spaces before saving
 
     var asn = form.elements['resource_asn'].value;
 
