@@ -451,6 +451,9 @@ function setupCreateResourceForm() {
 
       opt.innerHTML = roles[i].name;
       opt.setAttribute('value', roles[i].role_id);
+      if (roles[i].name == "Unknown") {
+          opt.setAttribute('selected', '');
+      }
       role.appendChild(opt);
     }
   });
@@ -462,6 +465,9 @@ function setupCreateResourceForm() {
 
       opt.innerHTML = disciplines[i].name;
       opt.setAttribute('value', disciplines[i].discipline_id);
+      if (disciplines[i].name == "Unknown") {
+          opt.setAttribute('selected', '');
+      }
       discipline.appendChild(opt);
     }
   });
