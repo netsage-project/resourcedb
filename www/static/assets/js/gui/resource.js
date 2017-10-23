@@ -649,3 +649,13 @@ function onResourceCIDRChange(onChange) {
         onChange(e.target.value);
     });
 }
+
+// Checks to see if an IP is already in the db and warns the user
+function checkIP(cidr) {
+    getResourcesLike(cidr, function (resources) {
+        if (resources.length > 0) {
+            alert(cidr + " is already in the registry! \nSee resource '" + resources[0].name + "'");
+       } 
+    } );
+}
+

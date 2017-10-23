@@ -255,6 +255,7 @@ function resourceNew() {
 
     onResourceCIDRChange(function(cidr) {
         getGeoIP(cidr, renderGeoIPTable_autopop);
+        checkIP(cidr);
     });
 
     onResourceSearchSubmit(function(query) {
