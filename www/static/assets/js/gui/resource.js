@@ -460,23 +460,27 @@ function setupCreateResourceForm() {
     getRoles(function(roles) {
         var role = document.getElementById('resource_role');
         for (var i = 0; i < roles.length; i++) {
-          var opt = document.createElement('option');
-
-          opt.innerHTML = roles[i].name;
-          opt.setAttribute('value', roles[i].role_id);
-          role.appendChild(opt);
+            var opt = document.createElement('option');
+            opt.innerHTML = roles[i].name;
+            opt.setAttribute('value', roles[i].role_id);
+            if (roles[i].name == "Unknown") {
+                opt.setAttribute('selected', '');
+            }
+            role.appendChild(opt);
         }
     });
 
     getDisciplines(function(disciplines) {
         var discipline = document.getElementById('resource_discipline');
         for (var i = 0; i < disciplines.length; i++) {
-          var opt = document.createElement('option');
-
-          opt.innerHTML = disciplines[i].name;
-          opt.setAttribute('value', disciplines[i].discipline_id);
-          discipline.appendChild(opt);
-        }
+            var opt = document.createElement('option');
+            opt.innerHTML = disciplines[i].name;
+            opt.setAttribute('value', disciplines[i].discipline_id);
+            if (disciplines[i].name == "Unknown") {
+                opt.setAttribute('selected', '');
+            }
+            discipline.appendChild(opt);
+         }
     });
 }
 
