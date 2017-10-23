@@ -250,11 +250,6 @@ function resource() {
 
 function resourceNew() {
     console.log('Loading the new resource page');
-    getOrganizations(function(orgs) {
-        for (var i = 0; i < orgs.length; i++) {
-            renderCreateResourceFormOrganizationOption(orgs[i]);
-        }
-    });
 
     setupCreateResourceForm();
 
@@ -272,16 +267,10 @@ function resourceEdit() {
     var searchParams = new URLSearchParams(window.location.search);
     var id = searchParams.get('resource_id');
 
-    getOrganizations(function(orgs) {
-        for (var i = 0; i < orgs.length; i++) {
-            renderCreateResourceFormOrganizationOption(orgs[i]);
-        }
-    });
-
     getResource(id, function(resource) {
         setupEditResourceForm(resource);
-        getGeoIP(resource.addr_str, renderGeoIPTable);
 
+        getGeoIP(resource.addr_str, renderGeoIPTable);
         renderMap([resource]);
     });
 
