@@ -69,17 +69,17 @@ sub get_ip_blocks {
     my @where = ();
 
     # handle optional ip_block_id param
-    my $role_id_param = GRNOC::MetaParameter->new(name => 'ip_block_id', field => 'ip_block.ip_block_id');
-    @where = $role_id_param->process(args => \%args, where => \@where);
+    my $id_param = GRNOC::MetaParameter->new(name => 'ip_block_id', field => 'ip_block.ip_block_id');
+    @where = $id_param->process(args => \%args, where => \@where);
 
-    # handle optional ip_addr_str
-    my $addr_param = GRNOC::MetaParameter->new(name => 'addr_str', field => 'ip_block.addr_str');
+    # handle optional text_str param - addr_str or name or organization.name can be like text_str
+    my $addr_param = GRNOC::MetaParameter->new(name => 'text_str', field => 'ip_block.addr_str');
     @where = $addr_param->process(args => \%args, where => \@where);
 
-    my $name_param = GRNOC::MetaParameter->new( name => 'addr_str', field => 'ip_block.name' );
+    my $name_param = GRNOC::MetaParameter->new( name => 'text_str', field => 'ip_block.name' );
     @where = $name_param->process(args => \%args, where => \@where);
 
-    my $org_name_param = GRNOC::MetaParameter->new(name => 'addr_str', field => 'organization.name');
+    my $org_name_param = GRNOC::MetaParameter->new(name => 'text_str', field => 'organization.name');
     @where = $org_name_param->process(args => \%args, where => \@where);
 
     # get the order_by value
@@ -184,7 +184,6 @@ sub get_projects {
             name  => 'ip_block_id',
             field => 'ip_block_project.ip_block_id'
         );
-
         @where = $param->process(args => \%args, where => \@where);
 
         $table .= 'ip_block_project ';
@@ -203,6 +202,9 @@ sub get_projects {
     } else {
         $table .= 'project';
     }
+
+    my $name_param = GRNOC::MetaParameter->new(name => 'name', field => 'project.name');
+    @where = $name_param->process(args => \%args, where => \@where);
 
     my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
     my $order_by = $order_by_param->parse( %args );

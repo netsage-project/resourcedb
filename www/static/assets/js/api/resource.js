@@ -35,10 +35,11 @@ function getResources(on_success) {
     });
 }
 
-// Gets a list of resources from the backend where addr_str is like text.
+// Gets a list of resources from the backend where 
+// addr_string or name or organization's name is "like" text_str
 function getResourcesLike(text, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_ip_blocks';
-    url += '&addr_str_like=' + text;
+    url += '&text_str_like=' + text;
     fetch(url, {
         method: 'get',
         credentials: 'include'

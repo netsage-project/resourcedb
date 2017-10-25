@@ -1,7 +1,6 @@
 // GlobalNOC 2017
 
-// Renders a organization in linked_organization_list on
-// resource/index.html.
+// Renders a organization in linked_organization_list 
 function renderLinkedOrganizationListElement(org) {
     var table = document.getElementById('linked_organization_list');
     var row   = table.insertRow(-1);
@@ -17,8 +16,8 @@ function renderLinkedOrganizationListElement(org) {
     });
 }
 
-// Renders a organization in linked_organization_list on
-// resource/index.html.
+// Renders a organization in my_organization_list 
+// on resource/index.html.
 function renderMyOrganizationListElement(org) {
     var table = document.getElementById('my_organization_list');
     var row   = table.insertRow(-1);
@@ -74,6 +73,18 @@ function renderOrganizationRecord(organization) {
 
   document.getElementById('organization_owner').innerHTML = organization.owner;
   document.getElementById('organization_email').innerHTML = organization.email;
+}
+
+// Empty my_organization_list
+function renderEmptyOrganizationList() {
+    document.getElementById('my_organization_list').innerHTML = '';
+}
+
+// Renders the number of organizations organization_list should contain.
+function renderOrganizationCount(count) {
+    var text = document.getElementById('organization_list_count');
+
+    text.innerHTML = count.toString() + ' records found';
 }
 
 // Sets up submitCreateOrganization to be called when the create button on

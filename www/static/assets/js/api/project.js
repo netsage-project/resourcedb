@@ -35,6 +35,25 @@ function getProjects(on_success) {
     });
 }
 
+// Gets a list of projects from the backend where name is like text.
+function getProjectsLike(text, on_success) {
+    var url = baseUrl + 'api/index.cgi?method=get_projects';
+    url += '&name_like=' + text;
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            on_success(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Gets a list of projects from the backend filtered by resourceID.
 function getProjectsByResourceID(resourceID, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_projects' + '&ip_block_id=' + resourceID.toString();

@@ -51,6 +51,25 @@ function getOrganizations(onSuccess) {
     });
 }
 
+// Gets a list of organizations from the backend where name is like text.
+function getOrganizationsLike(text, on_success) {
+    var url = baseUrl + 'api/index.cgi?method=get_organizations';
+    url += '&name_like=' + text;
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            on_success(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Creates a new organization using the backend api. On success, we
 // redirect to the assoicated organization/index.html page.
 function createOrganization(id, name, desc, owner, email, country_code, lat, lon, orgUrl) {

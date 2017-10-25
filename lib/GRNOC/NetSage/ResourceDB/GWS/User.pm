@@ -57,12 +57,12 @@ sub _init_get_methods {
                                   multiple    => 1,
                                   description => 'The id of the IP block');
 
-    # add the optional 'addr_str' logic parameter
-    # acccepts options such as addr_str_like=127.0
+    # add the optional 'text_str' logic parameter
+    # acccepts options such as text_str_like=127.0 or text_str_like=NASA
     $method->add_logic_parameter(
-                                name => "addr_str",
+                                name => "text_str",
                                 pattern => $TEXT,
-                                description => "The IP/CIDR address to match on",
+                                description => "The IP address, name, or org name to match on",
     );
 
     $method->add_logic_parameter(
@@ -85,6 +85,7 @@ sub _init_get_methods {
                                   multiple    => 0,
                                   description => 'The offset (pagination)');
 
+    # add the rest of the parameters
     $self->_get_dynamic_where_parameters( $method );
     $self->websvc()->register_method( $method );
 
@@ -111,7 +112,16 @@ sub _init_get_methods {
         description => 'The id of the IP block'
     );
 
+    # add the rest of the fields in the db table
     $self->_get_dynamic_where_parameters($method);
+
+    # handle name_like
+    $method->add_logic_parameter(
+        name => "name",
+        pattern => $TEXT,
+        description => "The text to look for in project name",
+    );
+
     $self->websvc()->register_method($method);
 
     #-- update_project 
@@ -243,6 +253,7 @@ sub _get_dynamic_where_parameters {
     }
 }
 
+# 'get' methods for roles, organizations, desciplines, countries, continents
 sub _init_dynamic_get_methods {
     my ( $self, $method_in, $args ) = @_;
 
@@ -268,6 +279,11 @@ sub _init_dynamic_get_methods {
             required    => 0,
             multiple    => 1,
             description => "The name of the $name");
+
+        # allow name_like
+        $method->add_logic_parameter( name      => "name",
+            pattern => $TEXT,
+            description => "The name of the $name to match on");
 
         # add the optional 'limit' input param to the get_$names() method
         $method->add_input_parameter( name        => "limit",
