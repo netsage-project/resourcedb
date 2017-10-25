@@ -58,61 +58,116 @@ var index = function() {
     var query = searchParams.get('search');
 
     if (query === null || query === '') {
+        // Normal full lists:
         getResources(function(resources) {
             for (var i = 0; i < resources.length; i++) {
                 renderResourceListElement(resources[i]);
             }
             renderResourceCount(resources.length);
         });
-    } else {
+        getOrganizations(function(orgs) {
+            for (var i = 0; i < orgs.length; i++) {
+                renderMyOrganizationListElement(orgs[i]);
+            }
+            /// renderOrganizationCount(organizations.length);
+        });
+        getProjects(function(projects) {
+            for (var i = 0; i < projects.length; i++) {
+                renderMyProjectListElement(projects[i]);
+            }
+           /// renderProjectCount(projects.length);
+        });
+    } 
+    else {
+        // If a search query is in the url (search was entered when on another page):
+        document.getElementById("search_field").value = query;
         getResourcesLike(query, function(resources) {
             for (var i = 0; i < resources.length; i++) {
                 renderResourceListElement(resources[i]);
             }
             renderResourceCount(resources.length);
         });
+        getOrganizationsLike(query, function(organizations) {
+            renderEmptyOrganizationList();
+            for (var i = 0; i < organizations.length; i++) {
+                renderMyOrganizationListElement(organizations[i]);
+            }
+            /// renderOrganizationCount(organizations.length);
+        });
+        getProjectsLike(query, function(projects) {
+            renderEmptyProjectList();
+            for (var i = 0; i < projects.length; i++) {
+                renderMyProjectListElement(projects[i]);
+            }
+           /// renderProjectCount(projects.length);
+        });
     }
 
-    getOrganizations(function(orgs) {
-        for (var i = 0; i < orgs.length; i++) {
-            renderMyOrganizationListElement(orgs[i]);
-        }
-     });
+    // When a search string is entered/removed on the index page:
+    var delayTimer;
 
-    getProjects(function(projects) {
-        for (var i = 0; i < projects.length; i++) {
-            renderMyProjectListElement(projects[i]);
-        }
-    });
+    onSearchKeyUp(function(input) {
+      // Doing all 3 gets after each letter is too slow. 
+      // Add a delay so gets don't start until there is a pause in typing.
+      clearTimeout(delayTimer);
+      delayTimer = setTimeout(function() {
 
-    onResourceSearchKeyUp(function(input) {
         if (input === null || input === '') {
             getResources(function(resources) {
                 renderEmptyResourceList();
-
                 for (var i = 0; i < resources.length; i++) {
                     renderResourceListElement(resources[i]);
                 }
                 renderResourceCount(resources.length);
             });
-        } else {
+            getOrganizations(function(organizations) {
+                renderEmptyOrganizationList();
+                for (var i = 0; i < organizations.length; i++) {
+                    renderMyOrganizationListElement(organizations[i]);
+                }
+                /// renderOrganizationCount(organizations.length);
+            });
+            getProjects(function(projects) {
+                renderEmptyProjectList();
+                for (var i = 0; i < projects.length; i++) {
+                    renderMyProjectListElement(projects[i]);
+                }
+               /// renderProjectCount(projects.length);
+            });
+        } 
+        else {
             getResourcesLike(input, function(resources) {
                 renderEmptyResourceList();
-
                 for (var i = 0; i < resources.length; i++) {
                     renderResourceListElement(resources[i]);
                 }
                 renderResourceCount(resources.length);
             });
+            getOrganizationsLike(input, function(organizations) {
+                renderEmptyOrganizationList();
+                for (var i = 0; i < organizations.length; i++) {
+                    renderMyOrganizationListElement(organizations[i]);
+                }
+                /// renderOrganizationCount(organizations.length);
+            });
+            getProjectsLike(input, function(projects) {
+                renderEmptyProjectList();
+                for (var i = 0; i < projects.length; i++) {
+                    renderMyProjectListElement(projects[i]);
+                }
+               /// renderProjectCount(projects.length);
+            });
         }
+
+      }, 500); // wait for .5 sec after typing a letter 
     });
 }
 
 function about() {
     console.log('Loading the about page.');
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }
 
@@ -138,8 +193,8 @@ function project() {
         renderMap(resources);
     });
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }
 
@@ -147,8 +202,8 @@ function projectNew() {
     console.log('Loading the new project page');
     setupCreateProjectForm();
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }
 
@@ -165,8 +220,8 @@ function projectEdit() {
         renderMap(resources);
     });
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }
 
@@ -211,8 +266,8 @@ function projectLink() {
         }
     });
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }
 
@@ -243,8 +298,8 @@ function resource() {
         });
     });
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }
 
@@ -258,8 +313,8 @@ function resourceNew() {
         checkIP(cidr);
     });
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }
 
@@ -279,8 +334,8 @@ function resourceEdit() {
         getGeoIP(cidr, renderGeoIPTable);
     });
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }
 
@@ -306,8 +361,8 @@ function organization() {
         events.map(renderOrganizationEventListElement);
     });
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }
 
@@ -315,8 +370,8 @@ function organizationNew() {
     console.log('Loading the new organization page');
     setupCreateOrganizationForm();
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }
 
@@ -333,7 +388,7 @@ function organizationEdit() {
         });
     });
 
-    onResourceSearchSubmit(function(query) {
-        submitResourceSearch(query);
+    onSearchSubmit(function(query) {
+        submitSearch(query);
     });
 }

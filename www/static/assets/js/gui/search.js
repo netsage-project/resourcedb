@@ -3,7 +3,7 @@
 
 // Calls onKeyUp whenever the search_field has been updated, and
 // disables form submit behavior on search_form.
-function onResourceSearchKeyUp(onKeyUp) {
+function onSearchKeyUp(onKeyUp) {
     var search = document.getElementById('search_field');
     var form = document.getElementById('search_form');
 
@@ -25,7 +25,7 @@ function onProjectLinkResourceSearchKeyUp(onKeyUp) {
 }
 
 // Called when enter is pressed and search_form is in focus.
-function onResourceSearchSubmit(onSubmit) {
+function onSearchSubmit(onSubmit) {
     var search = document.getElementById('search_form');
 
     search.addEventListener('submit', function(e) {

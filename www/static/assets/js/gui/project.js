@@ -79,6 +79,18 @@ function renderProjectRecord(project) {
   edit_link.href = basePath + 'project/link.html?project_id=' + project.project_id.toString();
 }
 
+// Empty my_project_list
+function renderEmptyProjectList() {
+    document.getElementById('my_project_list').innerHTML = '';
+}
+
+// Renders the number of projects  project_list should contain.
+function renderProjectCount(count) {
+    var text = document.getElementById('project_list_count');
+
+    text.innerHTML = count.toString() + ' records found';
+}
+
 // Sets up submitCreateProject to be called when the create button on
 // project/new.html is pressed.
 function setupCreateProjectForm() {
