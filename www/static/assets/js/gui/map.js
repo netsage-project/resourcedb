@@ -17,13 +17,16 @@ function renderMap(resources, orgs, onRender) {
     }).addTo(map);
 
     var latlngPoints = [];
+    var legendTxt = "";
+
     for (var i = 0; i < resources.length; i++) {
         var latlng = L.latLng(resources[i].latitude, resources[i].longitude);
         latlngPoints.push(latlng);
 
-        var marker = L.circleMarker([resources[i].latitude, resources[i].longitude]).addTo(map);
+        var marker = L.circleMarker([resources[i].latitude, resources[i].longitude],{color: '#52a9f5'}).addTo(map);
         marker.bindPopup("<b>" + resources[i].name + "</b><br/>");
     }
+    legendTxt = "<span style='color:#489feb;'><span style='font-size:18px'>o</span> Resources</span>";
 
     if (orgs != undefined) {
         for (var i = 0; i < orgs.length; i++) {
@@ -34,10 +37,19 @@ function renderMap(resources, orgs, onRender) {
             var marker = L.circleMarker([orgs[i].latitude, orgs[i].longitude],{color: '#ff4d4d'}).addTo(map);
             marker.bindPopup("<b>" + orgs[i].name + "</b><br/>");
         }
+        legendTxt = "<span style='color:#ff5757;'><span style='font-size:18px'>o</span> Organization</span><br/>" + legendTxt;
     }
 
-    var bounds = L.latLngBounds(latlngPoints);
+    var legend = new L.control({position:"bottomleft"});
+    legend.onAdd = function() {
+        var div = L.DomUtil.create( 'div', 'legend' );
+        div.innerHTML = legendTxt;
+        div.style = "padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.9); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 4px;";
+        return div;
+    };
+    map.addControl(legend);
 
+    var bounds = L.latLngBounds(latlngPoints);
 
     var center;
     var zoom;
