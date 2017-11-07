@@ -285,9 +285,9 @@ function resource() {
         getGeoIP(resource.addr_str, function(geoip) {
             renderGeoIPTable(geoip);
         });
-        //getReverseDNS(resource.addr_str, function(revdns) {
-        //    renderReverseDNSTable);
-        //});
+        getReverseDNS(resource.addr_str, function(revdns) {
+            renderReverseDNSTable(revdns);
+        });
 
         getProjectsByResourceID(id, function(projects) {
             console.log(projects);
@@ -331,7 +331,7 @@ function resourceEdit() {
         setupEditResourceForm(resource);
 
         getGeoIP(resource.addr_str, renderGeoIPTable);
-        getReverseDNS(cidr, renderReverseDNSTable);
+        getReverseDNS(resource.addr_str, renderReverseDNSTable);
         renderMap([resource]);
     });
 
