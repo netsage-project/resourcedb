@@ -285,6 +285,9 @@ function resource() {
         getGeoIP(resource.addr_str, function(geoip) {
             renderGeoIPTable(geoip);
         });
+        getReverseDNS(resource.addr_str, function(revdns) {
+            renderReverseDNSTable(revdns);
+        });
 
         getProjectsByResourceID(id, function(projects) {
             console.log(projects);
@@ -309,8 +312,9 @@ function resourceNew() {
     setupCreateResourceForm();
 
     onResourceCIDRChange(function(cidr) {
-        getGeoIP(cidr, renderGeoIPTable_autopop);
         checkIP(cidr);
+        getGeoIP(cidr, renderGeoIPTable_autopop);
+        getReverseDNS(cidr, renderReverseDNSTable);
     });
 
     onSearchSubmit(function(query) {
@@ -327,11 +331,13 @@ function resourceEdit() {
         setupEditResourceForm(resource);
 
         getGeoIP(resource.addr_str, renderGeoIPTable);
+        getReverseDNS(resource.addr_str, renderReverseDNSTable);
         renderMap([resource]);
     });
 
     onResourceCIDRChange(function(cidr) {
         getGeoIP(cidr, renderGeoIPTable);
+        getReverseDNS(cidr, renderReverseDNSTable);
     });
 
     onSearchSubmit(function(query) {

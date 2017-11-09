@@ -2,6 +2,7 @@
 
 // shows info from GeoIP in a table
 function renderGeoIPTable(geoip) {
+    if (geoip) {
     document.getElementById('geoip_provider').innerHTML = 'Maxmind';
     document.getElementById('geoip_organization').innerHTML = geoip.organization;
     document.getElementById('geoip_asn').innerHTML = geoip.asn;
@@ -10,6 +11,7 @@ function renderGeoIPTable(geoip) {
     document.getElementById('geoip_region').innerHTML = geoip.region;
     document.getElementById('geoip_latitude').innerHTML = geoip.latitude;
     document.getElementById('geoip_longitude').innerHTML = geoip.longitude;
+    }
 }
 
 // shows info from GeoIP in a table and

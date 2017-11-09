@@ -3,13 +3,12 @@ package GRNOC::NetSage::ResourceDB::DataService::External;
 use strict;
 use warnings;
 
+use Data::Dumper;
 use Data::Validate::IP;
 use GRNOC::Config;
 use GRNOC::DatabaseQuery;
 use Geo::IP;
-
-use Data::Dumper;
-
+use Net::DNS::Resolver;
 use base 'GRNOC::NetSage::ResourceDB::DataService';
 
 my $singleton;
@@ -64,7 +63,21 @@ sub get_geoip {
     # TODO: handle CIDR input
     my $ip = $address;
 
+    # default values
     my %results = ();
+        $results{'country_code'} = "";
+        $results{'country_name'} =  "";
+        $results{'city'} =  "";
+        $results{'region'} =  "";
+        $results{'region_name'} = ""; 
+        $results{'postal_code'} =  "";
+        $results{'time_zone'} =  "";
+        $results{'latitude'} =  "";
+        $results{'longitude'} =  "";
+        $results{'continent_code'} = ""; 
+        $results{'continent'} =  "";
+        $results{'asn'} = "";
+        $results{'organization'} = "";
 
     my $asn_org;
     my $record;
@@ -77,7 +90,8 @@ sub get_geoip {
         $asn_org =  $geoip_asn_ipv6->name_by_addr_v6 ( $ip );
     } else {
         $self->error("Invalid ipv4/ipv6 address supplied");
-        return;
+        $results{'organization'} = "ERROR";
+        $results{'country_name'} = "ERROR";
     }
 
     if ( $record ) {
@@ -103,7 +117,8 @@ sub get_geoip {
             $results{'organization'} = $organization;
 
         } else {
-            #warn "\n\nASN/ORG don't match regex\n\n";
+            $results{'asn'} = "ERROR";
+            $results{'organization'} = "ERROR";
         }
     }
 
@@ -149,6 +164,52 @@ sub get_continent {
     my $continent = $continents{ $abbr };
 
     return $continent;
+}
+
+# get hostname from IP 
+sub get_revdns {
+
+    my ( $self, %args ) = @_;
+    # ONE IP WITHOUT /xx should be in the args
+    my $ip = $args{'address'};
+
+    # default values
+    my %results = ( 'provider' => 'Net::DNS::Resolver', 
+                    'ip'=> $ip, 
+                    'hostname' => '');
+    my $num_rows = 0;
+
+    # create new Resolver Object
+    my $resolver = Net::DNS::Resolver->new;
+
+    # query DNS
+    my $res = $resolver->query("$ip", "PTR");
+
+    # if a result is found (returns undef if no result found)
+    if ($res){
+        foreach my $rr ($res->answer){
+            next unless $rr->type eq "PTR";
+            $results{'hostname'} = $rr->ptrdname;
+            $num_rows = $num_rows + 1;
+        }
+    } 
+    elsif ($resolver->errorstring and $resolver->errorstring == "NXDOMAIN") {
+        $results{'hostname'} = "none found";
+    }
+    elsif ($resolver->errorstring) {
+        $self->error( 'An error occurred getting the reverse dns information. '.$resolver->errorstring  );
+        $results{'hostname'} = "ERROR. ".$resolver->errorstring;
+    }
+    else {
+        $results{'hostname'} = "none found";
+    }
+
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => \%results,
+                                                                       total => $num_rows,
+                                                                      );
+
+    return $result;
+
 }
 
 1;

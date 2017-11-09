@@ -34,6 +34,7 @@ Requires: perl-GRNOC-Log
 Requires: perl-GRNOC-DatabaseQuery
 Requires: perl-MIME-Lite-TT
 Requires: perl-String-MkPasswd
+Requires: perl-Net-DNS-Resolver
 
 %description
 NetSage Resource Database (Science Registry)
