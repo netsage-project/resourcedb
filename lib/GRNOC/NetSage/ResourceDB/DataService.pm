@@ -374,6 +374,7 @@ sub _init_dynamic_fields {
 
     $fields->{'organization'} = {
         'name' => 1,
+        'abbr' => 1,
         'description' => 1,
         'url' => 1,
         'owner' => 1,

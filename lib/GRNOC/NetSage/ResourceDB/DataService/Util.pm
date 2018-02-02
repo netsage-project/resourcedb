@@ -209,7 +209,60 @@ sub update_schema {
     if ($version eq '0.0.8') {
         ($version, $err) = $self->upgrade_to_0_0_9($db, $version);
     }
+    if ($version eq '0.0.9') {
+        ($version, $err) = $self->upgrade_to_0_0_10($db, $version);
+    }
 
+    return ($version, $err);
+}
+
+sub upgrade_to_0_0_10 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+
+    # Add column to `organization`
+    my $query = "alter table `organization`
+                 add column `abbr` varchar(10) unique after `name`
+                ";
+    my $org_ok = $db->do( $query );
+    if ($org_ok) {
+        warn "Added 'abbr' to 'organization' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add 'abbr' column to 'organization' table: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+
+    # Get initial abbr values from (xxx)'s in org names
+    $query = "update IGNORE organization set abbr = SUBSTRING_INDEX(name, '(', -1)";
+    my $update_ok = $db->do( $query );
+    if (! $update_ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Did not increase version number. Couldn't set abbr values: $err";
+        } 
+        return ($version, $err);
+    }
+    $query = "update IGNORE organization set abbr = REPLACE(abbr,')','') where abbr IS NOT NULL";
+    $update_ok = $db->do( $query );
+    if (! $update_ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Did not increase version number. Couldn't remove )'s in abbr values: $err";
+        } 
+        return ($version, $err);
+    }
+    print "*** PLEASE FIX BAD AND MISSING ABBR VALUES BY HAND! *** ";
+
+    $version = '0.0.10';
+    my $updated_ok = $self->_update_version( $db, $version );
     return ($version, $err);
 }
 
