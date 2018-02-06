@@ -72,7 +72,7 @@ function getOrganizationsLike(text, on_success) {
 
 // Creates a new organization using the backend api. On success, we
 // redirect to the assoicated organization/index.html page.
-function createOrganization(id, name, desc, owner, email, country_code, lat, lon, orgUrl) {
+function createOrganization(id, name, abbr, desc, owner, email, country_code, lat, lon, orgUrl) {
     var url = baseUrl;
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_organizations';
@@ -82,6 +82,7 @@ function createOrganization(id, name, desc, owner, email, country_code, lat, lon
     }
 
     url += '&name=' + name;
+    url += '&abbr=' + abbr;
     url += '&description=' + desc;
     url += '&owner=' + owner;
     url += '&email=' + email;

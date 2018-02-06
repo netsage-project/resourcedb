@@ -376,6 +376,10 @@ function organizationNew() {
     console.log('Loading the new organization page');
     setupCreateOrganizationForm();
 
+    onAbbrChange(function(newAbbr) {
+        checkAbbr(newAbbr);
+    });
+
     onSearchSubmit(function(query) {
         submitSearch(query);
     });
@@ -392,6 +396,10 @@ function organizationEdit() {
         getResourcesByOrganizationId(id, function(resources) {
             renderMap(resources, [org]);
         });
+    });
+
+    onAbbrChange(function(newAbbr) {
+        checkAbbr(newAbbr);
     });
 
     onSearchSubmit(function(query) {

@@ -26,12 +26,14 @@ function renderResourceListElement(resource) {
     var id = resource.ip_block_id.toString();
 
     var type = row.insertCell(0);
-    var name = row.insertCell(1);
-    var addr = row.insertCell(2);
-    var ownr = row.insertCell(3);
-    var location = row.insertCell(4);
+    var abbr = row.insertCell(1);
+    var name = row.insertCell(2);
+    var addr = row.insertCell(3);
+    var ownr = row.insertCell(4);
+    var location = row.insertCell(5);
 
     type.innerHTML = resource.role_name;
+    abbr.innerHTML =  ""; ///// org abbr is not part of Resource yet
     name.innerHTML = resource.name;
     addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
     ownr.innerHTML = resource.organization_name;
