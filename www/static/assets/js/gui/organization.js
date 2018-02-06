@@ -17,16 +17,20 @@ function renderLinkedOrganizationListElement(org) {
 }
 
 // Renders a organization in my_organization_list 
-// on resource/index.html.
+// Main org list on Organizations tab
 function renderMyOrganizationListElement(org) {
     var table = document.getElementById('my_organization_list');
     var row   = table.insertRow(-1);
 
     var id = org.organization_id.toString();
 
-    var name = row.insertCell(0);
+    var abbr = row.insertCell(0);
+    var name = row.insertCell(1);
+    var location = row.insertCell(2);
 
+    abbr.innerHTML = org.abbr;
     name.innerHTML = org.name;
+    location.innerHTML = org.country_code;
 
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'organization/index.html?organization_id=' + id;
@@ -58,7 +62,6 @@ function renderOrganizationHeader(organization) {
 }
 
 // Given a organization record, set the innerHTML of the elements
-// identified by organization_owner, and organization_email.
 function renderOrganizationRecord(organization) {
   var link = document.getElementById('organization_edit_link');
   link.href = basePath + 'organization/edit.html?organization_id=' + organization.organization_id.toString();
@@ -71,6 +74,10 @@ function renderOrganizationRecord(organization) {
     document.getElementById('organization_url').appendChild(url);
   }
 
+  document.getElementById('organization_abbr').innerHTML = organization.abbr;
+  document.getElementById('organization_country').innerHTML = organization.country_code;
+  document.getElementById('organization_latitude').innerHTML = organization.latitude;
+  document.getElementById('organization_longitude').innerHTML = organization.longitude;
   document.getElementById('organization_owner').innerHTML = organization.owner;
   document.getElementById('organization_email').innerHTML = organization.email;
 }
@@ -125,6 +132,7 @@ function submitCreateOrUpdateOrganization(e) {
 
     var name = form.elements['organization_name'].value;
     var desc = form.elements['organization_description'].value;
+    var abbr = form.elements['organization_abbr'].value;
     var owner = form.elements['organization_owner'].value;
     var email = form.elements['organization_email'].value;
     var orgUrl = form.elements['organization_url'].value;
@@ -139,18 +147,37 @@ function submitCreateOrUpdateOrganization(e) {
 
     if (id === -1) {
         console.log('Creating a new organization');
-        createOrganization(null, name, desc, owner, email, country_code,
+        createOrganization(null, name, abbr, desc, owner, email, country_code,
                            lat, lon, orgUrl);
     } else {
         console.log('Editing organization ' + id.toString());
-        createOrganization(id, name, desc, owner, email, country_code,
+        createOrganization(id, name, abbr, desc, owner, email, country_code,
                            lat, lon, orgUrl);
     }
+}
+
+// Calls onChange and passes the updated value of abbr as the
+// first argument.
+function onAbbrChange(onChange) {
+    var abbr = document.getElementById('organization_abbr');
+    abbr.addEventListener('change', function(e) {
+        onChange(e.target.value);
+    });
+}
+
+// Checks to see if an Abbr is already in the db and warns the user
+function checkAbbr(newAbbr) {
+    getOrganizationsLike(newAbbr, function (organizations) {
+        if (organizations.length > 0) {
+            alert("Abbreviations must be unique but " + newAbbr + " is already in the registry! \nSee resource '" + organizations[0].name + "'");
+       }
+    } );
 }
 
 function setupEditOrganizationForm(org) {
     document.getElementById('organization_id').value = org.organization_id;
     document.getElementById('organization_name').value = org.name;
+    document.getElementById('organization_abbr').value = org.abbr;
     document.getElementById('organization_description').value = org.description;
 
     document.getElementById('organization_owner').value = org.owner;
