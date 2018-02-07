@@ -96,6 +96,7 @@ cp -ar www/* %{buildroot}%{_datadir}/resourcedb/www
 
 %{__install} -m 544 bin/resourcedb-init-db %{buildroot}%{_bindir}
 %{__install} -m 544 bin/resourcedb-update-db %{buildroot}%{_bindir}
+%{__install} -m 544 bin/resourcedb-export.pl %{buildroot}%{_bindir}
 
 %check
 make test_jenkins
@@ -133,5 +134,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_sysconfdir}/grnoc/netsage/resourcedb/resourcedb.sql
 
-%{_bindir}/resourcedb-init-db
 %{_bindir}/resourcedb-update-db
+%{_bindir}/resourcedb-init-db
+%{_bindir}/resourcedb-export.pl
