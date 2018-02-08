@@ -64,8 +64,8 @@ sub _init_add_methods {
 
     my $method;
 
+    # --dynamically-added add methods
     $self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
-
     $self->_init_dynamic_add_methods( @_ );
 
     # --add_user
@@ -147,27 +147,32 @@ sub _init_add_methods {
                                   pattern     => $TEXT,
                                   required    => 1,
                                   multiple    => 0,
-                                  description => 'The event message');
+                                  description => 'The project name');
+    $method->add_input_parameter( name        => 'abbr',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'A short name for the project');
     $method->add_input_parameter( name        => 'description',
                                   pattern     => $TEXT,
                                   required    => 0,
                                   multiple    => 0,
-                                  description => 'The event ip_block_id');
+                                  description => 'The project description');
     $method->add_input_parameter( name        => 'url',
                                   pattern     => $TEXT,
                                   required    => 0,
                                   multiple    => 0,
-                                  description => 'The event project_id');
+                                  description => 'The project webpage');
     $method->add_input_parameter( name        => 'owner',
                                   pattern     => $TEXT,
                                   required    => 1,
                                   multiple    => 0,
-                                  description => 'The event organization_id');
+                                  description => 'The main contact for the project');
     $method->add_input_parameter( name        => 'email',
                                   pattern     => $TEXT,
                                   required    => 1,
                                   multiple    => 0,
-                                  description => 'The event user_id');
+                                  description => 'The email of the contact');
     $self->websvc()->register_method($method);
 }
 
@@ -197,7 +202,7 @@ sub _init_update_methods {
     # add the required 'addr_str' input param to the  method
     $method->add_input_parameter( name        => 'addr_str',
                                   pattern     => $TEXT,
-                                  required    => 0,
+                                  required    => 1,
                                   multiple    => 0,
                                   description => 'The address string (CIDR)');
 
@@ -241,6 +246,13 @@ sub _add_ip_block_params {
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The name of the ip resource block');
+
+    # add the optional 'abbr' input param to the  method
+    $method->add_input_parameter( name        => 'abbr',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The short name of the ip resource block');
 
     # add the optional 'description' input param to the method
     $method->add_input_parameter( name        => 'description',

@@ -45,6 +45,7 @@ sub get_ip_blocks {
     my $select_fields = [
                          'ip_block.ip_block_id as ip_block_id',
                          'ip_block.name as name',
+                         'ip_block.abbr as abbr',
                          'ip_block.description as description',
                          'ip_block.addr_str as addr_str',
                          'ip_block.addr_lower as addr_lower',
@@ -72,12 +73,15 @@ sub get_ip_blocks {
     my $id_param = GRNOC::MetaParameter->new(name => 'ip_block_id', field => 'ip_block.ip_block_id');
     @where = $id_param->process(args => \%args, where => \@where);
 
-    # handle optional text_str param - addr_str or name or organization.name can be like text_str
+    # handle optional text_str param - addr_str or name or abbr or organization.name can be like text_str
     my $addr_param = GRNOC::MetaParameter->new(name => 'text_str', field => 'ip_block.addr_str');
     @where = $addr_param->process(args => \%args, where => \@where);
 
     my $name_param = GRNOC::MetaParameter->new( name => 'text_str', field => 'ip_block.name' );
     @where = $name_param->process(args => \%args, where => \@where);
+
+    my $abbr_param = GRNOC::MetaParameter->new( name => 'text_str', field => 'ip_block.abbr' );
+    @where = $abbr_param->process(args => \%args, where => \@where);
 
     my $org_name_param = GRNOC::MetaParameter->new(name => 'text_str', field => 'organization.name');
     @where = $org_name_param->process(args => \%args, where => \@where);
@@ -169,6 +173,7 @@ sub get_projects {
     my $fields = [
         'project.project_id as project_id',
         'project.name as name',
+        'project.abbr as abbr',
         'project.description as description',
         'project.url as url',
         'project.email as email',
@@ -217,7 +222,7 @@ sub get_projects {
         order_by => $order_by
     );
     if (!$results) {
-        $self->error('An unknown error occurred getting the ip blocks.');
+        $self->error('An unknown error occurred getting the projects.');
         return undef;
     }
 
@@ -263,7 +268,7 @@ sub get_events {
         limit => 10
     );
     if (!$results) {
-        $self->error('An unknown error occurred getting the ip blocks.');
+        $self->error('An unknown error occurred getting the events.');
         return undef;
     }
 

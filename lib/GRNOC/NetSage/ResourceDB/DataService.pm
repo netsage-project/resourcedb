@@ -386,13 +386,15 @@ sub _init_dynamic_fields {
         'continent_name' => 1
     };
 
-    $fields->{'project'} = {
-        'name' => 1,
-        'description' => 1,
-        'url' => 1,
-        'owner' => 1,
-        'email' => 1
-    };
+# this is apparently not a dynamic table, but leaving here till I'm sure
+    #$fields->{'project'} = {
+    #    'name' => 1,
+    #    'abbr' => 1,
+    #    'description' => 1,
+    #    'url' => 1,
+    #    'owner' => 1,
+    #    'email' => 1
+    #};
 
     $fields->{'discipline'} = {
         'name' => 1,
