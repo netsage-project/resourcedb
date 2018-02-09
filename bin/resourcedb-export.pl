@@ -12,20 +12,30 @@ use Data::Dumper;
 # This script will pull data out of the Science Registry database and write it to a file as JSON.
 
 # Defaults
+my $help;
 # Use same config file as resourcedb (Science Registry)
 my $config_file = "/etc/grnoc/netsage/resourcedb/config.xml";
 # Name output file with the current timestamp
 my $output_file = "/etc/grnoc/netsage/resourcedb/datadump_".time().".json";
 
+#-----------------------------
+sub usage() {
+  print "  USAGE: perl resourcedb-export.pl [-c <config file>] [-o <output file>] [-h] 
+  Without parameters, the defaults are 
+    config_file = /etc/grnoc/netsage/resourcedb/config.xml 
+    output_file = /etc/grnoc/netsage/resourcedb/datadump_<timestamp>.json (must run as sudo) \n";
+  exit;
+}
+#-----------------------------
+
 # defaults can be overridden on command line (-c and -o)
 GetOptions( 'config|c=s' => \$config_file,
-            'output|o=s' => \$output_file
+            'output|o=s' => \$output_file,
+            'help|h|?' => \$help 
           );
-#            'logging=s' => \$logging,
-#            'help|h|?' => \$help 
-#
-## did they ask for help?
-#usage() if $help;
+
+# did they ask for help?
+usage() if $help;
 
 
 # Read config file to get db connection info
@@ -131,7 +141,7 @@ foreach my $res (@$resources) {
     foreach my $proj (@$projects) {
         push(@{$res->{'projects'}}, $proj);
     }
-    print Dumper($res); ###
+    ### print Dumper($res); ###
     push(@data, $res);
 }
 
