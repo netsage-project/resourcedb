@@ -80,6 +80,7 @@ my $resources = $dbq->select(
              'JOIN role ON ip_block.role_id = role.role_id ',
     fields => [ 'ip_block.ip_block_id',
                 'ip_block.name      as resource',
+                'ip_block.abbr      as resource_abbr',
                 'ip_block.description',
                 'ip_block.addr_str  as addresses_str',
                 'ip_block.asn',
@@ -115,6 +116,7 @@ foreach my $res (@$resources) {
     my $projects = $dbq->select(
         table => 'project JOIN ip_block_project ON ip_block_project.project_id = project.project_id',
         fields => [ 'project.name  as project_name',
+                    'project.abbr  as project_abbr',
                     'project.description  as project_description',
                     'project.url   as project_url',
                     'project.owner as project_contact',

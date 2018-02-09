@@ -68,7 +68,7 @@ sub _init_get_methods {
     $method->add_logic_parameter(
                                 name => "project_id",
                                 pattern => $INTEGER,
-                                description => "The IP/CIDR address to match on",
+                                description => "The project id to match on",
     );
 
     # add the optional 'limit' input param to the get_ip_blocks() method

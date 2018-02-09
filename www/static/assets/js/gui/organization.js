@@ -16,10 +16,10 @@ function renderLinkedOrganizationListElement(org) {
     });
 }
 
-// Renders a organization in my_organization_list 
+// Renders a organization in organization_list 
 // Main org list on Organizations tab
-function renderMyOrganizationListElement(org) {
-    var table = document.getElementById('my_organization_list');
+function renderOrganizationListElement(org) {
+    var table = document.getElementById('organization_list');
     var row   = table.insertRow(-1);
 
     var id = org.organization_id.toString();
@@ -76,15 +76,21 @@ function renderOrganizationRecord(organization) {
 
   document.getElementById('organization_abbr').innerHTML = organization.abbr;
   document.getElementById('organization_country').innerHTML = organization.country_code;
-  document.getElementById('organization_latitude').innerHTML = organization.latitude;
-  document.getElementById('organization_longitude').innerHTML = organization.longitude;
   document.getElementById('organization_owner').innerHTML = organization.owner;
   document.getElementById('organization_email').innerHTML = organization.email;
+
+  geolocation = document.getElementById('organization_geolocation');
+  if (organization.latitude == null || organization.longitude == null) {
+        geolocation.innerHTML = 'Location is not available';
+  } else {
+        geolocation.innerHTML = organization.latitude.toString() + ', ' + organization.longitude.toString();
+  }
+
 }
 
-// Empty my_organization_list
+// Empty organization_list
 function renderEmptyOrganizationList() {
-    document.getElementById('my_organization_list').innerHTML = '';
+    document.getElementById('organization_list').innerHTML = '';
 }
 
 // Renders the number of organizations organization_list should contain.

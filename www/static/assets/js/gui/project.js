@@ -8,8 +8,10 @@ function renderMyProjectListElement(project) {
     var id = project.project_id.toString();
 
     var name = row.insertCell(0);
+    var abbr = row.insertCell(1);
 
     name.innerHTML = project.name;
+    abbr.innerHTML = project.abbr;
 
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'project/index.html?project_id=' + id;
@@ -59,7 +61,7 @@ function renderProjectHeader(project) {
 }
 
 // Given a project record, set the innerHTML of the elements
-// identified by project_owner, and project_email.
+// identified by project_owner, and project_email, etc.
 function renderProjectRecord(project) {
   var link = document.getElementById('project_edit_link');
   link.href = basePath + 'project/edit.html?project_id=' + project.project_id.toString();
@@ -72,6 +74,7 @@ function renderProjectRecord(project) {
     document.getElementById('project_url').appendChild(url);
   }
 
+  document.getElementById('project_abbr').innerHTML = project.abbr;
   document.getElementById('project_owner').innerHTML = project.owner;
   document.getElementById('project_email').innerHTML = project.email;
 
@@ -135,6 +138,7 @@ function submitCreateOrUpdateProject(e) {
     console.log(form.elements);
 
     var name = form.elements['project_name'].value;
+    var abbr = form.elements['project_abbr'].value;
     var desc = form.elements['project_description'].value;
     var owner = form.elements['project_owner'].value;
     var email = form.elements['project_email'].value;
@@ -144,18 +148,19 @@ function submitCreateOrUpdateProject(e) {
     var project_id = parseInt(form.elements['project_id'].value);
     if (project_id === -1) {
         console.log('Creating a new project');
-        createOrEditProject(null, name, desc, owner, email, projUrl);
+        createOrEditProject(null, name, abbr, desc, owner, email, projUrl);
     } else {
         console.log('Editing project ' + project_id.toString());
-        createOrEditProject(project_id, name, desc, owner, email, projUrl);
+        createOrEditProject(project_id, name, abbr, desc, owner, email, projUrl);
     }
 }
 
-// Sets up submitEditProject to be called when the edit button on
+// Sets up submitEditProject to be called when a button on
 // project/edit.html is pressed.
 function setupEditProjectForm(project) {
     var id = document.getElementById('project_id');
     var name = document.getElementById('project_name');
+    var abbr = document.getElementById('project_abbr');
     var desc = document.getElementById('project_description');
     var owner = document.getElementById('project_owner');
     var email = document.getElementById('project_email');
@@ -163,6 +168,7 @@ function setupEditProjectForm(project) {
 
     id.value = project.project_id;
     name.value = project.name;
+    abbr.value = project.abbr;
     desc.value = project.description;
     owner.value = project.owner;
     email.value = project.email;

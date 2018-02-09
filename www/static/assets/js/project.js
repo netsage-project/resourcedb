@@ -67,7 +67,7 @@ var index = function() {
         });
         getOrganizations(function(orgs) {
             for (var i = 0; i < orgs.length; i++) {
-                renderMyOrganizationListElement(orgs[i]);
+                renderOrganizationListElement(orgs[i]);
             }
             /// renderOrganizationCount(organizations.length);
         });
@@ -90,7 +90,7 @@ var index = function() {
         getOrganizationsLike(query, function(organizations) {
             renderEmptyOrganizationList();
             for (var i = 0; i < organizations.length; i++) {
-                renderMyOrganizationListElement(organizations[i]);
+                renderOrganizationListElement(organizations[i]);
             }
             /// renderOrganizationCount(organizations.length);
         });
@@ -123,7 +123,7 @@ var index = function() {
             getOrganizations(function(organizations) {
                 renderEmptyOrganizationList();
                 for (var i = 0; i < organizations.length; i++) {
-                    renderMyOrganizationListElement(organizations[i]);
+                    renderOrganizationListElement(organizations[i]);
                 }
                 /// renderOrganizationCount(organizations.length);
             });
@@ -146,7 +146,7 @@ var index = function() {
             getOrganizationsLike(input, function(organizations) {
                 renderEmptyOrganizationList();
                 for (var i = 0; i < organizations.length; i++) {
-                    renderMyOrganizationListElement(organizations[i]);
+                    renderOrganizationListElement(organizations[i]);
                 }
                 /// renderOrganizationCount(organizations.length);
             });
