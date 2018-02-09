@@ -111,7 +111,7 @@ function getResourcesByOrganizationId(organizationId, onSuccess) {
 
 // Creates a new resouce using the backend api. On success, we
 // redirect to the assoicated resource/index.html page.
-function createOrEditResource(id, name, desc, cidr, asn, org_id, country_code,
+function createOrEditResource(id, name, abbr, desc, cidr, asn, org_id, country_code,
                               lat, lon, discipline_id, role_id) {
     var url = baseUrl;
     if (id === null) {
@@ -122,6 +122,7 @@ function createOrEditResource(id, name, desc, cidr, asn, org_id, country_code,
     }
 
     url += '&name=' + name;
+    url += '&abbr=' + abbr;
     url += '&description=' + desc;
     url += '&addr_str=' + cidr;
     url += '&asn=' + asn;

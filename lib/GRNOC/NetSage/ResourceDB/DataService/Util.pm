@@ -212,7 +212,58 @@ sub update_schema {
     if ($version eq '0.0.9') {
         ($version, $err) = $self->upgrade_to_0_0_10($db, $version);
     }
+    if ($version eq '0.0.10') {
+        ($version, $err) = $self->upgrade_to_0_0_11($db, $version);
+    }
 
+    return ($version, $err);
+}
+
+sub upgrade_to_0_0_11 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+
+    # Add abbr column to `project`
+    my $query = "alter table `project`
+                 add column `abbr` varchar(20) unique after `name`
+                ";
+    my $add_ok = $db->do( $query );
+    if ($add_ok) {
+        warn "Added 'abbr' to 'project' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add 'abbr' column to 'project' table: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+
+    # Add abbr column to `ip_block`
+    my $query = "alter table `ip_block`
+                 add column `abbr` varchar(50) unique after `name`
+                ";
+    $add_ok = $db->do( $query );
+    if ($add_ok) {
+        warn "Added 'abbr' to 'ip_block' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add 'abbr' column to 'ip_block' table: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+
+    print "*** PLEASE ENTER RESOURCE and PROJECT ABBR VALUES BY HAND! *** \n";
+
+    $version = '0.0.11';
+    my $updated_ok = $self->_update_version( $db, $version );
     return ($version, $err);
 }
 
@@ -223,7 +274,7 @@ sub upgrade_to_0_0_10 {
 
     my $err = undef;
 
-    # Add column to `organization`
+    # Add abbr column to `organization`
     my $query = "alter table `organization`
                  add column `abbr` varchar(10) unique after `name`
                 ";
@@ -259,7 +310,7 @@ sub upgrade_to_0_0_10 {
         } 
         return ($version, $err);
     }
-    print "*** PLEASE FIX BAD AND MISSING ABBR VALUES BY HAND! *** ";
+    print "*** PLEASE FIX BAD AND MISSING ABBR VALUES BY HAND! *** \n";
 
     $version = '0.0.10';
     my $updated_ok = $self->_update_version( $db, $version );

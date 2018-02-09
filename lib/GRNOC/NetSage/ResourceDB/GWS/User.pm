@@ -62,13 +62,13 @@ sub _init_get_methods {
     $method->add_logic_parameter(
                                 name => "text_str",
                                 pattern => $TEXT,
-                                description => "The IP address, name, or org name to match on",
+                                description => "The IP address, name, abbr, or org name to match on",
     );
 
     $method->add_logic_parameter(
                                 name => "project_id",
                                 pattern => $INTEGER,
-                                description => "The IP/CIDR address to match on",
+                                description => "The project id to match on",
     );
 
     # add the optional 'limit' input param to the get_ip_blocks() method
@@ -136,7 +136,7 @@ sub _init_get_methods {
         pattern     => $INTEGER,
         required    => 1,
         multiple    => 0,
-        description => 'The id of the IP block'
+        description => 'The id of the project'
     );
 
     $method->add_input_parameter(
@@ -144,7 +144,15 @@ sub _init_get_methods {
         pattern     => $TEXT,
         required    => 1,
         multiple    => 0,
-        description => 'The id of the IP block'
+        description => 'The name of the project'
+    );
+
+    $method->add_input_parameter(
+        name        => 'abbr',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'A short name for the project'
     );
 
     $method->add_input_parameter(
@@ -152,7 +160,7 @@ sub _init_get_methods {
         pattern     => $TEXT,
         required    => 0,
         multiple    => 0,
-        description => 'The id of the IP block'
+        description => 'The description of the project'
     );
 
     $method->add_input_parameter(
@@ -160,7 +168,7 @@ sub _init_get_methods {
         pattern     => $TEXT,
         required    => 1,
         multiple    => 0,
-        description => 'The id of the IP block'
+        description => 'The main contact for the project'
     );
 
     $method->add_input_parameter(
@@ -168,7 +176,7 @@ sub _init_get_methods {
         pattern     => $TEXT,
         required    => 1,
         multiple    => 0,
-        description => 'The id of the IP block'
+        description => 'The email of the main contact'
     );
 
     $method->add_input_parameter(
@@ -176,7 +184,7 @@ sub _init_get_methods {
         pattern     => $TEXT,
         required    => 0,
         multiple    => 0,
-        description => 'The id of the IP block'
+        description => 'The webpage for the project'
     );
     $self->websvc()->register_method($method);
 

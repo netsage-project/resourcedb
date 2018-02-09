@@ -111,7 +111,7 @@ function setProjectResourceLinks(projectID, resourceIDs) {
 
 // Create or edit a new project using the backend api. On success, we
 // redirect to the assoicated project/index.html page.
-function createOrEditProject(id, name, desc, owner, email, projUrl) {
+function createOrEditProject(id, name, abbr, desc, owner, email, projUrl) {
     var url = baseUrl;
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_projects';
@@ -121,6 +121,7 @@ function createOrEditProject(id, name, desc, owner, email, projUrl) {
     }
 
     url += '&name=' + name;
+    url += '&abbr=' + abbr;
     url += '&description=' + desc;
     url += '&owner=' + owner;
     url += '&email=' + email;

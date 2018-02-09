@@ -197,12 +197,12 @@ sub add_projects {
                                        );
 
     if ( !$results ) {
-        $self->error( 'An unknown error occurred adding the ip blocks.' );
+        $self->error( 'An unknown error occurred adding the projects.' );
         return;
     }
     $self->add_events(
         project_id => $results,
-        message => "$ENV{'REMOTE_USER'} created this resource."
+        message => "$ENV{'REMOTE_USER'} created this project."
     );
 
     my $num_rows = $self->dbq_rw()->num_rows();
@@ -457,6 +457,7 @@ sub _get_project_args {
 
     my @all_args = (
         'name',
+        'abbr',
         'description',
         'url',
         'owner',
@@ -484,6 +485,7 @@ sub _get_ip_block_args {
     #  -  mask
     my @all_args = (
         'name',
+        'abbr',
         'description',
         'addr_str',
         #'addr_lower',
