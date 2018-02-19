@@ -1,6 +1,6 @@
 Summary:   NetSage Resource Database
 Name:      resourcedb
-Version:   0.4.0
+Version:   0.5.0
 Release:   %{_buildno}%{?dist}
 License:   Apache
 Group:     GRNOC
@@ -35,6 +35,7 @@ Requires: perl-GRNOC-DatabaseQuery
 Requires: perl-MIME-Lite-TT
 Requires: perl-String-MkPasswd
 Requires: perl-Net-DNS
+Requires: perl-JSON
 
 %description
 NetSage Resource Database (Science Registry)
