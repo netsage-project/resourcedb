@@ -52,7 +52,8 @@ sub new {
     bless( $self, $class );
 
     # parse config, setup database connections, etc.
-    $self->_init();
+    my $res = $self->_init();
+    if (! $res) { die ("FATAL ERROR IN DATASERVICE INITIALIZATION"); } 
 
     return $self;
 }
@@ -133,6 +134,7 @@ sub error {
     my ( $self, $error ) = @_;
 
     $self->{'error'} = $error if ( defined( $error ) );
+    warn ("ERROR: ".$self->{'error'});
 
     return $self->{'error'};
 }
@@ -322,7 +324,7 @@ sub _init {
     if ( !defined( $config ) ) {
 
         $self->error( 'Unable to parse the config file.' );
-        return;
+        return 0;
     }
 
     $self->config( $config );
@@ -342,7 +344,7 @@ sub _init {
     if ( !$ret ) {
 
         $self->error( 'Unable to connect to the database using read-only credentials.' );
-        return;
+        return 0;
     }
 
     my $dbq_rw = GRNOC::DatabaseQuery->new( name  => $config->get( '/config/database-name' ),
@@ -357,7 +359,7 @@ sub _init {
     if ( !$ret ) {
 
         $self->error( 'Unable to connect to the database using read-write credentials.' );
-        return;
+        return 0;
     }
 
     $self->dbq_ro( $dbq_ro );
