@@ -77,6 +77,7 @@ function renderProjectRecord(project) {
   document.getElementById('project_abbr').innerHTML = project.abbr;
   document.getElementById('project_owner').innerHTML = project.owner;
   document.getElementById('project_email').innerHTML = project.email;
+  if (project.notes) { document.getElementById('project_notes').innerHTML = project.notes.replace(/ @@ /g,"<br>"); } // new-lines are @@ in db.
 
   var edit_link = document.getElementById('project_edit_resources');
   edit_link.href = basePath + 'project/link.html?project_id=' + project.project_id.toString();
@@ -142,16 +143,18 @@ function submitCreateOrUpdateProject(e) {
     var desc = form.elements['project_description'].value;
     var owner = form.elements['project_owner'].value;
     var email = form.elements['project_email'].value;
+    var notes = form.elements['project_notes'].value;
+    if (notes) { notes = notes.replace(/\n/g," @@ "); }  // encode new-lines as @@ in the db
     var projUrl = form.elements['project_url'].value;
 
     // Hidden field project_id
     var project_id = parseInt(form.elements['project_id'].value);
     if (project_id === -1) {
         console.log('Creating a new project');
-        createOrEditProject(null, name, abbr, desc, owner, email, projUrl);
+        createOrEditProject(null, name, abbr, desc, owner, email, projUrl, notes);
     } else {
         console.log('Editing project ' + project_id.toString());
-        createOrEditProject(project_id, name, abbr, desc, owner, email, projUrl);
+        createOrEditProject(project_id, name, abbr, desc, owner, email, projUrl, notes);
     }
 }
 
@@ -165,6 +168,7 @@ function setupEditProjectForm(project) {
     var owner = document.getElementById('project_owner');
     var email = document.getElementById('project_email');
     var url = document.getElementById('project_url');
+    var notes = document.getElementById('project_notes');
 
     id.value = project.project_id;
     name.value = project.name;
@@ -173,6 +177,7 @@ function setupEditProjectForm(project) {
     owner.value = project.owner;
     email.value = project.email;
     url.value = project.url;
+    if (project.notes) { notes.value = project.notes.replace(/ @@ /g, "\n"); } // new-lines are @@ in the db
 
     var form = document.getElementById('create_project_form');
     form.onsubmit = submitCreateOrUpdateProject;

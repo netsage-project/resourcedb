@@ -110,9 +110,9 @@ function getResourcesByOrganizationId(organizationId, onSuccess) {
 }
 
 // Creates a new resouce using the backend api. On success, we
-// redirect to the assoicated resource/index.html page.
+// redirect to the associated resource/index.html page.
 function createOrEditResource(id, name, abbr, desc, cidr, asn, org_id, country_code,
-                              lat, lon, discipline_id, role_id) {
+                              lat, lon, discipline_id, role_id, resUrl, notes) {
     var url = baseUrl;
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_ip_blocks';
@@ -132,6 +132,8 @@ function createOrEditResource(id, name, abbr, desc, cidr, asn, org_id, country_c
     url += '&longitude='  + lon.toFixed(5);
     url += '&discipline_id='  + discipline_id;
     url += '&role_id='  + role_id;
+    url += '&url='  + resUrl;
+    url += '&notes='  + notes;
 
     function successCallback(resource) {
         var id = resource.ip_block_id;

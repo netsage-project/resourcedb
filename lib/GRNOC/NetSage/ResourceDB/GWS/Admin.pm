@@ -163,14 +163,19 @@ sub _init_add_methods {
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The project webpage');
+    $method->add_input_parameter( name        => 'notes',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The project notes');
     $method->add_input_parameter( name        => 'owner',
                                   pattern     => $TEXT,
-                                  required    => 1,
+                                  required    => 0,
                                   multiple    => 0,
                                   description => 'The main contact for the project');
     $method->add_input_parameter( name        => 'email',
                                   pattern     => $TEXT,
-                                  required    => 1,
+                                  required    => 0,
                                   multiple    => 0,
                                   description => 'The email of the contact');
     $self->websvc()->register_method($method);
@@ -261,6 +266,19 @@ sub _add_ip_block_params {
                                   multiple    => 0,
                                   description => 'The description of the ip resource block');
 
+    # add the optional 'url' input param to the method
+    $method->add_input_parameter( name        => 'url',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The url of the ip resource block');
+
+    # add the optional 'notes' input param to the method
+    $method->add_input_parameter( name        => 'notes',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The notes of the ip resource block');
 
     # add the optional 'asn' input param to the  method
     $method->add_input_parameter( name        => 'asn',
@@ -438,7 +456,6 @@ sub _add_dynamic_add_update_parameters {
                 multiple    => 0,
                 description => "The latitude of the $name");
 
-
         } elsif ( $field eq "longitude" ) {
             # add the optional 'longitude' input param to all the basic dynamic methods
             $method->add_input_parameter(
@@ -466,6 +483,14 @@ sub _add_dynamic_add_update_parameters {
                 multiple    => 0,
                 description => "The continent_name of the $name");
 
+        } elsif ( $field eq "notes" ) {
+            # add the optional 'notes' input param to all the basic dynamic methods
+            $method->add_input_parameter(
+                name        => $field,
+                pattern     => $TEXT,
+                required    => 0,
+                multiple    => 0,
+                description => "The notes of the $name");
         }
     }
 }

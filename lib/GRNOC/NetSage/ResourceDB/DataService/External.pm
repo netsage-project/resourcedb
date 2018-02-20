@@ -193,7 +193,7 @@ sub get_revdns {
             $num_rows = $num_rows + 1;
         }
     } 
-    elsif ($resolver->errorstring and $resolver->errorstring == "NXDOMAIN") {
+    elsif ($resolver->errorstring and $resolver->errorstring eq "NXDOMAIN") {
         $results{'hostname'} = "none found";
     }
     elsif ($resolver->errorstring) {

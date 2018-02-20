@@ -70,9 +70,9 @@ function getOrganizationsLike(text, on_success) {
     });
 }
 
-// Creates a new organization using the backend api. On success, we
-// redirect to the assoicated organization/index.html page.
-function createOrganization(id, name, abbr, desc, owner, email, country_code, lat, lon, orgUrl) {
+// Creates or Updates a new organization using the backend api. On success, we
+// redirect to the associated organization/index.html page.
+function createOrEditOrganization(id, name, abbr, desc, owner, email, country_code, lat, lon, orgUrl, notes) {
     var url = baseUrl;
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_organizations';
@@ -90,6 +90,7 @@ function createOrganization(id, name, abbr, desc, owner, email, country_code, la
     url += '&latitude='  + lat.toFixed(5);
     url += '&longitude='  + lon.toFixed(5);
     url += '&url='  + orgUrl;
+    url += '&notes='  + notes;
 
     function successCallback(organization) {
         var id = organization.organization_id;

@@ -181,8 +181,8 @@ sub update_schema {
         }
     }
 
+    # Place upgrade script for next schema version here.
     if ($version eq '0.0.1') {
-        # Place upgrade script for next schema version here.
         ($version, $err) = $self->upgrade_to_0_0_2($db, $version);
     }
     if ($version eq '0.0.2') {
@@ -215,7 +215,86 @@ sub update_schema {
     if ($version eq '0.0.10') {
         ($version, $err) = $self->upgrade_to_0_0_11($db, $version);
     }
+    if ($version eq '0.0.11') {
+        ($version, $err) = $self->upgrade_to_0_0_12($db, $version);
+    }
 
+    if ($version eq '0.0.12') { print ("Schema is up-to-date\n"); }
+
+    return ($version, $err);
+}
+
+sub upgrade_to_0_0_12 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+
+    # Add url column to `ip_block` table
+    my $query = "alter table `ip_block`
+                 add column `url` varchar(255) 
+                ";
+    my $add_ok = $db->do( $query );
+    if ($add_ok) {
+        warn "Added 'url' to 'ip_block' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add 'url' column to 'ip_block' table: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+    # Add notes column to `ip_block` table
+    $query = "alter table `ip_block`
+                 add column `notes` text ";
+    $add_ok = $db->do( $query );
+    if ($add_ok) {
+        warn "Added 'notes' to 'ip_block' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add 'notes' column to 'ip_block' table: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+    # Add notes column to `organization` table
+    $query = "alter table `organization`
+                 add column `notes` text ";
+    $add_ok = $db->do( $query );
+    if ($add_ok) {
+        warn "Added 'notes' to 'organization' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add 'notes' column to 'organization' table: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+    # Add notes column to `project` table
+    $query = "alter table `project`
+                 add column `notes` text ";
+    $add_ok = $db->do( $query );
+    if ($add_ok) {
+        warn "Added 'notes' to 'project' table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add 'notes' column to 'project' table: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+
+    $version = '0.0.12';
+    my $updated_ok = $self->_update_version( $db, $version );
     return ($version, $err);
 }
 
@@ -244,7 +323,7 @@ sub upgrade_to_0_0_11 {
     }
 
     # Add abbr column to `ip_block`
-    my $query = "alter table `ip_block`
+    $query = "alter table `ip_block`
                  add column `abbr` varchar(50) unique after `name`
                 ";
     $add_ok = $db->do( $query );

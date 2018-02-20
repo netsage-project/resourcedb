@@ -461,7 +461,8 @@ sub _get_project_args {
         'description',
         'url',
         'owner',
-        'email'
+        'email',
+        'notes'
     );
 
     foreach my $arg( @all_args ) {
@@ -500,6 +501,8 @@ sub _get_ip_block_args {
         'project_id',
         'discipline_id',
         'role_id',
+        'url',
+        'notes'
     );
 
     foreach my $arg( @all_args ) {

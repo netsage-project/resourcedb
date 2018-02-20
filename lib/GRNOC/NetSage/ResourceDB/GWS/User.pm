@@ -166,7 +166,7 @@ sub _init_get_methods {
     $method->add_input_parameter(
         name        => 'owner',
         pattern     => $TEXT,
-        required    => 1,
+        required    => 0,
         multiple    => 0,
         description => 'The main contact for the project'
     );
@@ -174,7 +174,7 @@ sub _init_get_methods {
     $method->add_input_parameter(
         name        => 'email',
         pattern     => $TEXT,
-        required    => 1,
+        required    => 0,
         multiple    => 0,
         description => 'The email of the main contact'
     );
@@ -185,6 +185,14 @@ sub _init_get_methods {
         required    => 0,
         multiple    => 0,
         description => 'The webpage for the project'
+    );
+
+    $method->add_input_parameter(
+        name        => 'notes',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'The notes for the project'
     );
     $self->websvc()->register_method($method);
 

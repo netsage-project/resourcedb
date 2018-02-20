@@ -385,7 +385,8 @@ sub _init_dynamic_fields {
         'latitude' => 1,
         'longitude' => 1,
         'country_code' => 1,
-        'continent_name' => 1
+        'continent_name' => 1,
+        'notes' => 1
     };
 
 # this is apparently not a dynamic table, but leaving here till I'm sure

@@ -140,7 +140,7 @@ function renderResourceHeader(resource) {
     desc.innerHTML = resource.description;
 }
 
-// Given a resouce record, set the innerHTML of the elements
+// Given a resource record, set the innerHTML of the elements
 // identified by resource_cidr, resource_country, etc
 function renderResourceRecord(resource) {
     var abbr = document.getElementById('resource_abbr');
@@ -148,6 +148,8 @@ function renderResourceRecord(resource) {
     var country = document.getElementById('resource_country');
     var geolocation = document.getElementById('resource_geolocation');
     var organization = document.getElementById('resource_organization');
+    var url = document.getElementById('resource_url');
+    var notes = document.getElementById('resource_notes');
     var role = document.getElementById('resource_role');
     var discipline = document.getElementById('resource_discipline');
     var link = document.getElementById('resource_edit_link');
@@ -156,6 +158,8 @@ function renderResourceRecord(resource) {
     abbr.innerHTML = resource.abbr;
     country.innerHTML = resource.country_name;
     organization.innerHTML = resource.organization_name;
+    url.innerHTML = resource.url;
+    if (resource.notes) { notes.innerHTML = resource.notes.replace(/ @@ /g,"<br>"); } // new-lines are @@ in db.
     role.innerHTML = resource.role_name;
     discipline.innerHTML = resource.discipline_name;
 
@@ -503,6 +507,8 @@ function setupEditResourceForm(resource) {
     var country = document.getElementById('resource_country');   
     var role = document.getElementById('resource_role');
     var discipline = document.getElementById('resource_discipline');
+    var url = document.getElementById('resource_url');
+    var notes = document.getElementById('resource_notes');
   
     cidr.addEventListener('input', function(event) {
         if (cidr.validity.patternMismatch) {
@@ -520,6 +526,8 @@ function setupEditResourceForm(resource) {
     asn.value = resource.asn;
     lat.value = resource.latitude;
     lon.value = resource.longitude;
+    url.value = resource.url;
+    if (resource.notes) { notes.value = resource.notes.replace(/ @@ /g, "\n"); } // new-lines are @@ in the db
 
     getOrganizations(function(orgs) {
         for (var i = 0; i < orgs.length; i++) {
@@ -598,18 +606,6 @@ function renderCreateResourceFormProjectOption(project) {
     dropd.appendChild(opt);
 }
 
-// Appends an option to the resource_organization drop down box on
-// resource/new.html.
-////function renderCreateResourceFormOrganizationOption(org) {
-   //// var dropd = document.getElementById('resource_organization');
-    ////var opt = document.createElement('option');
-
-    ////opt.innerHTML = org.name;
-    ////opt.setAttribute('value', org.organization_id);
-////
-    ////dropd.appendChild(opt);
-////}
-
 // Gathers values from create_resource_form on resource/new.html when
 // the create button is pressed. Passes the collected values to
 // createResource after parameters are validated.
@@ -625,6 +621,9 @@ function submitCreateOrUpdateResource(e) {
     var abbr = form.elements['resource_abbr'].value;
     var desc = form.elements['resource_description'].value;
     var cidr = form.elements['resource_cidr'].value.replace(/ /g, ""); // remove spaces before saving
+    var url  = form.elements['resource_url'].value;
+    var notes= form.elements['resource_notes'].value;
+    if (notes) { notes = notes.replace(/\n/g, " @@ "); } // encode new-lines as @@ in db.;
 
     var asn = form.elements['resource_asn'].value;
 
@@ -644,11 +643,11 @@ function submitCreateOrUpdateResource(e) {
     if (resource_id === -1) {
         console.log('Creating a new resource');
         createOrEditResource(null, name, abbr, desc, cidr, asn, org_id, country_code,
-                       lat, lon, discipline_id, role_id);
+                       lat, lon, discipline_id, role_id, url, notes);
     } else {
         console.log('Editing resource ' + resource_id.toString());
         createOrEditResource(resource_id, name, abbr, desc, cidr, asn, org_id, country_code,
-                             lat, lon, discipline_id, role_id);
+                             lat, lon, discipline_id, role_id, url, notes);
     }
 }
 
