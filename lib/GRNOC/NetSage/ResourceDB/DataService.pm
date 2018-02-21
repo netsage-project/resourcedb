@@ -210,6 +210,13 @@ sub get_table_dynamically {
     @where = $name_param->process( args => \%args,
                                  where => \@where );
 
+    # handle optional 'abbr' param
+    my $abbr_param = GRNOC::MetaParameter->new( name => "abbr",
+                                              field => "abbr" );
+
+    @where = $abbr_param->process( args => \%args,
+                                 where => \@where );
+
     # get the order_by value
     my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
     my $order_by = $order_by_param->parse( %args );

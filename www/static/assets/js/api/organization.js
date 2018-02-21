@@ -70,6 +70,25 @@ function getOrganizationsLike(text, on_success) {
     });
 }
 
+// Gets a list of organizations from the backend where abbreviation = text.
+function getOrgWithAbbr(text, on_success) {
+    var url = baseUrl + 'api/index.cgi?method=get_organizations';
+    url += '&abbr=' + text;
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            on_success(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Creates or Updates a new organization using the backend api. On success, we
 // redirect to the associated organization/index.html page.
 function createOrEditOrganization(id, name, abbr, desc, owner, email, country_code, lat, lon, orgUrl, notes) {

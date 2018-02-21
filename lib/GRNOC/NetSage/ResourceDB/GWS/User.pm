@@ -296,6 +296,13 @@ sub _init_dynamic_get_methods {
             multiple    => 1,
             description => "The name of the $name");
 
+        # add the optional 'abbr' input param to the get_$names() method
+        $method->add_input_parameter( name        => "abbr",
+            pattern     => $TEXT,
+            required    => 0,
+            multiple    => 1,
+            description => "The abbr of the $name");
+
         # allow name_like
         $method->add_logic_parameter( name      => "name",
             pattern => $TEXT,

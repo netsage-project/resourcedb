@@ -177,7 +177,7 @@ function onAbbrChange(onChange) {
 
 // Checks to see if an Abbr is already in the db and warns the user
 function checkAbbr(newAbbr) {
-    getOrganizationsLike(newAbbr, function (organizations) {
+    getOrgWithAbbr(newAbbr, function (organizations) {
         if (organizations.length > 0) {
             alert("Abbreviations must be unique but " + newAbbr + " is already in the registry! \nSee resource '" + organizations[0].name + "'");
        }
