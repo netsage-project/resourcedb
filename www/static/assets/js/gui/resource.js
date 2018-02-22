@@ -669,3 +669,20 @@ function checkIP(cidr) {
     } );
 }
 
+// Calls onChange and passes the updated value of abbr as the
+// first argument.
+function onResAbbrChange(onChange) {
+    var abbr = document.getElementById('resource_abbr');
+    abbr.addEventListener('change', function(e) {
+        onChange(e.target.value);
+    });
+}
+
+// Checks to see if an Abbr is already in the db and warns the user
+function checkResAbbr(newAbbr) {
+    getResourcesWithAbbr(newAbbr, function (resources) {
+        if (resources.length > 0) {
+            alert("Abbreviations must be unique but " + newAbbr + " is already in the registry! \nSee resource '" + resources[0].name + "'");
+       }
+    } );
+}

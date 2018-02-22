@@ -166,24 +166,6 @@ function submitCreateOrUpdateOrganization(e) {
     }
 }
 
-// Calls onChange and passes the updated value of abbr as the
-// first argument.
-function onAbbrChange(onChange) {
-    var abbr = document.getElementById('organization_abbr');
-    abbr.addEventListener('change', function(e) {
-        onChange(e.target.value);
-    });
-}
-
-// Checks to see if an Abbr is already in the db and warns the user
-function checkAbbr(newAbbr) {
-    getOrgWithAbbr(newAbbr, function (organizations) {
-        if (organizations.length > 0) {
-            alert("Abbreviations must be unique but " + newAbbr + " is already in the registry! \nSee resource '" + organizations[0].name + "'");
-       }
-    } );
-}
-
 function setupEditOrganizationForm(org) {
     document.getElementById('organization_id').value = org.organization_id;
     document.getElementById('organization_name').value = org.name;
@@ -226,3 +208,22 @@ function setupEditOrganizationForm(org) {
         window.location.href = basePath + 'organization/index.html?organization_id=' + org.organization_id;
     };
 }
+
+// Calls onChange and passes the updated value of abbr as the
+// first argument.
+function onOrgAbbrChange(onChange) {
+    var abbr = document.getElementById('organization_abbr');
+    abbr.addEventListener('change', function(e) {
+        onChange(e.target.value);
+    });
+}
+
+// Checks to see if an Abbr is already in the db and warns the user
+function checkOrgAbbr(newAbbr) {
+    getOrgWithAbbr(newAbbr, function (organizations) {
+        if (organizations.length > 0) {
+            alert("Abbreviations must be unique but " + newAbbr + " is already in the registry! \nSee organization '" + organizations[0].name + "'");
+       }
+    } );
+}
+

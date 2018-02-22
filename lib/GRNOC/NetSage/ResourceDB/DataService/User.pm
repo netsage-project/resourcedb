@@ -77,17 +77,18 @@ sub get_ip_blocks {
     @where = $id_param->process(args => \%args, where => \@where);
 
     # handle optional text_str param - addr_str or name or abbr or organization.name can be like text_str
-    my $addr_param = GRNOC::MetaParameter->new(name => 'text_str', field => 'ip_block.addr_str');
-    @where = $addr_param->process(args => \%args, where => \@where);
-
+    my $address_param = GRNOC::MetaParameter->new(name => 'text_str', field => 'ip_block.addr_str');
+    @where = $address_param->process(args => \%args, where => \@where);
     my $name_param = GRNOC::MetaParameter->new( name => 'text_str', field => 'ip_block.name' );
     @where = $name_param->process(args => \%args, where => \@where);
-
     my $abbr_param = GRNOC::MetaParameter->new( name => 'text_str', field => 'ip_block.abbr' );
     @where = $abbr_param->process(args => \%args, where => \@where);
-
     my $org_name_param = GRNOC::MetaParameter->new(name => 'text_str', field => 'organization.name');
     @where = $org_name_param->process(args => \%args, where => \@where);
+
+    # handle optional abbr param
+    my $abbrev_param = GRNOC::MetaParameter->new(name => 'abbr', field => 'ip_block.abbr');
+    @where = $abbrev_param->process(args => \%args, where => \@where);
 
     # get the order_by value
     my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
@@ -214,6 +215,10 @@ sub get_projects {
 
     my $name_param = GRNOC::MetaParameter->new(name => 'name', field => 'project.name');
     @where = $name_param->process(args => \%args, where => \@where);
+
+    # handle optional 'abbr' param
+    my $abbr_param = GRNOC::MetaParameter->new( name => "abbr", field => "project.abbr" );
+    @where = $abbr_param->process( args => \%args, where => \@where );
 
     my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
     my $order_by = $order_by_param->parse( %args );

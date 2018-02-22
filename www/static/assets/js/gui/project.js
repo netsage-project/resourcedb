@@ -192,3 +192,21 @@ function setupEditProjectForm(project) {
         window.location.href = basePath + 'project/index.html?project_id=' + project.project_id;
     };
 }
+
+// Calls onChange and passes the updated value of abbr as the
+// first argument.
+function onProjAbbrChange(onChange) {
+    var abbr = document.getElementById('project_abbr');
+    abbr.addEventListener('change', function(e) {
+        onChange(e.target.value);
+    });
+}
+
+// Checks to see if an Abbr is already in the db and warns the user
+function checkProjAbbr(newAbbr) {
+    getProjectsWithAbbr(newAbbr, function (projects) {
+        if (projects.length > 0) {
+            alert("Abbreviations must be unique but " + newAbbr + " is already in the registry! \nSee project '" + projects[0].name + "'");
+       }
+    } );
+}

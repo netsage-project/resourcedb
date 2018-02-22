@@ -202,6 +202,10 @@ function projectNew() {
     console.log('Loading the new project page');
     setupCreateProjectForm();
 
+    onProjAbbrChange(function(newAbbr) {
+        checkProjAbbr(newAbbr);
+    });
+
     onSearchSubmit(function(query) {
         submitSearch(query);
     });
@@ -218,6 +222,10 @@ function projectEdit() {
 
     getResourcesByProjectId(id, function(resources) {
         renderMap(resources);
+    });
+
+    onProjAbbrChange(function(newAbbr) {
+        checkProjAbbr(newAbbr);
     });
 
     onSearchSubmit(function(query) {
@@ -317,6 +325,10 @@ function resourceNew() {
         getReverseDNS(cidr, renderReverseDNSTable);
     });
 
+    onResAbbrChange(function(newAbbr) {
+        checkResAbbr(newAbbr);
+    });
+
     onSearchSubmit(function(query) {
         submitSearch(query);
     });
@@ -338,6 +350,10 @@ function resourceEdit() {
     onResourceCIDRChange(function(cidr) {
         getGeoIP(cidr, renderGeoIPTable);
         getReverseDNS(cidr, renderReverseDNSTable);
+    });
+
+    onResAbbrChange(function(newAbbr) {
+        checkResAbbr(newAbbr);
     });
 
     onSearchSubmit(function(query) {
@@ -376,8 +392,8 @@ function organizationNew() {
     console.log('Loading the new organization page');
     setupCreateOrganizationForm();
 
-    onAbbrChange(function(newAbbr) {
-        checkAbbr(newAbbr);
+    onOrgAbbrChange(function(newAbbr) {
+        checkOrgAbbr(newAbbr);
     });
 
     onSearchSubmit(function(query) {
@@ -398,8 +414,8 @@ function organizationEdit() {
         });
     });
 
-    onAbbrChange(function(newAbbr) {
-        checkAbbr(newAbbr);
+    onOrgAbbrChange(function(newAbbr) {
+        checkOrgAbbr(newAbbr);
     });
 
     onSearchSubmit(function(query) {

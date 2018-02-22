@@ -62,14 +62,19 @@ sub _init_get_methods {
     $method->add_logic_parameter(
                                 name => "text_str",
                                 pattern => $TEXT,
-                                description => "The IP address, name, abbr, or org name to match on",
-    );
+                                description => "The IP address, name, abbr, or org name to match on" );
 
+    # add the optional 'abbr' logic param to the get_ip_blocks() method [needs to be logic param !?]
+    $method->add_logic_parameter(
+                                name => "abbr",
+                                pattern => $TEXT,
+                                description => "The abbr" );
+
+    # add the optional 'project_id' logic param to the get_ip_blocks() method [needs to be logic param !?]
     $method->add_logic_parameter(
                                 name => "project_id",
                                 pattern => $INTEGER,
-                                description => "The project id to match on",
-    );
+                                description => "The project id to match on" );
 
     # add the optional 'limit' input param to the get_ip_blocks() method
     $method->add_input_parameter( name        => 'limit',
@@ -112,7 +117,14 @@ sub _init_get_methods {
         description => 'The id of the IP block'
     );
 
-    # add the rest of the fields in the db table
+    # add the optional 'abbr' logic param to the get_projects() method
+    $method->add_logic_parameter(
+         name => "abbr",
+         pattern => $TEXT,
+         description => "The abbr" 
+    );
+
+    # add the rest of the fields 
     $self->_get_dynamic_where_parameters($method);
 
     # handle name_like
