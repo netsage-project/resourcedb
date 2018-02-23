@@ -9,11 +9,13 @@ use GRNOC::CLI;
 
 sub main {
     print "\nThis script will connect to your database, create a couple of users to be named shortly, and write a config file.\n";
-    print "You may hit enter to use the default values shown.\n";
+    print "We will first need to get login credentials for the existing mysql root user.\n";
+    print "Run with SUDO so the config file can be written!\n";
+    print "(You may hit enter to use the default values shown.)\n\n";
 
     my $cli = GRNOC::CLI->new();
 
-    my $user = $cli->get_input("   MySQL/MariaDB user", default => "root");
+    my $user = $cli->get_input("   Existing MySQL/MariaDB admin user", default => "root");
     my $pass = $cli->get_password("   Password");
     my $host = $cli->get_input("   Database host address", default => "127.0.0.1");
     my $port = $cli->get_input("   Database port number", default => 3306);
