@@ -55,6 +55,25 @@ function getResourcesLike(text, on_success) {
     });
 }
 
+// Gets a list of resources from the backend where abbreviation = text.
+function getResourcesWithAbbr(text, on_success) {
+    var url = baseUrl + 'api/index.cgi?method=get_ip_blocks';
+    url += '&abbr=' + text;
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            on_success(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Gets an resource's events from the backend by resourceId.
 function getResourceEvents(resourceId, onSuccess) {
     var url = baseUrl + 'api/index.cgi?method=get_events' + '&ip_block_id=' + resourceId.toString();
@@ -110,9 +129,9 @@ function getResourcesByOrganizationId(organizationId, onSuccess) {
 }
 
 // Creates a new resouce using the backend api. On success, we
-// redirect to the assoicated resource/index.html page.
+// redirect to the associated resource/index.html page.
 function createOrEditResource(id, name, abbr, desc, cidr, asn, org_id, country_code,
-                              lat, lon, discipline_id, role_id) {
+                              lat, lon, discipline_id, role_id, resUrl, notes) {
     var url = baseUrl;
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_ip_blocks';
@@ -132,6 +151,8 @@ function createOrEditResource(id, name, abbr, desc, cidr, asn, org_id, country_c
     url += '&longitude='  + lon.toFixed(5);
     url += '&discipline_id='  + discipline_id;
     url += '&role_id='  + role_id;
+    url += '&url='  + resUrl;
+    url += '&notes='  + notes;
 
     function successCallback(resource) {
         var id = resource.ip_block_id;

@@ -65,17 +65,17 @@ var index = function() {
             }
             renderResourceCount(resources.length);
         });
-        getOrganizations(function(orgs) {
-            for (var i = 0; i < orgs.length; i++) {
-                renderOrganizationListElement(orgs[i]);
+        getOrganizations(function(organizations) {
+            for (var i = 0; i < organizations.length; i++) {
+                renderOrganizationListElement(organizations[i]);
             }
-            /// renderOrganizationCount(organizations.length);
+            renderOrganizationCount(organizations.length);
         });
         getProjects(function(projects) {
             for (var i = 0; i < projects.length; i++) {
                 renderMyProjectListElement(projects[i]);
             }
-           /// renderProjectCount(projects.length);
+            renderProjectCount(projects.length);
         });
     } 
     else {
@@ -92,14 +92,14 @@ var index = function() {
             for (var i = 0; i < organizations.length; i++) {
                 renderOrganizationListElement(organizations[i]);
             }
-            /// renderOrganizationCount(organizations.length);
+            renderOrganizationCount(organizations.length);
         });
         getProjectsLike(query, function(projects) {
             renderEmptyProjectList();
             for (var i = 0; i < projects.length; i++) {
                 renderMyProjectListElement(projects[i]);
             }
-           /// renderProjectCount(projects.length);
+            renderProjectCount(projects.length);
         });
     }
 
@@ -125,14 +125,14 @@ var index = function() {
                 for (var i = 0; i < organizations.length; i++) {
                     renderOrganizationListElement(organizations[i]);
                 }
-                /// renderOrganizationCount(organizations.length);
+                renderOrganizationCount(organizations.length);
             });
             getProjects(function(projects) {
                 renderEmptyProjectList();
                 for (var i = 0; i < projects.length; i++) {
                     renderMyProjectListElement(projects[i]);
                 }
-               /// renderProjectCount(projects.length);
+                renderProjectCount(projects.length);
             });
         } 
         else {
@@ -148,14 +148,14 @@ var index = function() {
                 for (var i = 0; i < organizations.length; i++) {
                     renderOrganizationListElement(organizations[i]);
                 }
-                /// renderOrganizationCount(organizations.length);
+                renderOrganizationCount(organizations.length);
             });
             getProjectsLike(input, function(projects) {
                 renderEmptyProjectList();
                 for (var i = 0; i < projects.length; i++) {
                     renderMyProjectListElement(projects[i]);
                 }
-               /// renderProjectCount(projects.length);
+                renderProjectCount(projects.length);
             });
         }
 
@@ -202,6 +202,10 @@ function projectNew() {
     console.log('Loading the new project page');
     setupCreateProjectForm();
 
+    onProjAbbrChange(function(newAbbr) {
+        checkProjAbbr(newAbbr);
+    });
+
     onSearchSubmit(function(query) {
         submitSearch(query);
     });
@@ -218,6 +222,10 @@ function projectEdit() {
 
     getResourcesByProjectId(id, function(resources) {
         renderMap(resources);
+    });
+
+    onProjAbbrChange(function(newAbbr) {
+        checkProjAbbr(newAbbr);
     });
 
     onSearchSubmit(function(query) {
@@ -317,6 +325,10 @@ function resourceNew() {
         getReverseDNS(cidr, renderReverseDNSTable);
     });
 
+    onResAbbrChange(function(newAbbr) {
+        checkResAbbr(newAbbr);
+    });
+
     onSearchSubmit(function(query) {
         submitSearch(query);
     });
@@ -338,6 +350,10 @@ function resourceEdit() {
     onResourceCIDRChange(function(cidr) {
         getGeoIP(cidr, renderGeoIPTable);
         getReverseDNS(cidr, renderReverseDNSTable);
+    });
+
+    onResAbbrChange(function(newAbbr) {
+        checkResAbbr(newAbbr);
     });
 
     onSearchSubmit(function(query) {
@@ -376,8 +392,8 @@ function organizationNew() {
     console.log('Loading the new organization page');
     setupCreateOrganizationForm();
 
-    onAbbrChange(function(newAbbr) {
-        checkAbbr(newAbbr);
+    onOrgAbbrChange(function(newAbbr) {
+        checkOrgAbbr(newAbbr);
     });
 
     onSearchSubmit(function(query) {
@@ -398,8 +414,8 @@ function organizationEdit() {
         });
     });
 
-    onAbbrChange(function(newAbbr) {
-        checkAbbr(newAbbr);
+    onOrgAbbrChange(function(newAbbr) {
+        checkOrgAbbr(newAbbr);
     });
 
     onSearchSubmit(function(query) {

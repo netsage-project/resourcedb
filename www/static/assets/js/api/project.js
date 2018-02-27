@@ -54,6 +54,25 @@ function getProjectsLike(text, on_success) {
     });
 }
 
+// Gets a list of projects from the backend where abbreviation = text.
+function getProjectsWithAbbr(text, on_success) {
+    var url = baseUrl + 'api/index.cgi?method=get_projects';
+    url += '&abbr=' + text;
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            on_success(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
 // Gets a list of projects from the backend filtered by resourceID.
 function getProjectsByResourceID(resourceID, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_projects' + '&ip_block_id=' + resourceID.toString();
@@ -110,8 +129,8 @@ function setProjectResourceLinks(projectID, resourceIDs) {
 }
 
 // Create or edit a new project using the backend api. On success, we
-// redirect to the assoicated project/index.html page.
-function createOrEditProject(id, name, abbr, desc, owner, email, projUrl) {
+// redirect to the associated project/index.html page.
+function createOrEditProject(id, name, abbr, desc, owner, email, projUrl, notes) {
     var url = baseUrl;
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_projects';
@@ -126,6 +145,7 @@ function createOrEditProject(id, name, abbr, desc, owner, email, projUrl) {
     url += '&owner=' + owner;
     url += '&email=' + email;
     url += '&url=' + projUrl;
+    url += '&notes=' + notes;
 
     function successCallback(project) {
         var id = project.project_id;

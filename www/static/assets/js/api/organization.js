@@ -70,9 +70,28 @@ function getOrganizationsLike(text, on_success) {
     });
 }
 
-// Creates a new organization using the backend api. On success, we
-// redirect to the assoicated organization/index.html page.
-function createOrganization(id, name, abbr, desc, owner, email, country_code, lat, lon, orgUrl) {
+// Gets a list of organizations from the backend where abbreviation = text.
+function getOrgWithAbbr(text, on_success) {
+    var url = baseUrl + 'api/index.cgi?method=get_organizations';
+    url += '&abbr=' + text;
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            on_success(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
+// Creates or Updates a new organization using the backend api. On success, we
+// redirect to the associated organization/index.html page.
+function createOrEditOrganization(id, name, abbr, desc, owner, email, country_code, lat, lon, orgUrl, notes) {
     var url = baseUrl;
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_organizations';
@@ -90,6 +109,7 @@ function createOrganization(id, name, abbr, desc, owner, email, country_code, la
     url += '&latitude='  + lat.toFixed(5);
     url += '&longitude='  + lon.toFixed(5);
     url += '&url='  + orgUrl;
+    url += '&notes='  + notes;
 
     function successCallback(organization) {
         var id = organization.organization_id;

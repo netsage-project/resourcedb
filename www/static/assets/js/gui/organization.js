@@ -78,6 +78,8 @@ function renderOrganizationRecord(organization) {
   document.getElementById('organization_country').innerHTML = organization.country_code;
   document.getElementById('organization_owner').innerHTML = organization.owner;
   document.getElementById('organization_email').innerHTML = organization.email;
+  if (organization.notes) { document.getElementById('organization_notes').innerHTML = organization.notes.replace(/ @@ /g,"<br>"); } // new-lines are @@ in db.
+
 
   geolocation = document.getElementById('organization_geolocation');
   if (organization.latitude == null || organization.longitude == null) {
@@ -129,7 +131,7 @@ function setupCreateOrganizationForm() {
 
 // Gathers values from create_organization_form on organization/new.html when
 // the create button is pressed. Passes the collected values to
-// createOrganization after parameters are validated.
+// createOrEditOrganization after parameters are validated.
 function submitCreateOrUpdateOrganization(e) {
     e.preventDefault();
 
@@ -142,6 +144,8 @@ function submitCreateOrUpdateOrganization(e) {
     var owner = form.elements['organization_owner'].value;
     var email = form.elements['organization_email'].value;
     var orgUrl = form.elements['organization_url'].value;
+    var notes  = form.elements['organization_notes'].value;
+    if (notes) { notes = notes.replace(/\n/g, " @@ "); } // encode new lines as @@ in the db
 
     var country_code = form.elements['organization_country'].value;
 
@@ -153,31 +157,13 @@ function submitCreateOrUpdateOrganization(e) {
 
     if (id === -1) {
         console.log('Creating a new organization');
-        createOrganization(null, name, abbr, desc, owner, email, country_code,
-                           lat, lon, orgUrl);
+        createOrEditOrganization(null, name, abbr, desc, owner, email, country_code,
+                           lat, lon, orgUrl, notes);
     } else {
         console.log('Editing organization ' + id.toString());
-        createOrganization(id, name, abbr, desc, owner, email, country_code,
-                           lat, lon, orgUrl);
+        createOrEditOrganization(id, name, abbr, desc, owner, email, country_code,
+                           lat, lon, orgUrl, notes);
     }
-}
-
-// Calls onChange and passes the updated value of abbr as the
-// first argument.
-function onAbbrChange(onChange) {
-    var abbr = document.getElementById('organization_abbr');
-    abbr.addEventListener('change', function(e) {
-        onChange(e.target.value);
-    });
-}
-
-// Checks to see if an Abbr is already in the db and warns the user
-function checkAbbr(newAbbr) {
-    getOrganizationsLike(newAbbr, function (organizations) {
-        if (organizations.length > 0) {
-            alert("Abbreviations must be unique but " + newAbbr + " is already in the registry! \nSee resource '" + organizations[0].name + "'");
-       }
-    } );
 }
 
 function setupEditOrganizationForm(org) {
@@ -189,6 +175,7 @@ function setupEditOrganizationForm(org) {
     document.getElementById('organization_owner').value = org.owner;
     document.getElementById('organization_email').value = org.email;
     document.getElementById('organization_url').value = org.url;
+    if (org.notes) { document.getElementById('organization_notes').value = org.notes.replace(/ @@ /g, "\n"); }  // new-lines are @@ in the db
 
     var country = document.getElementById('organization_country');
     for (var i in countries) {
@@ -221,3 +208,22 @@ function setupEditOrganizationForm(org) {
         window.location.href = basePath + 'organization/index.html?organization_id=' + org.organization_id;
     };
 }
+
+// Calls onChange and passes the updated value of abbr as the
+// first argument.
+function onOrgAbbrChange(onChange) {
+    var abbr = document.getElementById('organization_abbr');
+    abbr.addEventListener('change', function(e) {
+        onChange(e.target.value);
+    });
+}
+
+// Checks to see if an Abbr is already in the db and warns the user
+function checkOrgAbbr(newAbbr) {
+    getOrgWithAbbr(newAbbr, function (organizations) {
+        if (organizations.length > 0) {
+            alert("Abbreviations must be unique but " + newAbbr + " is already in the registry! \nSee organization '" + organizations[0].name + "'");
+       }
+    } );
+}
+

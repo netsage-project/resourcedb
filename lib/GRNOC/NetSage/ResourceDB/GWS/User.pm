@@ -62,14 +62,19 @@ sub _init_get_methods {
     $method->add_logic_parameter(
                                 name => "text_str",
                                 pattern => $TEXT,
-                                description => "The IP address, name, abbr, or org name to match on",
-    );
+                                description => "The IP address, name, abbr, or org name to match on" );
 
+    # add the optional 'abbr' logic param to the get_ip_blocks() method [needs to be logic param !?]
+    $method->add_logic_parameter(
+                                name => "abbr",
+                                pattern => $TEXT,
+                                description => "The abbr" );
+
+    # add the optional 'project_id' logic param to the get_ip_blocks() method [needs to be logic param !?]
     $method->add_logic_parameter(
                                 name => "project_id",
                                 pattern => $INTEGER,
-                                description => "The project id to match on",
-    );
+                                description => "The project id to match on" );
 
     # add the optional 'limit' input param to the get_ip_blocks() method
     $method->add_input_parameter( name        => 'limit',
@@ -112,7 +117,14 @@ sub _init_get_methods {
         description => 'The id of the IP block'
     );
 
-    # add the rest of the fields in the db table
+    # add the optional 'abbr' logic param to the get_projects() method
+    $method->add_logic_parameter(
+         name => "abbr",
+         pattern => $TEXT,
+         description => "The abbr" 
+    );
+
+    # add the rest of the fields 
     $self->_get_dynamic_where_parameters($method);
 
     # handle name_like
@@ -166,7 +178,7 @@ sub _init_get_methods {
     $method->add_input_parameter(
         name        => 'owner',
         pattern     => $TEXT,
-        required    => 1,
+        required    => 0,
         multiple    => 0,
         description => 'The main contact for the project'
     );
@@ -174,7 +186,7 @@ sub _init_get_methods {
     $method->add_input_parameter(
         name        => 'email',
         pattern     => $TEXT,
-        required    => 1,
+        required    => 0,
         multiple    => 0,
         description => 'The email of the main contact'
     );
@@ -185,6 +197,14 @@ sub _init_get_methods {
         required    => 0,
         multiple    => 0,
         description => 'The webpage for the project'
+    );
+
+    $method->add_input_parameter(
+        name        => 'notes',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'The notes for the project'
     );
     $self->websvc()->register_method($method);
 
@@ -287,6 +307,13 @@ sub _init_dynamic_get_methods {
             required    => 0,
             multiple    => 1,
             description => "The name of the $name");
+
+        # add the optional 'abbr' input param to the get_$names() method
+        $method->add_input_parameter( name        => "abbr",
+            pattern     => $TEXT,
+            required    => 0,
+            multiple    => 1,
+            description => "The abbr of the $name");
 
         # allow name_like
         $method->add_logic_parameter( name      => "name",

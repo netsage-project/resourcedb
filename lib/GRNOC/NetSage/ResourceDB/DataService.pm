@@ -52,7 +52,8 @@ sub new {
     bless( $self, $class );
 
     # parse config, setup database connections, etc.
-    $self->_init();
+    my $res = $self->_init();
+    if (! $res) { die ("FATAL ERROR IN DATASERVICE INITIALIZATION"); } 
 
     return $self;
 }
@@ -133,6 +134,7 @@ sub error {
     my ( $self, $error ) = @_;
 
     $self->{'error'} = $error if ( defined( $error ) );
+    warn ("ERROR: ".$self->{'error'});
 
     return $self->{'error'};
 }
@@ -206,6 +208,13 @@ sub get_table_dynamically {
                                               field => "name" );
 
     @where = $name_param->process( args => \%args,
+                                 where => \@where );
+
+    # handle optional 'abbr' param
+    my $abbr_param = GRNOC::MetaParameter->new( name => "abbr",
+                                              field => "abbr" );
+
+    @where = $abbr_param->process( args => \%args,
                                  where => \@where );
 
     # get the order_by value
@@ -322,7 +331,7 @@ sub _init {
     if ( !defined( $config ) ) {
 
         $self->error( 'Unable to parse the config file.' );
-        return;
+        return 0;
     }
 
     $self->config( $config );
@@ -342,7 +351,7 @@ sub _init {
     if ( !$ret ) {
 
         $self->error( 'Unable to connect to the database using read-only credentials.' );
-        return;
+        return 0;
     }
 
     my $dbq_rw = GRNOC::DatabaseQuery->new( name  => $config->get( '/config/database-name' ),
@@ -357,7 +366,7 @@ sub _init {
     if ( !$ret ) {
 
         $self->error( 'Unable to connect to the database using read-write credentials.' );
-        return;
+        return 0;
     }
 
     $self->dbq_ro( $dbq_ro );
@@ -383,7 +392,8 @@ sub _init_dynamic_fields {
         'latitude' => 1,
         'longitude' => 1,
         'country_code' => 1,
-        'continent_name' => 1
+        'continent_name' => 1,
+        'notes' => 1
     };
 
 # this is apparently not a dynamic table, but leaving here till I'm sure
