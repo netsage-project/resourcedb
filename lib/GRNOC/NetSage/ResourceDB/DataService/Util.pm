@@ -92,7 +92,7 @@ sub database_created {
         # ignore this case. All others should be handled.
         $err = $DBI::errstr;
         if (index($err, "database exists") != -1) {
-            print "Database already exists\n";
+            print "Database already exists. Will update it.\n";
             return 2;
         } else {
             return 0;
@@ -219,7 +219,7 @@ sub update_schema {
         ($version, $err) = $self->upgrade_to_0_0_12($db, $version);
     }
 
-    if ($version eq '0.0.12') { print ("Schema is up-to-date\n"); }
+    if ($version eq '0.0.12') { print ("Schema is now up-to-date - version $version\n"); }
 
     return ($version, $err);
 }
@@ -937,7 +937,7 @@ sub upgrade_to_0_0_3 {
         }
     }
 
-    my $ok = $org_ok && $project_ok && $discipline_ok && $role_ok;
+    my $ok = $org_ok && $project_ok && $role_ok;
     if ( $ok ) {
         warn "Schema successfully updated";
         $version = '0.0.3';
