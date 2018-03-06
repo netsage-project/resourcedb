@@ -1,5 +1,6 @@
 <config debug="0">
   <database-name>resourcedb</database-name>
+  <database-schema>/etc/grnoc/netsage/resourcedb/resourcedb.sql</database-schema>
   <database-root-username>root</database-root-username>
   <database-root-password>root-pass</database-root-password>
   <database-readonly-username>readonly-user</database-readonly-username>
