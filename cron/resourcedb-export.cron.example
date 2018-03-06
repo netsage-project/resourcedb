@@ -1,0 +1,1 @@
+0 * * * root /usr/bin/resourcedb-export.pl -o /usr/share/resourcedb/www/exported/scireg.json

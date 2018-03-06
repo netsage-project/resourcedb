@@ -58,6 +58,7 @@ sub install_database {
         return (undef, $err);
     }
 
+    # create the db, if needed, otherwise validate its existence
     $ok = $self->database_created($db);
     if (!$ok) {
         $err = "Couldn't validate database's existence.";
@@ -75,6 +76,7 @@ sub install_database {
         return (undef, $err);
     }
 
+    # Add tables and/or do updates
     ($version, $err) = $self->update_schema($db, $db_exists);
     return ($version, $err);
 }
@@ -86,19 +88,21 @@ sub database_created {
     my $err = undef;
     my $ok  = undef;
 
+    # CREATE the resourcedb database (try to)
     $ok = $db->do("create database resourcedb");
     if (!$ok) {
         # An error is created if database already exists, but we can
         # ignore this case. All others should be handled.
         $err = $DBI::errstr;
         if (index($err, "database exists") != -1) {
-            print "Database already exists\n";
+            # Database already exists. Will update it.
             return 2;
         } else {
+            # some other kind of error
             return 0;
         }
     } else {
-        print "Created database\n";
+        warn "Created database";
     }
 
     return 1;
@@ -116,9 +120,9 @@ sub schema_created {
 
 
     if ( ! $db_exists ) {
-        # Initialize the database from the Schema located at $path.
+        # Initialize the database from the Schema located at $path - file has sql to CREATE TABLES
+        warn "Creating db tables";
         `mysql -u $self->{'username'} --password=$self->{'password'} -D resourcedb < $self->{'schema'}`;
-
     }
 
     ($version, $err) = $self->version($db);
@@ -128,13 +132,11 @@ sub schema_created {
 
     if (!defined $version) {
         # The version was not set by the database schema.
+        warn "Setting schema version to '0.0.0.1'";
         $ok = $db->do("insert into version (version) values ('0.0.1')");
-        warn "Inserting version in schema '0.0.0.1'";
         if (!$ok) {
             $err = "Couldn't set initial schema version: " . $DBI::errstr . "\n";
         }
-
-        warn "Database schema version was configured.";
     }
 
     return $self->version($db);
@@ -171,13 +173,13 @@ sub update_schema {
 
     ($version, $err) = $self->version($db);
     if (defined $err || not defined $version) {
+        # if no version table or version number in it, create tables, etc.
         warn "Initializing database!";
         ($version, $err) = $self->schema_created($db, $db_exists);
         if (defined $err) {
             warn "Could not initialize_schema: $err";
         } else {
             warn "Schema initialized";
-
         }
     }
 
@@ -219,7 +221,7 @@ sub update_schema {
         ($version, $err) = $self->upgrade_to_0_0_12($db, $version);
     }
 
-    if ($version eq '0.0.12') { print ("Schema is up-to-date\n"); }
+    if ($version eq '0.0.12') { warn ("Schema is now up-to-date - version $version"); }
 
     return ($version, $err);
 }
@@ -339,7 +341,7 @@ sub upgrade_to_0_0_11 {
         return ($version, $err);
     }
 
-    print "*** PLEASE ENTER RESOURCE and PROJECT ABBR VALUES BY HAND! *** \n";
+    warn "*** PLEASE ENTER RESOURCE and PROJECT ABBR VALUES BY HAND! *** ";
 
     $version = '0.0.11';
     my $updated_ok = $self->_update_version( $db, $version );
@@ -389,7 +391,7 @@ sub upgrade_to_0_0_10 {
         } 
         return ($version, $err);
     }
-    print "*** PLEASE FIX BAD AND MISSING ABBR VALUES BY HAND! *** \n";
+    warn "*** PLEASE FIX BAD AND MISSING ABBR VALUES BY HAND! *** ";
 
     $version = '0.0.10';
     my $updated_ok = $self->_update_version( $db, $version );
@@ -583,7 +585,7 @@ alter table ip_block drop column project_id
     if (!$ok) {
         $err = $DBI::errstr;
         if (defined $err) {
-            warn "Couldn't drop column: $err";
+            warn "Couldn't drop column 'project_id' from 'ip_block' table: $err";
             return ($version, $err);
         }
         warn "Database schema version is undefined.";
@@ -775,11 +777,11 @@ sub upgrade_to_0_0_3_1 {
                 ";
     my $org_ok = $db->do( $query );
     if ($org_ok) {
-        warn "Added columns to 'organization' table";
+        warn "Added 'url' column to 'organization' table";
     } else {
         $err = $DBI::errstr;
         if (defined $err) {
-            warn "Couldn't add columns to 'organization' table: $err";
+            warn "Couldn't add 'url' column to 'organization' table: $err";
             return ($version, $err);
         } else {
             warn "Database schema version is undefined.";
@@ -792,11 +794,11 @@ sub upgrade_to_0_0_3_1 {
                 ";
     my $project_ok = $db->do( $query );
     if ($project_ok) {
-        warn "Added columns to 'project' table";
+        warn "Added 'url' column to 'project' table";
     } else {
         $err = $DBI::errstr;
         if (defined $err) {
-            warn "Couldn't add columns to 'project' table: $err";
+            warn "Couldn't add 'url' column to 'project' table: $err";
             return ($version, $err);
         } else {
             warn "Database schema version is undefined.";
@@ -809,11 +811,11 @@ sub upgrade_to_0_0_3_1 {
                 ";
     my $discipline_ok = $db->do( $query );
     if ($discipline_ok) {
-        warn "Added column to 'discipline' table";
+        warn "Added 'url' column to 'discipline' table";
     } else {
         $err = $DBI::errstr;
         if (defined $err) {
-            warn "Couldn't add columns to 'discipline' table: $err";
+            warn "Couldn't add 'url' column to 'discipline' table: $err";
             return ($version, $err);
         } else {
             warn "Database schema version is undefined.";
@@ -826,11 +828,11 @@ sub upgrade_to_0_0_3_1 {
                 ";
     my $role_ok = $db->do( $query );
     if ($role_ok) {
-        warn "Added column to 'role' table";
+        warn "Added 'url' column to 'role' table";
     } else {
         $err = $DBI::errstr;
         if (defined $err) {
-            warn "Couldn't add columns to 'role' table: $err";
+            warn "Couldn't add 'url' column to 'role' table: $err";
             return ($version, $err);
         } else {
             warn "Database schema version is undefined.";
@@ -902,22 +904,23 @@ sub upgrade_to_0_0_3 {
         }
     }
 
+    # Moved to init script 3/6/18
     # Add column to `discipline`
-    $query = "alter table `discipline`
-                 add column `description` text after `name`
-                ";
-    my $discipline_ok = $db->do( $query );
-    if ($discipline_ok) {
-        warn "Added column to 'discipline' table";
-    } else {
-        $err = $DBI::errstr;
-        if (defined $err) {
-            warn "Couldn't add columns to 'discipline' table: $err";
-            return ($version, $err);
-        } else {
-            warn "Database schema version is undefined.";
-        }
-    }
+    #$query = "alter table `discipline`
+    #             add column `description` text after `name`
+    #            ";
+    #my $discipline_ok = $db->do( $query );
+    #if ($discipline_ok) {
+    #    warn "Added column to 'discipline' table";
+    #} else {
+    #    $err = $DBI::errstr;
+    #    if (defined $err) {
+    #        warn "Couldn't add columns to 'discipline' table: $err";
+    #        return ($version, $err);
+    #    } else {
+    #        warn "Database schema version is undefined.";
+    #    }
+    #}
 
     # Add column to `role`
     $query = "alter table `role`
@@ -925,20 +928,18 @@ sub upgrade_to_0_0_3 {
                 ";
     my $role_ok = $db->do( $query );
     if ($role_ok) {
-        warn "Added column to 'role' table";
+        warn "Added 'description' column to 'role' table";
     } else {
         $err = $DBI::errstr;
         if (defined $err) {
-            warn "Couldn't add columns to 'role' table: $err";
+            warn "Couldn't add 'description' column to 'role' table: $err";
             return ($version, $err);
         } else {
             warn "Database schema version is undefined.";
         }
     }
 
-
-    my $ok = $org_ok && $project_ok && $discipline_ok && $role_ok;
-
+    my $ok = $org_ok && $project_ok && $role_ok;
     if ( $ok ) {
         warn "Schema successfully updated";
         $version = '0.0.3';
@@ -965,13 +966,13 @@ sub upgrade_to_0_0_2 {
     if (!$ok) {
         $err = $DBI::errstr;
         if (defined $err) {
-            warn "Couldn't add column 'description': $err";
+            warn "Couldn't add column 'description' to table 'ip_block': $err";
             return ($version, $err);
         } else {
             warn "Database schema version is undefined.";
         }
     } else {
-        warn "Added 'description' field";
+        warn "Added 'description' field to table 'ip_block'";
         $version = '0.0.2';
 
     }

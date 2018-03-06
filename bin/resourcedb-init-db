@@ -8,10 +8,13 @@ use DBI;
 use GRNOC::CLI;
 
 sub main {
-    print "\nThis script will connect to your database, create a couple of users to be named shortly, and write a config file.\n";
+    print "\n---------------------\n";
+    print "This script will connect to mysql, create a couple of users to be named shortly, and write a config file.\n";
     print "We will first need to get login credentials for the existing mysql root user.\n";
-    print "Run with SUDO so the config file can be written!\n";
-    print "(You may hit enter to use the default values shown.)\n\n";
+    print "(You may hit enter to use the default values shown.)\n";
+    print "Note: Run with sudo so the config file can be written!";
+    print "\n---------------------\n\n";
+    # This script does not create the resourcedb db
 
     my $cli = GRNOC::CLI->new();
 
@@ -25,11 +28,11 @@ sub main {
                               $pass,
                               {PrintError => 0});
     if (!$handle) {
-        warn "Couldn't connect to database: " . $DBI::errstr . "\n";
+        warn "Couldn't connect to mysql." . $DBI::errstr . "\n";
         exit 1;
     }
-    print "Connected to database.\n";
-   
+    print "Connected to mysql.\n";
+
     print "Next, create read/write and read-only users for the Science Registry to use.\n"; # resourcedb need not exist yet
     
     my $rw_alpha = undef;
@@ -65,11 +68,13 @@ sub main {
     $handle->do("flush privileges");
 
     print "Users were created for the resourcedb database.\n";
-    print "Writing /etc/grnoc/netsage/resourcedb/config.xml.\n";
 
     `/bin/mkdir -p /etc/grnoc/netsage/resourcedb/`;
-    open(FILE, "> /etc/grnoc/netsage/resourcedb/config.xml");
-    print FILE << "END";
+
+    my $opened = open(FILE, "> /etc/grnoc/netsage/resourcedb/config.xml");
+    if ($opened) {
+        print "Writing /etc/grnoc/netsage/resourcedb/config.xml.\n";
+        print FILE << "END";
 <config debug="0">
   <database-name>resourcedb</database-name>
   <database-schema>/etc/grnoc/netsage/resourcedb/resourcedb.sql</database-schema>
@@ -96,6 +101,9 @@ sub main {
   </geoip>
 </config>
 END
+    } else {
+	print "Could not write /etc/grnoc/netsage/resourcedb/config.xml. Did you run with sudo? Create it by hand.\n";
+    }
 
     print("You now need to run 'sudo resourcedb-update-db' to create and update the resourcedb database. \n\n");
 

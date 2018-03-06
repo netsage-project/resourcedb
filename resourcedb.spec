@@ -46,7 +46,9 @@ NetSage Resource Database (Science Registry)
 %build
 %{__perl} Makefile.PL PREFIX="%{buildroot}%{_prefix}" INSTALLDIRS="vendor"
 
+
 %install
+
 # Perl modules
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage
 %{__install} lib/GRNOC/NetSage/ResourceDB.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB.pm
@@ -86,6 +88,9 @@ NetSage Resource Database (Science Registry)
 %{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www
 
 cp -ar www/* %{buildroot}%{_datadir}/resourcedb/www
+
+# dir for exported db file
+%{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www/exported
 
 # Configuration and schema files
 %{__install} -d -p %{buildroot}%{_sysconfdir}/grnoc/netsage/resourcedb
