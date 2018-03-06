@@ -902,22 +902,23 @@ sub upgrade_to_0_0_3 {
         }
     }
 
+    # Moved to init script 3/6/18
     # Add column to `discipline`
-    $query = "alter table `discipline`
-                 add column `description` text after `name`
-                ";
-    my $discipline_ok = $db->do( $query );
-    if ($discipline_ok) {
-        warn "Added column to 'discipline' table";
-    } else {
-        $err = $DBI::errstr;
-        if (defined $err) {
-            warn "Couldn't add columns to 'discipline' table: $err";
-            return ($version, $err);
-        } else {
-            warn "Database schema version is undefined.";
-        }
-    }
+    #$query = "alter table `discipline`
+    #             add column `description` text after `name`
+    #            ";
+    #my $discipline_ok = $db->do( $query );
+    #if ($discipline_ok) {
+    #    warn "Added column to 'discipline' table";
+    #} else {
+    #    $err = $DBI::errstr;
+    #    if (defined $err) {
+    #        warn "Couldn't add columns to 'discipline' table: $err";
+    #        return ($version, $err);
+    #    } else {
+    #        warn "Database schema version is undefined.";
+    #    }
+    #}
 
     # Add column to `role`
     $query = "alter table `role`
@@ -936,9 +937,7 @@ sub upgrade_to_0_0_3 {
         }
     }
 
-
     my $ok = $org_ok && $project_ok && $discipline_ok && $role_ok;
-
     if ( $ok ) {
         warn "Schema successfully updated";
         $version = '0.0.3';

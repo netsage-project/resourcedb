@@ -25,9 +25,20 @@ DROP TABLE IF EXISTS `discipline`;
 CREATE TABLE `discipline` (
   `discipline_id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
+  `description` text,
   PRIMARY KEY (`discipline_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Data for table `discipline`
+--
+
+LOCK TABLES `discipline` WRITE;
+/*!40000 ALTER TABLE `discipline` DISABLE KEYS */;
+INSERT INTO `discipline` VALUES (5,'Biomedical','cells, indiv. genes, cancer, medical research'),(6,'Bioinformatics','genomes, *omics, statistics, computational biology'),(7,'Brain and Neurosciences','at the physical level '),(8,'Cognitive Sciences and Psychology','cognition, language, social behavior, etc '),(9,'Environmental Biology','populations, species, ecosystems, ecological studies'),(10,'Other/Unspecified Biology',''),(11,'Computer Intelligence','including computer vision and AI '),(12,'PerfSonar','network testing '),(13,'Other/Unspecified IT','including general infrastructure and services, grid computing'),(14,'VLBI (geodetic/astrometric)','(not this if for astronomy)'),(15,'Atmospheric Sciences','observation and modeling of weather, etc. not primarily climate change '),(16,'GeoSpace','observation and modeling of ionosphere, auroras, space weather, the sun'),(17,'Earth Sciences','geology, hydrology, tectonics, etc '),(18,'Remote Sensing','for agriculture, land use, archeology, multiple sciences'),(19,'Other/Unspecified/Multiple Earth-Space','(not astronomy)'),(20,'Energy','R&D related to various forms of energy, including fusion'),(21,'Materials','R&D related to materials '),(22,'Particle Physics','theortical and high energy experimental physics'),(23,'Other/Unspecified Physics',' '),(24,'Astronomy and Astrophysics','observation, theory, incl. cosmic rays, VLBI for astronomy'),(25,'Chemistry',' '),(26,'Mathematics and Statistics','(if not applied to other disciplines)'),(27,'Ocean Sciences',''),(28,'Economics, Business',''),(29,'Sociology, Politics, Culture',' '),(30,'Other',''),(31,'Multiple','used by more than one discipline'),(32,'Unknown',''),(33,'Climate Change (multi-discipline)','(choose Atmospheric Sciences when applicable)'),(34,'Space Operations and Technology','');
+/*!40000 ALTER TABLE `discipline` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `ip_block`
