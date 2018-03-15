@@ -36,6 +36,8 @@ Requires: perl-MIME-Lite-TT
 Requires: perl-String-MkPasswd
 Requires: perl-Net-DNS
 Requires: perl-JSON
+Requires: perl-Email-Send
+Requires: perl-MIME-Lite
 
 %description
 NetSage Resource Database (Science Registry)
@@ -75,7 +77,6 @@ NetSage Resource Database (Science Registry)
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Util.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Util.pod
 
 # lib/GRNOC/NetSage/ResourceDB/DataService/Data.pm
-
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS/Admin.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/Admin.pm
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS/Admin.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/Admin.pod

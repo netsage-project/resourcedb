@@ -10,6 +10,7 @@
   <database-host>localhost</database-host>
   <database-port>3306</database-port> 
   <database-query-debug>0</database-query-debug>
+
   <geoip>
     <config_files>
       <country>/usr/share/GeoIP/GeoIP.dat</country>
@@ -20,4 +21,6 @@
       <asn_ipv6>/usr/share/GeoIP/GeoLiteASNumv6.dat</asn_ipv6>
     </config_files>
   </geoip>
+
+  <contacts>someone@globalnoc.iu.edu,sometwo@iu.edu</contacts>
 </config>

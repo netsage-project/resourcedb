@@ -9,12 +9,13 @@ function getProject(projectId, onSuccess) {
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("getProject json: ");
             console.log(json);
             onSuccess(json.results[0]);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getProject error: " + err);
     });
 }
 
@@ -26,12 +27,13 @@ function getProjects(on_success) {
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("getProjectS json:");
             console.log(json);
             on_success(json.results);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getProjectS error: " + err);
     });
 }
 

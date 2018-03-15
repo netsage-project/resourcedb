@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         index();
     } else if (url.pathname === basePath + 'about.html') {
         about();
+    } else if (url.pathname === basePath + 'contact.html') {
+        contact();
     } else if (url.pathname === basePath + 'project/index.html') {
         project();
     } else if (url.pathname === basePath + 'project/new.html') {
@@ -169,6 +171,11 @@ function about() {
     onSearchSubmit(function(query) {
         submitSearch(query);
     });
+}
+
+function contact() {
+    console.log('Loading the contact page.');
+    setupContactForm();
 }
 
 function project() {

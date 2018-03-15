@@ -9,12 +9,13 @@ function getOrganization(organizationId, onSuccess) {
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("getOrganization json:");
             console.log(json);
             onSuccess(json.results[0]);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getOrganization error: " + err);
     });
 }
 
@@ -42,12 +43,13 @@ function getOrganizations(onSuccess) {
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("getOrganizationS json:");
             console.log(json);
             onSuccess(json.results);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getOrganizationS error:" + err);
     });
 }
 
@@ -116,7 +118,7 @@ function createOrEditOrganization(id, name, abbr, desc, owner, email, country_co
         window.location.href = basePath + 'organization/index.html?organization_id=' + id;
     };
 
-    console.log(url);
+    console.log("createOrEditOrganization url: " + url);
 
     fetch(url, {
         method: 'get',
@@ -124,12 +126,13 @@ function createOrEditOrganization(id, name, abbr, desc, owner, email, country_co
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("createOrEditOrganization json: ");
             console.log(json);
             successCallback(json.results[0]);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("createOrEditOrganization error: " + err);
     });
 }
 
