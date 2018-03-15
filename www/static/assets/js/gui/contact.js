@@ -31,6 +31,10 @@ function setupContactForm() {
             discipline.appendChild(opt);
          }
     });
+ 
+    // change Back link to go to previous page
+    var backLink = document.getElementById('contact_back');
+    backLink.href = 'javascript:history.go(-1)';
 
 }
 
