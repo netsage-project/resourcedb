@@ -129,8 +129,8 @@ function setupCreateOrganizationForm() {
     };
 }
 
-// Gathers values from create_organization_form on organization/new.html when
-// the create button is pressed. Passes the collected values to
+// Gathers values from form on organization/new.html or edit.html when
+// the submit button is pressed. Passes the collected values to
 // createOrEditOrganization after parameters are validated.
 function submitCreateOrUpdateOrganization(e) {
     e.preventDefault();
@@ -139,13 +139,21 @@ function submitCreateOrUpdateOrganization(e) {
     console.log('submitCreateOrganization');
 
     var name = form.elements['organization_name'].value;
-    var desc = form.elements['organization_description'].value;
     var abbr = form.elements['organization_abbr'].value;
+
+    var desc = form.elements['organization_description'].value;
+    if (desc) { desc = desc.replace(/[\u2018\u2019]/g, "'"); } // replace smart quotes
+    if (desc) { desc = desc.replace(/[\u201C\u201D]/g, '"'); } // replace smart quotes
+
     var owner = form.elements['organization_owner'].value;
     var email = form.elements['organization_email'].value;
+
     var orgUrl = form.elements['organization_url'].value;
+
     var notes  = form.elements['organization_notes'].value;
     if (notes) { notes = notes.replace(/\n/g, " @@ "); } // encode new lines as @@ in the db
+    if (notes) { notes = notes.replace(/[\u2018\u2019]/g, "'"); } // replace smart quotes
+    if (notes) { notes = notes.replace(/[\u201C\u201D]/g, '"'); } // replace smart quotes
 
     var country_code = form.elements['organization_country'].value;
 

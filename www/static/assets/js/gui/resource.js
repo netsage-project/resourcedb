@@ -447,7 +447,7 @@ function setupCreateResourceForm() {
     var cidr = document.getElementById('resource_cidr');
     cidr.addEventListener('input', function(event) {
         if (cidr.validity.patternMismatch) {
-            cidr.setCustomValidity('Expects a comma separated list of IPv4 CIDR addresses.');
+            cidr.setCustomValidity('Check your formatting for valid IPv4 and IPv6 addresses in CIDR notation (/32 for single IP), comma separated with 0 or 1 spaces if more than one.');
         } else {
             cidr.setCustomValidity("");
         }
@@ -512,7 +512,7 @@ function setupEditResourceForm(resource) {
   
     cidr.addEventListener('input', function(event) {
         if (cidr.validity.patternMismatch) {
-            cidr.setCustomValidity('Expects a comma separated list of IPv4 CIDR addresses');
+            cidr.setCustomValidity('Check your formatting for valid IPv4 and IPv6 addresses in CIDR notation (/32 for single IP), comma separated with 0 or 1 spaces if more than one.');
         } else {
             cidr.setCustomValidity("");
         }
@@ -613,17 +613,25 @@ function submitCreateOrUpdateResource(e) {
     e.preventDefault();
 
     var form = document.getElementById('create_resource_form');
-    console.log('submitCreateResource');
+    console.log('in submitCreateOrUpdateResource. e and form.elements:');
     console.log(e);
     console.log(form.elements);
 
     var name = form.elements['resource_name'].value;
     var abbr = form.elements['resource_abbr'].value;
+
     var desc = form.elements['resource_description'].value;
+    if (desc) { desc = desc.replace(/[\u2018\u2019]/g, "'"); } // replace smart quotes
+    if (desc) { desc = desc.replace(/[\u201C\u201D]/g, '"'); } // replace smart quotes
+
     var cidr = form.elements['resource_cidr'].value.replace(/ /g, ""); // remove spaces before saving
+
     var url  = form.elements['resource_url'].value;
+
     var notes= form.elements['resource_notes'].value;
     if (notes) { notes = notes.replace(/\n/g, " @@ "); } // encode new-lines as @@ in db.;
+    if (notes) { notes = notes.replace(/[\u2018\u2019]/g, "'"); } // replace smart quotes
+    if (notes) { notes = notes.replace(/[\u201C\u201D]/g, '"'); } // replace smart quotes
 
     var asn = form.elements['resource_asn'].value;
 
