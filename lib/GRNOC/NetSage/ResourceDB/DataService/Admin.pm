@@ -5,6 +5,8 @@ use warnings;
 
 use GRNOC::Config;
 use GRNOC::DatabaseQuery;
+use MIME::Lite;
+use Email::Send;
 
 use Data::Dumper;
 
@@ -34,6 +36,41 @@ sub new {
     $self->{'config'} = $config;
 
     return $self;
+}
+
+sub send_us_email {
+    # from contact form
+    my ( $self, %args ) = @_;
+
+    my $to = $self->{'config'}->get('/config/contacts');
+
+    if (!$args{'phone'}) { $args{'phone'} = " "; }
+    my $body =  "FROM:  ".$args{'name'}."\nORG:    ".$args{'org'}."\nEMAIL:  ".$args{'email'}.
+                    "\nPHONE:  ".$args{'phone'}."\n\n".$args{'msg'};
+
+    my $email = MIME::Lite->new(
+        To => $to,
+        From => 'ScienceRegistry',
+        Subject => 'Message from Science Registry Contact Form',
+        Data => $body
+    );
+
+    # Send email. return 1 for success, 0 for error. $self->error('xx') will be displayed to the user.
+    eval { $email->send; };
+    if($@) { 
+        warn( 'An error occurred sending an email: '.$@ ); 
+        $self->error( 'An error occurred sending the email.' );
+        return 0;
+    }
+
+    # this just checks to see if the email was dispatched ok, not if it arrived ok.
+    if (!$email->last_send_successful) {
+        warn( 'An error occurred sending an email. ' );
+        $self->error( 'An error occurred sending the email.' );
+        return 0;
+    }
+
+    return 1;
 }
 
 sub get_users {
@@ -167,7 +204,6 @@ sub add_ip_blocks {
     my $results = $self->dbq_rw()->insert( table => $from_sql,
                                            fields => $fields
                                        );
-
     if ( !$results ) {
         $self->error( 'An unknown error occurred adding the ip blocks.' );
         return;
@@ -275,7 +311,6 @@ sub update_ip_blocks {
                                            fields => $fields,
                                            where => [-and => \@where],
                                        );
-
     if ( !$results ) {
         $self->error( 'An unknown error occurred updating the ip blocks.' );
         return;

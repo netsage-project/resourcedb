@@ -1,21 +1,20 @@
+# Put in /etc/httpd/conf.d/
+
 Alias /rdb/api /usr/share/resourcedb/www/api
 Alias /rdb     /usr/share/resourcedb/www/static
 Alias /exported  /usr/share/resourcedb/www/exported
 
 <Location /rdb>
-  AuthType Basic
-  AuthName "ScienceRegistry"
-  AuthUserFile /usr/share/resourcedb/www/.htpasswd
-  Require valid-user
   DirectoryIndex index.html
   AddHandler cgi-script .cgi
   Options +ExecCGI
 </Location>
 
-# Shibboleth should protect /rdb. Use Basic Auth for location of db-export file:
-<Directory "/user/share/resourcedb/www/exported">     
+# Shibboleth protects /. Use Basic Auth for location of db-export file:
+<Location /exported>
+  ShibRequestSetting requireSession false
   AuthType Basic
   AuthName "Basic Auth Password Required"
   AuthUserFile "/etc/grnoc/netsage/resourcedb/htpasswd"
   Require valid-user
-</Directory>
+</Location>

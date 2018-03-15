@@ -61,6 +61,8 @@ sub _init {
     $self->_init_add_methods();
     $self->_init_update_methods();
     $self->_init_delete_methods();
+
+    $self->_init_email_methods();
 }
 
 sub config {
@@ -132,7 +134,6 @@ sub _init_websvc {
     $self->{'websvc'} = $websvc;
 }
 
-
 sub _init_get_methods {}
 
 sub _init_add_methods {}
@@ -140,6 +141,8 @@ sub _init_add_methods {}
 sub _init_update_methods {}
 
 sub _init_delete_methods {}
+
+sub _init_email_methods {}
 
 sub _disallow_html {
 

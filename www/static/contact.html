@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>registry</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bitter:400,700">
+    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/Contact-Form-Clean.css">
+    <link rel="stylesheet" href="assets/css/custom.css">
+    <link rel="stylesheet" href="assets/css/Footer-Basic.css">
+    <link rel="stylesheet" href="assets/css/Footer-Clean.css">
+    <link rel="stylesheet" href="assets/css/Header-Dark.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css">
+    <link rel="stylesheet" href="assets/css/Map-Clean.css">
+<title> NetSage Science Registry</title>
+
+<link rel="icon" href="logoNoShadow.png" type="image/x-icon" />
+
+</head>
+
+<body>
+    <div>
+        <div class="header-dark">
+            <nav class="navbar navbar-default navigation-clean-search" style="padding-bottom:8px;margin-bottom:0px;">
+                <div class="container">
+                    <div class="navbar-header">
+                        <a class="navbar-brand navbar-link" href="index.html"> <img class="img-rounded" src="assets/img/logo_text.png"> </a>
+                        <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navcol-1">
+                        <form class="navbar-form navbar-left" target="_self" id="search_form">
+                            <div class="form-group">
+                                <label class="control-label" for="search-field"><i class="glyphicon glyphicon-search"></i></label>
+                                <input class="form-control input-lg search-field" type="search" name="search" autocomplete="on" id="search_field">
+                            </div>
+                        </form>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li role="presentation"><a href="index.html" id="contact_back">Back </a></li>
+                        </ul>
+                        <p class="navbar-text navbar-right"> </p>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div class="contact-clean" style="background-color:rgb(250,250,250);padding-top:50px;padding-bottom:0px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6" style="padding-right:0px;padding-left:0px;margin-bottom:15px;">
+                    <form method="post" id="contact_form" style="border:1px solid;border-color:lightgray;/*padding-top:28px;*/margin-left:25px;margin-right:25px;">
+                        <h2 class="text-center" style="margin-bottom:22px;margin-top:0px;color:rgb(95,94,94);">Contact us</h2>
+                        <div class="form-group">
+                            <label class="control-label" for="name">Your Name</label>
+                            <input class="form-control" type="text" name="contact_name" required="" id="name">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="org">Organization and Job Title/Position</label>
+                            <input class="form-control" type="text" name="contact_org" required="" id="org">
+                        </div>
+                        <div class="form-group has-error">
+                            <label class="control-label" for="email" style="color:rgb(80,94,108);">Email</label>
+                            <input class="form-control" type="email" name="contact_email" required="" id="email">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="phone">Phone</label>
+                            <input class="form-control" type="tel" name="contact_phone" inputmode="tel" id="phone">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="message">Message</label>
+                            <textarea class="form-control" rows="20" name="contact_message" required="" id="message"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="submit">send </button>
+                            <div id="msg_sent" style="width:69%;float:right;">
+                                <p class="hidden" style="margin-top:11px;color:rgb(38,176,84);font-size:16px;">Your message has been sent. Someone should get back to you soon. </p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6" style="padding-left:0px;padding-right:0px;margin-right:0px;width:452px;margin-left:25px;">
+                    <div style="background-color:#e4eef9;margin:-1px;padding:10px;border:1px solid lightgray;">
+                        <p><strong><span style="font-size:16px;">Owners of resources! </span> <br>We'd greatly appreciate submissions of new resources to include in the registry and corrections to existing information!</strong>                            </p>
+                        <p> See the reminders below when composing your message; copy and paste may be useful! &nbsp;Be sure to include exact names of any existing entities involved. If you have many resources to submit, let us know and we'll work out a way
+                            to get the information more conveniently.</p>
+                    </div>
+                    <h3 style="color:rgb(95,94,94);margin-top:23px;">Reminders of information needed</h3>
+                    <div class="panel-group" role="tablist" aria-multiselectable="true" id="accordion-1">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab">
+                                <h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion-1" aria-expanded="false" href="#accordion-1 .item-1" style="color:rgb(96,127,205);">Organizations (resource owners)</a></h4></div>
+                            <div class="panel-collapse collapse item-1" role="tabpanel">
+                                <div class="panel-body" style="padding-bottom:0px;">
+                                    <p>Organizations are at the level of a university or a governmental entity like NASA. Sub-organizations, eg, departments or divisions, can be indicated in resource names.</p>
+                                    <div style="width:58%;float:right;color:rgb(150,150,150);">
+                                        <ul class="list-group">
+                                            <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Indiana University </span></li>
+                                            <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>IU </span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>IU is a public research university...</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>https://www.indiana.edu </span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>United States</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> 39.166100, -86.526500</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>Univ. IT Services = UITS</span>
+                                                <div></div>
+                                            </li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><em>IPs or names of resources that this organization manages</em></li>
+                                        </ul>
+                                    </div>
+                                    <ul class="list-group" style="width:40%;">
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Name </span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Abbreviation </span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Description </span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Homepage URL</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Country </span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Latitude, Longitude</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Notes </span>
+                                            <div></div>
+                                        </li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><em>Resources </em></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab">
+                                <h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion-1" aria-expanded="false" href="#accordion-1 .item-2" style="color:rgb(96,127,205);">Resources (flow origins and destinations)</a></h4></div>
+                            <div class="panel-collapse collapse item-2" role="tabpanel">
+                                <div class="panel-body" style="padding-bottom:0px;">
+                                    <p>A resource can cover multiple IP's, in a CIDR block or as a list of individuals, if they all have the same info, including lat/long. </p>
+                                    <div style="width:58%;float:right;color:rgb(150,150,150);">
+                                        <ul class="list-group">
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>149.165.238.1/24 </span></li>
+                                            <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Indiana University </span></li>
+                                            <li class="list-group-item" style="padding-top:15px;padding-bottom:15px;"><span style="padding-top:0px;">IU - UITS - Big Red II</span></li>
+                                            <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Big Red</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>Big Red II is IU's main system for... </span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>none </span></li>
+                                            <li class="list-group-item" style="padding-bottom:15px;padding-top:15px;"><span> 39.174500, -86.500800</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>United States</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;">
+                                                <select id="discipline_select">
+                                                    <optgroup label="This is a group">
+                                                        <option value="12" selected="">This is item 1</option>
+                                                        <option value="13">This is item 2</option>
+                                                        <option value="14">This is item 3</option>
+                                                    </optgroup>
+                                                </select>
+                                            </li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;">
+                                                <select id="role_select">
+                                                    <optgroup label="This is a group">
+                                                        <option value="12" selected="">This is item 1</option>
+                                                        <option value="13">This is item 2</option>
+                                                        <option value="14">This is item 3</option>
+                                                    </optgroup>
+                                                </select>
+                                            </li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> 149.165.238.{1,2} is login{1,2}.bigred2.uits.iu.edu</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><em>Names of Projects which use this resource</em></li>
+                                        </ul>
+                                    </div>
+                                    <ul class="list-group" style="width:40%;">
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> IP / CIDR</span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Organization</span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Name (preface with sub-organizations)</span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Short Name (optional)</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Description </span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> URL of the resource </span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Latitude, Longitude of this resource</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Country of resource</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Science Discipline</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Role</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Notes </span></li>
+                                        <li class="list-group-item" style="padding-bottom:15px;padding-top:15px;"><em>Projects </em></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab">
+                                <h4 class="panel-title" style="color:rgb(96,127,205);"><a role="button" data-toggle="collapse" data-parent="#accordion-1" aria-expanded="false" href="#accordion-1 .item-3">Projects (groups of resources)</a></h4></div>
+                            <div class="panel-collapse collapse item-3" role="tabpanel">
+                                <div class="panel-body" style="padding-bottom:0px;">
+                                    <p>Examples of Projects could be VLBI or the Large Hadron Collider. The Contact Person would ideally be able to provide technical assistance with providing or verifying resources for this registry.</p>
+                                    <div style="width:58%;float:right;color:rgb(150,150,150);">
+                                        <ul class="list-group">
+                                            <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Fake International Collaboration</span></li>
+                                            <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>FIC </span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>FIC scientists work to ....</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>https://www.fic.org</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>Chris Smith</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Csmith@fic.org</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> any other interesting info</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><em>IPs or names of resources participating in this project </em></li>
+                                        </ul>
+                                    </div>
+                                    <ul class="list-group" style="width:40%;">
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Name </span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Abbreviation </span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Description </span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Homepage URL</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Contact Person</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Contact Email</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Notes </span>
+                                            <div></div>
+                                        </li>
+                                        <li class="list-group-item" style="padding-bottom:15px;padding-top:15px;"><em>Resources </em></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-basic">
+        <footer>
+            <ul class="list-inline">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="http://www.netsage.global/home/netsage-privacy-policy">Privacy Policy</a></li>
+            </ul>
+            <p class="copyright">Indiana University © 2017</p>
+        </footer>
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/polyfill/urlsearchparams.js"></script>
+    <script src="assets/js/polyfill/fetch.js"></script>
+    <script src="assets/js/api/geoip.js"></script>
+    <script src="assets/js/gui/geoip.js"></script>
+    <script src="assets/js/project.js"></script>
+    <script src="assets/js/api/organization.js"></script>
+    <script src="assets/js/gui/organization.js"></script>
+    <script src="assets/js/gui/project.js"></script>
+    <script src="assets/js/api/project.js"></script>
+    <script src="assets/js/api/role.js"></script>
+    <script src="assets/js/api/discipline.js"></script>
+    <script src="assets/js/gui/resource.js"></script>
+    <script src="assets/js/api/resource.js"></script>
+    <script src="assets/js/api/search.js"></script>
+    <script src="assets/js/gui/search.js"></script>
+    <script src="assets/js/api/map.js"></script>
+    <script src="assets/js/gui/map.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <script src="assets/js/api/contact.js"></script>
+    <script src="assets/js/api/revdns.js"></script>
+    <script src="assets/js/api/user.js"></script>
+    <script src="assets/js/gui/contact.js"></script>
+    <script src="assets/js/gui/revdns.js"></script>
+</body>
+
+</html>

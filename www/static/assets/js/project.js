@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         index();
     } else if (url.pathname === basePath + 'about.html') {
         about();
+    } else if (url.pathname === basePath + 'contact.html') {
+        contact();
     } else if (url.pathname === basePath + 'project/index.html') {
         project();
     } else if (url.pathname === basePath + 'project/new.html') {
@@ -48,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 });
 
-// Below, call functions in js/api/* that use api/webservices to get things like organizations, 
+// Depending on the page, call functions in js/api/* that use api/webservices to get things like organizations, 
 // then on success, run the anonymous function() on the results,
 // eg, getOrganizations(function to run on success) uses api/index.cgi?method=get_organizations.
 
@@ -161,6 +163,23 @@ var index = function() {
 
       }, 500); // wait for .5 sec after typing a letter 
     });
+
+    // this makes it so that when you reload the home page, it shows the tab you were last on
+    // (from stackoverflow)
+    $('a[data-toggle="tab"]').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+    
+    $('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
+        var id = $(e.target).attr("href");
+        localStorage.setItem('selectedTab', id)
+    });
+    
+    var selectedTab = localStorage.getItem('selectedTab');
+    if (selectedTab != null) {
+        $('a[data-toggle="tab"][href="' + selectedTab + '"]').tab('show');
+    }
 }
 
 function about() {
@@ -169,6 +188,11 @@ function about() {
     onSearchSubmit(function(query) {
         submitSearch(query);
     });
+}
+
+function contact() {
+    console.log('Loading the contact page.');
+    setupContactForm();
 }
 
 function project() {
@@ -422,3 +446,4 @@ function organizationEdit() {
         submitSearch(query);
     });
 }
+

@@ -9,12 +9,13 @@ function getResource(resourceId, onSuccess) {
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("getResource json: ");
             console.log(json);
             onSuccess(json.results[0]);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getResource error: " + err);
     });
 }
 
@@ -26,12 +27,13 @@ function getResources(on_success) {
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("getResourceS json: ");
             console.log(json);
             on_success(json.results);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getResourceS error: " + err);
     });
 }
 
@@ -51,7 +53,7 @@ function getResourcesLike(text, on_success) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getResourcesLike error: " + err);
     });
 }
 
@@ -65,12 +67,13 @@ function getResourcesWithAbbr(text, on_success) {
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("getResourcesWithAbbr json: ");
             console.log(json);
             on_success(json.results);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getResourcesWithAbbr error: " + err);
     });
 }
 
@@ -81,12 +84,15 @@ function getResourceEvents(resourceId, onSuccess) {
         method: 'get',
         credentials: 'include'
     }).then(function(response) {
+
         response.json().then(function(json) {
+            console.log("getResourceEvents json:");
             console.log(json);
             onSuccess(json.results);
         });
+
     }).catch(function(err) {
-        console.log(err);
+        console.log("getResourceEvents error: " + err);
     });
 }
 
@@ -100,12 +106,13 @@ function getResourcesByProjectId(projectId, onSuccess) {
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("getResourcesByProjectId json: ");
             console.log(json);
             onSuccess(json.results);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getResourcesByProjectId error: " + err);
     });
 }
 
@@ -119,12 +126,13 @@ function getResourcesByOrganizationId(organizationId, onSuccess) {
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("getResourcesByOrganizationId json:");
             console.log(json);
             onSuccess(json.results);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getResourcesByOrganizationId error: " + err);
     });
 }
 
@@ -159,7 +167,7 @@ function createOrEditResource(id, name, abbr, desc, cidr, asn, org_id, country_c
         window.location.href = basePath + 'resource/index.html?resource_id=' + id;
     };
 
-    console.log(url);
+    console.log("createOrEditResource url: " + url);
 
     fetch(url, {
         method: 'get',
@@ -167,12 +175,13 @@ function createOrEditResource(id, name, abbr, desc, cidr, asn, org_id, country_c
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("createOrEditResource json: ");
             console.log(json);
             successCallback(json.results[0]);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("createOrEditResource error: " + err);
     });
 }
 
@@ -190,11 +199,12 @@ function deleteResource(id) {
     }).then(function(response) {
 
         response.json().then(function(json) {
+            console.log("delete_ip_blocks json: ");
             console.log(json);
             successCallback(json.results[0]);
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("delete_ip_blocks error: " + err);
     });
 }
