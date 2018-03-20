@@ -2,3 +2,22 @@
   opacity:1;
 }
 
+.nav-tabs > li > a {
+  border-color:#dddddd;
+}
+
+.nav-tabs > li.active > a {
+  border-color:#dddddd #dddddd transparent #dddddd;
+}
+
+.nav.nav-tabs {
+  border-bottom-color:#dddddd;
+}
+
+.tab-pane {
+  border-left:1px solid #dddddd;
+  border-right:1px solid #dddddd;
+  border-bottom:1px solid #dddddd;
+  border-top:0px;
+}
+
