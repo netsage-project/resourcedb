@@ -41,7 +41,7 @@ function getResources(on_success) {
 // addr_string or name or organization's name is "like" text_str
 function getResourcesLike(text, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_ip_blocks';
-    url += '&text_str_like=' + text;
+    url += '&text_str_like=' + encodeURIComponent( text );
     fetch(url, {
         method: 'get',
         credentials: 'include'
@@ -60,7 +60,7 @@ function getResourcesLike(text, on_success) {
 // Gets a list of resources from the backend where abbreviation = text.
 function getResourcesWithAbbr(text, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_ip_blocks';
-    url += '&abbr=' + text;
+    url += '&abbr=' + encodeURIComponent( text );
     fetch(url, {
         method: 'get',
         credentials: 'include'
@@ -148,19 +148,19 @@ function createOrEditResource(id, name, abbr, desc, cidr, asn, org_id, country_c
         url += '&ip_block_id=' + id.toString();
     }
 
-    url += '&name=' + name;
-    url += '&abbr=' + abbr;
-    url += '&description=' + desc;
-    url += '&addr_str=' + cidr;
-    url += '&asn=' + asn;
-    url += '&organization_id=' + org_id;
-    url += '&country_code=' + country_code;
-    url += '&latitude='  + lat.toFixed(5);
-    url += '&longitude='  + lon.toFixed(5);
-    url += '&discipline_id='  + discipline_id;
-    url += '&role_id='  + role_id;
-    url += '&url='  + resUrl;
-    url += '&notes='  + notes;
+    url += '&name=' + encodeURIComponent( name );
+    url += '&abbr=' + encodeURIComponent( abbr );
+    url += '&description=' + encodeURIComponent( desc );
+    url += '&addr_str=' + encodeURIComponent( cidr );
+    url += '&asn=' + encodeURIComponent( asn );
+    url += '&organization_id=' + encodeURIComponent( org_id );
+    url += '&country_code=' + encodeURIComponent( country_code );
+    url += '&latitude='  + encodeURIComponent( lat.toFixed(5) );
+    url += '&longitude='  + encodeURIComponent( lon.toFixed(5) );
+    url += '&discipline_id='  + encodeURIComponent( discipline_id );
+    url += '&role_id='  + encodeURIComponent( role_id );
+    url += '&url='  + encodeURIComponent( resUrl );
+    url += '&notes='  + encodeURIComponent( notes );
 
     function successCallback(resource) {
         var id = resource.ip_block_id;

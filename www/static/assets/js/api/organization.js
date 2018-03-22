@@ -56,7 +56,7 @@ function getOrganizations(onSuccess) {
 // Gets a list of organizations from the backend where name is like text.
 function getOrganizationsLike(text, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_organizations';
-    url += '&name_like=' + text;
+    url += '&name_like=' + encodeURIComponent( text );
     fetch(url, {
         method: 'get',
         credentials: 'include'
@@ -75,7 +75,7 @@ function getOrganizationsLike(text, on_success) {
 // Gets a list of organizations from the backend where abbreviation = text.
 function getOrgWithAbbr(text, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_organizations';
-    url += '&abbr=' + text;
+    url += '&abbr=' + encodeURIComponent( text );
     fetch(url, {
         method: 'get',
         credentials: 'include'
@@ -102,16 +102,16 @@ function createOrEditOrganization(id, name, abbr, desc, owner, email, country_co
         url += '&organization_id=' + id.toString();
     }
 
-    url += '&name=' + name;
-    url += '&abbr=' + abbr;
-    url += '&description=' + desc;
-    url += '&owner=' + owner;
-    url += '&email=' + email;
-    url += '&country_code=' + country_code;
-    url += '&latitude='  + lat.toFixed(5);
-    url += '&longitude='  + lon.toFixed(5);
-    url += '&url='  + orgUrl;
-    url += '&notes='  + notes;
+    url += '&name=' + encodeURIComponent( name );
+    url += '&abbr=' + encodeURIComponent( abbr );
+    url += '&description=' + encodeURIComponent( desc );
+    url += '&owner=' + encodeURIComponent( owner );
+    url += '&email=' + encodeURIComponent( email );
+    url += '&country_code=' + encodeURIComponent( country_code );
+    url += '&latitude='  + encodeURIComponent( lat.toFixed(5) );
+    url += '&longitude='  + encodeURIComponent( lon.toFixed(5) );
+    url += '&url='  + encodeURIComponent( orgUrl );
+    url += '&notes='  + encodeURIComponent( notes );
 
     function successCallback(organization) {
         var id = organization.organization_id;

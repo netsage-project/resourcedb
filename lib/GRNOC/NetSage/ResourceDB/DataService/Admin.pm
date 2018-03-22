@@ -265,7 +265,7 @@ sub add_table_dynamically {
     my $fields = {};
 
     foreach my $field ( @field_list ) {
-        # add to field list
+        # add to field list if defined
         $fields->{ $field } = $args{ $field } if defined $args{ $field };
     }
 
@@ -288,33 +288,33 @@ sub add_table_dynamically {
 
 
 sub update_ip_blocks {
-
     my ( $self, %args ) = @_;
 
     my $remote_user = $args{'remote_user'};
     # TODO: check remote_user, what should this be?
 
-    my $from_sql = 'ip_block ';
-
-    my $fields = $self->_get_ip_block_args( %args );
+    ### just pass everything, in case some field needs to change from something to nothing
+    ### my $fields = $self->_get_ip_block_args( %args );
+    my $fields = \%args;   
 
     my @where = ();
 
     # handle required ip_block_id param
     my $id_param = GRNOC::MetaParameter->new( name => 'ip_block_id',
-                                                   field => 'ip_block.ip_block_id' );
+                                              field => 'ip_block.ip_block_id' );
 
     @where = $id_param->process( args => \%args,
-                                      where => \@where );
+                                 where => \@where );
 
-    my $results = $self->dbq_rw()->update( table => $from_sql,
+    my $results = $self->dbq_rw()->update( table => 'ip_block',
                                            fields => $fields,
                                            where => [-and => \@where],
                                        );
     if ( !$results ) {
         $self->error( 'An unknown error occurred updating the ip blocks.' );
-        return;
+        return { error => $self->dbq_rw()->get_error() };
     }
+
     $self->add_events(
         ip_block_id => $args{'ip_block_id'},
         message => "$ENV{'REMOTE_USER'} updated this resource."
@@ -325,6 +325,40 @@ sub update_ip_blocks {
     $results = [ {'ip_block_id' => $args{'ip_block_id'} }];
     return $results;
 
+}
+
+sub update_project {
+    my ($self, %args) = @_;
+
+    my @where = ();
+
+    my $param = GRNOC::MetaParameter->new(
+        name  => 'project_id',
+        field => 'project.project_id'
+    );
+
+    @where = $param->process(args => \%args, where => \@where);
+
+    my $project_id = $args{'project_id'};
+    delete $args{'project_id'};
+
+    my $result = $self->dbq_rw()->update(
+                                table => 'project',
+                                fields => \%args,
+                                where => [-and => \@where]
+                            );
+
+    if (!defined $result || $result != 1) {
+        $self->error( 'An unknown error occurred updating the project.' );
+        return { error => $self->dbq_rw()->get_error() };
+    }
+
+    $self->add_events(
+        project_id => $project_id,
+        message => "$ENV{'REMOTE_USER'} updated this project."
+    );
+
+    return { results => [{ project_id => $project_id }] };
 }
 
 sub update_table_dynamically {
@@ -355,8 +389,8 @@ sub update_table_dynamically {
     my @field_list = keys %{ $field_obj->{ $name } };
     my $fields = {};
     foreach my $field ( @field_list ) {
-        # add to field list
-        $fields->{ $field } = $args{ $field } if defined $args{ $field };
+        ### just pass everything, in case some field needs to change from something to nothing
+        $fields->{ $field } = $args{ $field }; ### ... if defined $args{ $field };
     }
 
     my $results = $self->dbq_rw()->update( table => $from_sql,
@@ -465,6 +499,43 @@ sub delete_table_dynamically {
 
 }
 
+sub set_project_ip_block_links {
+    my ($self, %args) = @_;
+
+    my @where = ();
+
+    my $param = GRNOC::MetaParameter->new(
+        name  => 'project_id',
+        field => 'project_id'
+    );
+
+    @where = $param->process(args => \%args, where => \@where);
+
+    my $result = undef;
+    $result = $self->dbq_rw()->delete(
+        table => 'ip_block_project',
+        where => [-and => \@where]
+    );
+
+    if (!defined $result) {
+        return { error => $self->dbq_rw()->get_error() };
+    }
+
+    $result = undef;
+    foreach my $ip_block_id (@{$args{'ip_block_id'}}) {
+        $result = $self->dbq_rw()->insert(
+            table  => 'ip_block_project',
+            fields => { project_id => $args{'project_id'}, ip_block_id => $ip_block_id }
+        );
+    }
+
+    if (!defined $result || $result < 1) {
+        return { error => $self->dbq_rw()->get_error() };
+    }
+
+    return { results => [ int($result) ] };
+}
+
 sub _get_user_args {
     my ( $self, %args_in ) = @_;
 
@@ -513,7 +584,7 @@ sub _get_project_args {
 sub _get_ip_block_args {
     my ( $self, %args_in ) = @_;
 
-    my %args = ();
+    my %args_out = ();
 
     # TODO: figure out how to set these derived fields:
     #  - addr_lower
@@ -544,12 +615,11 @@ sub _get_ip_block_args {
         if ( not defined $args_in{ $arg } ) {
             next;
         }
-        $args{ $arg } = $args_in{ $arg };
+        $args_out{ $arg } = $args_in{ $arg };
 
     }
 
-    return \%args;
-
+    return \%args_out;
 }
 
 1;

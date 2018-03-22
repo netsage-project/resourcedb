@@ -136,39 +136,6 @@ sub get_ip_blocks {
     return $result;
 }
 
-sub update_project {
-    my ($self, %args) = @_;
-
-    my @where = ();
-
-    my $param = GRNOC::MetaParameter->new(
-        name  => 'project_id',
-        field => 'project.project_id'
-    );
-
-    @where = $param->process(args => \%args, where => \@where);
-
-    my $project_id = $args{'project_id'};
-    delete $args{'project_id'};
-
-    my $result = $self->dbq_rw()->update(
-        table => 'project',
-        fields => \%args,
-        where => [-and => \@where]
-    );
-
-    if (!defined $result || $result != 1) {
-        return { error => $self->dbq_rw()->get_error() };
-    }
-
-    $self->add_events(
-        project_id => $project_id,
-        message => "$ENV{'REMOTE_USER'} updated this project."
-    );
-
-    return { results => [{ project_id => $project_id }] };
-}
-
 sub get_projects {
     my ($self, %args) = @_;
 
@@ -305,43 +272,6 @@ sub _add_dynamic_parameters {
 
     }
 
-}
-
-sub set_project_ip_block_links {
-    my ($self, %args) = @_;
-
-    my @where = ();
-
-    my $param = GRNOC::MetaParameter->new(
-        name  => 'project_id',
-        field => 'project_id'
-    );
-
-    @where = $param->process(args => \%args, where => \@where);
-
-    my $result = undef;
-    $result = $self->dbq_rw()->delete(
-        table => 'ip_block_project',
-        where => [-and => \@where]
-    );
-
-    if (!defined $result) {
-        return { error => $self->dbq_rw()->get_error() };
-    }
-
-    $result = undef;
-    foreach my $ip_block_id (@{$args{'ip_block_id'}}) {
-        $result = $self->dbq_rw()->insert(
-            table  => 'ip_block_project',
-            fields => { project_id => $args{'project_id'}, ip_block_id => $ip_block_id }
-        );
-    }
-
-    if (!defined $result || $result < 1) {
-        return { error => $self->dbq_rw()->get_error() };
-    }
-
-    return { results => [ int($result) ] };
 }
 
 1;

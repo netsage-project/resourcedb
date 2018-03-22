@@ -40,7 +40,7 @@ function getProjects(on_success) {
 // Gets a list of projects from the backend where name is like text.
 function getProjectsLike(text, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_projects';
-    url += '&name_like=' + text;
+    url += '&name_like=' + encodeURIComponent( text );
     fetch(url, {
         method: 'get',
         credentials: 'include'
@@ -59,7 +59,7 @@ function getProjectsLike(text, on_success) {
 // Gets a list of projects from the backend where abbreviation = text.
 function getProjectsWithAbbr(text, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_projects';
-    url += '&abbr=' + text;
+    url += '&abbr=' + encodeURIComponent( text );
     fetch(url, {
         method: 'get',
         credentials: 'include'
@@ -113,7 +113,7 @@ function getProjectEvents(projectId, onSuccess) {
 // Adds each of resourceIDs to projectID. Redirects to the project
 // page for projectID on success.
 function setProjectResourceLinks(projectID, resourceIDs) {
-    var url = baseUrl + 'api/index.cgi?method=set_project_ip_block_links&project_id=' + projectID.toString();
+    var url = baseUrl + 'api/admin/index.cgi?method=set_project_ip_block_links&project_id=' + projectID.toString();
     for (var i = 0; i < resourceIDs.length; i++) {
         url += '&ip_block_id=' + resourceIDs[i];
     }
@@ -137,17 +137,17 @@ function createOrEditProject(id, name, abbr, desc, owner, email, projUrl, notes)
     if (id === null) {
         url += 'api/admin/index.cgi?method=add_projects';
     } else {
-        url += 'api/index.cgi?method=update_project';
+        url += 'api/admin/index.cgi?method=update_project';
         url += '&project_id=' + id.toString();
     }
 
-    url += '&name=' + name;
-    url += '&abbr=' + abbr;
-    url += '&description=' + desc;
-    url += '&owner=' + owner;
-    url += '&email=' + email;
-    url += '&url=' + projUrl;
-    url += '&notes=' + notes;
+    url += '&name=' + encodeURIComponent( name );
+    url += '&abbr=' + encodeURIComponent( abbr );
+    url += '&description=' + encodeURIComponent( desc );
+    url += '&owner=' + encodeURIComponent( owner );
+    url += '&email=' + encodeURIComponent( email );
+    url += '&url=' + encodeURIComponent( projUrl );
+    url += '&notes=' + encodeURIComponent( notes );
 
     function successCallback(project) {
         var id = project.project_id;
