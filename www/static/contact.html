@@ -55,27 +55,27 @@
                         <h2 class="text-center" style="margin-bottom:22px;margin-top:0px;color:rgb(95,94,94);">Contact us</h2>
                         <div class="form-group">
                             <label class="control-label" for="name">Your Name</label>
-                            <input class="form-control" type="text" name="contact_name" required="" id="name">
+                            <input class="form-control" type="text" name="contact_name" required="" id="name" tabindex="1">
                         </div>
                         <div class="form-group">
                             <label class="control-label" for="org">Organization and Job Title/Position</label>
-                            <input class="form-control" type="text" name="contact_org" required="" id="org">
+                            <input class="form-control" type="text" name="contact_org" required="" id="org" tabindex="2">
                         </div>
                         <div class="form-group has-error">
                             <label class="control-label" for="email" style="color:rgb(80,94,108);">Email</label>
-                            <input class="form-control" type="email" name="contact_email" required="" id="email">
+                            <input class="form-control" type="email" name="contact_email" required="" id="email" tabindex="3">
                         </div>
                         <div class="form-group">
                             <label class="control-label" for="phone">Phone</label>
-                            <input class="form-control" type="tel" name="contact_phone" inputmode="tel" id="phone">
+                            <input class="form-control" type="tel" name="contact_phone" inputmode="tel" id="phone" tabindex="4">
                         </div>
                         <div class="form-group">
                             <label class="control-label" for="message">Message</label>
-                            <textarea class="form-control" rows="20" name="contact_message" required="" id="message"></textarea>
+                            <textarea class="form-control" rows="20" name="contact_message" required="" id="message" tabindex="5"></textarea>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-primary" type="submit">send </button>
-                            <div id="msg_sent" style="width:69%;float:right;">
+                            <button class="btn btn-primary" type="submit" tabindex="6">send </button>
+                            <div id="msg_sent" style="width:69%;float:right;" tabindex="-1">
                                 <p class="hidden" style="margin-top:11px;color:rgb(38,176,84);font-size:16px;">Your message has been sent. Someone should get back to you soon. </p>
                             </div>
                         </div>
