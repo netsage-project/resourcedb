@@ -50,6 +50,7 @@ function renderOrgResourceListElement(resource) {
     role.innerHTML = resource.role_name;
     latlong.innerHTML = parseFloat(resource.latitude).toFixed(4) + ",<br>" + parseFloat(resource.longitude).toFixed(4);
 
+    row.setAttribute("role", "button");
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'resource/index.html?resource_id=' + id;
     });
@@ -76,6 +77,7 @@ function renderProjResourceListElement(resource) {
     role.innerHTML = resource.role_name;
     discipline.innerHTML = resource.discipline_name;
 
+    row.setAttribute("role", "button");
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'resource/index.html?resource_id=' + id;
     });
@@ -193,19 +195,21 @@ function renderResourceRecord(resource) {
     abbr.innerHTML = resource.abbr;
     country.innerHTML = resource.country_name;
     organization.innerHTML = resource.organization_name;
-    organization.addEventListener('click', function(e) {
-        window.location.href = basePath + 'organization/index.html?organization_id=' + resource.org_id;
-    });
     url.innerHTML = resource.url;
     if (resource.notes) { notes.innerHTML = resource.notes.replace(/ @@ /g,"<br>"); } // new-lines are @@ in db.
     role.innerHTML = resource.role_name;
     discipline.innerHTML = resource.discipline_name;
 
     if (resource.latitude == null || resource.longitude == null) {
-        geolocation.innerHTML = 'Location is not available';
+        geolocation.innerHTML = 'Location unknown';
     } else {
         geolocation.innerHTML = parseFloat(resource.latitude).toFixed(4) + ',<br>' + parseFloat(resource.longitude).toFixed(4);
     }
+
+    // make org a link to the details page
+    organization.addEventListener('click', function(e) {
+        window.location.href = basePath + 'organization/index.html?organization_id=' + resource.org_id;
+    });
 
     link.href = basePath + 'resource/edit.html?resource_id=' + resource.ip_block_id.toString();
 }

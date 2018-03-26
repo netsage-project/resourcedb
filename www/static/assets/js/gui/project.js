@@ -18,7 +18,7 @@ function renderMyProjectListElement(project) {
     });
 }
 
-// Renders a project in linked_project_list on resource/index.html.
+// Renders a project in linked_project_list on resource details page
 function renderLinkedProjectListElement(project) {
     var table = document.getElementById('project_list');
     var row   = table.insertRow(-1);
@@ -31,13 +31,13 @@ function renderLinkedProjectListElement(project) {
     var desc = row.insertCell(1);
     desc.innerHTML = project.description;
 
+    row.setAttribute("role", "button");
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'project/index.html?project_id=' + id;
     });
 }
 
-// Renders events as list items under project_event_list on
-// project/index.html
+// Renders events as list items under project_event_list on project details page
 function renderProjectEventListElement(event) {
     var eventText = document.createElement('span');
     eventText.innerHTML = '<b>' + event.date + '</b> - ' + event.message;

@@ -1,6 +1,6 @@
 // GlobalNOC 2017
 
-// Renders a organization in linked_organization_list 
+// Renders a organization in linked_organization_list //// not currently used (?) 
 function renderLinkedOrganizationListElement(org) {
     var table = document.getElementById('linked_organization_list');
     var row   = table.insertRow(-1);
@@ -83,7 +83,7 @@ function renderOrganizationRecord(organization) {
 
   geolocation = document.getElementById('organization_geolocation');
   if (organization.latitude == null || organization.longitude == null) {
-        geolocation.innerHTML = 'Location is not available';
+        geolocation.innerHTML = 'Location unknown';
   } else {
         geolocation.innerHTML = organization.latitude.toString() + ', ' + organization.longitude.toString();
   }
