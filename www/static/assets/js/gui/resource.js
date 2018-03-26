@@ -24,7 +24,7 @@ function renderResourceListElement(resource) {
     discipline.innerHTML = resource.discipline_name;
     role.innerHTML = resource.role_name;
     country.innerHTML = resource.country_name;
-    latlong.innerHTML = resource.latitude + ", " + resource.longitude;
+    latlong.innerHTML = parseFloat(resource.latitude).toFixed(4) + ",<br>" + parseFloat(resource.longitude).toFixed(4);
 
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'resource/index.html?resource_id=' + id;
@@ -48,7 +48,7 @@ function renderOrgResourceListElement(resource) {
     addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
     discipline.innerHTML = resource.discipline_name;
     role.innerHTML = resource.role_name;
-    latlong.innerHTML = resource.latitude + ", " + resource.longitude;
+    latlong.innerHTML = parseFloat(resource.latitude).toFixed(4) + ",<br>" + parseFloat(resource.longitude).toFixed(4);
 
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'resource/index.html?resource_id=' + id;
@@ -97,7 +97,7 @@ function renderResourceEventListElement(event) {
 
 // Renders a resource on the page linking resources to projects
 function renderResourceListSelectableElement(resource) {
-    var table = document.getElementById('resource_list');
+    var table = document.getElementById('selectable_resource_list');
     var row   = table.insertRow(-1);
 
     var id = resource.ip_block_id.toString();
@@ -183,7 +183,6 @@ function renderResourceRecord(resource) {
     var country = document.getElementById('resource_country');
     var geolocation = document.getElementById('resource_geolocation');
     var organization = document.getElementById('resource_organization');
-    var org_description = document.getElementById('org_description');
     var url = document.getElementById('resource_url');
     var notes = document.getElementById('resource_notes');
     var role = document.getElementById('resource_role');
@@ -194,7 +193,9 @@ function renderResourceRecord(resource) {
     abbr.innerHTML = resource.abbr;
     country.innerHTML = resource.country_name;
     organization.innerHTML = resource.organization_name;
-    org_description.innerHTML = resource.org_description;
+    organization.addEventListener('click', function(e) {
+        window.location.href = basePath + 'organization/index.html?organization_id=' + resource.org_id;
+    });
     url.innerHTML = resource.url;
     if (resource.notes) { notes.innerHTML = resource.notes.replace(/ @@ /g,"<br>"); } // new-lines are @@ in db.
     role.innerHTML = resource.role_name;
@@ -203,7 +204,7 @@ function renderResourceRecord(resource) {
     if (resource.latitude == null || resource.longitude == null) {
         geolocation.innerHTML = 'Location is not available';
     } else {
-        geolocation.innerHTML = resource.latitude.toString() + ', ' + resource.longitude.toString();
+        geolocation.innerHTML = parseFloat(resource.latitude).toFixed(4) + ',<br>' + parseFloat(resource.longitude).toFixed(4);
     }
 
     link.href = basePath + 'resource/edit.html?resource_id=' + resource.ip_block_id.toString();
