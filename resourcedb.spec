@@ -1,6 +1,6 @@
 Summary:   NetSage Resource Database
 Name:      resourcedb
-Version:   0.6.0
+Version:   0.7.0
 Release:   %{_buildno}%{?dist}
 License:   Apache
 Group:     GRNOC
@@ -62,6 +62,7 @@ NetSage Resource Database (Science Registry)
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS.pm
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS.pod
 
+# DataService/
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Admin.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Admin.pm
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Admin.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Admin.pod
@@ -76,7 +77,7 @@ NetSage Resource Database (Science Registry)
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Util.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Util.pm
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Util.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Util.pod
 
-# lib/GRNOC/NetSage/ResourceDB/DataService/Data.pm
+# GWS/
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS/Admin.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/Admin.pm
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS/Admin.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/Admin.pod
