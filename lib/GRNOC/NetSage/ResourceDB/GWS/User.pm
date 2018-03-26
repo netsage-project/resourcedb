@@ -136,104 +136,6 @@ sub _init_get_methods {
 
     $self->websvc()->register_method($method);
 
-    #-- update_project 
-    $method = GRNOC::WebService::Method->new(
-        name => 'update_project',
-        description => "Updates project project_id.",
-        expires => "-1d",
-        callback => sub { $self->_update_project( @_ ) } );
-
-    $method->add_input_parameter(
-        name        => 'project_id',
-        pattern     => $INTEGER,
-        required    => 1,
-        multiple    => 0,
-        description => 'The id of the project'
-    );
-
-    $method->add_input_parameter(
-        name        => 'name',
-        pattern     => $TEXT,
-        required    => 1,
-        multiple    => 0,
-        description => 'The name of the project'
-    );
-
-    $method->add_input_parameter(
-        name        => 'abbr',
-        pattern     => $TEXT,
-        required    => 0,
-        multiple    => 0,
-        description => 'A short name for the project'
-    );
-
-    $method->add_input_parameter(
-        name        => 'description',
-        pattern     => $TEXT,
-        required    => 0,
-        multiple    => 0,
-        description => 'The description of the project'
-    );
-
-    $method->add_input_parameter(
-        name        => 'owner',
-        pattern     => $TEXT,
-        required    => 0,
-        multiple    => 0,
-        description => 'The main contact for the project'
-    );
-
-    $method->add_input_parameter(
-        name        => 'email',
-        pattern     => $TEXT,
-        required    => 0,
-        multiple    => 0,
-        description => 'The email of the main contact'
-    );
-
-    $method->add_input_parameter(
-        name        => 'url',
-        pattern     => $TEXT,
-        required    => 0,
-        multiple    => 0,
-        description => 'The webpage for the project'
-    );
-
-    $method->add_input_parameter(
-        name        => 'notes',
-        pattern     => $TEXT,
-        required    => 0,
-        multiple    => 0,
-        description => 'The notes for the project'
-    );
-    $self->websvc()->register_method($method);
-
-    #-- set_project_ip_block_links
-    $method = GRNOC::WebService::Method->new(
-        name => 'set_project_ip_block_links',
-        description => "Updates project project_id.",
-        expires => "-1d",
-        callback => sub { $self->_set_project_ip_block_links( @_ ) } );
-
-    $method->add_input_parameter(
-        name        => 'project_id',
-        pattern     => $INTEGER,
-        required    => 1,
-        multiple    => 0,
-        description => 'The id of the project'
-    );
-
-    $method->add_input_parameter(
-        name        => 'ip_block_id',
-        pattern     => $INTEGER,
-        required    => 1,
-        multiple    => 1,
-        description => 'The id of the IP blocks to add'
-    );
-
-    $self->_get_dynamic_where_parameters($method);
-    $self->websvc()->register_method($method);
-
     #-- get_events
     $method = GRNOC::WebService::Method->new(
         name        => 'get_events',
@@ -412,30 +314,6 @@ sub _get_events {
         'offset' => $result->offset(),
         'warning' => $result->warning()
     };
-}
-
-sub _update_project {
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->user_ds()->update_project($self->process_args( $args ));
-    if (!$result) {
-        $method->set_error( $self->user_ds()->error() );
-        return;
-    }
-
-    return $result;
-}
-
-sub _set_project_ip_block_links {
-    my ($self, $method, $args) = @_;
-
-    my $result = $self->user_ds()->set_project_ip_block_links( $self->process_args( $args ) );
-    if (!$result) {
-        $method->set_error( $self->user_ds()->error() );
-        return;
-    }
-
-    return $result;
 }
 
 1;

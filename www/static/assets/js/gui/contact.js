@@ -9,6 +9,7 @@ function setupContactForm() {
     // fill in role and discipline selectors
     getRoles(function(roles) {
         var role = document.getElementById('role_select');
+        role.innerHTML = "";
         for (var i = 0; i < roles.length; i++) {
             var opt = document.createElement('option');
             opt.innerHTML = roles[i].name;
@@ -21,6 +22,7 @@ function setupContactForm() {
     });
     getDisciplines(function(disciplines) {
         var discipline = document.getElementById('discipline_select');
+        discipline.innerHTML = "";
         for (var i = 0; i < disciplines.length; i++) {
             var opt = document.createElement('option');
             opt.innerHTML = disciplines[i].name;

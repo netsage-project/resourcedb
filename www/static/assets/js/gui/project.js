@@ -1,24 +1,24 @@
 // GlobalNOC 2017
 
-// Renders a project in my_project_list on index.html.
+// Renders a project in the main list (id=my_project_list) on the homepage
 function renderMyProjectListElement(project) {
     var table = document.getElementById('my_project_list');
     var row   = table.insertRow(-1);
 
     var id = project.project_id.toString();
 
-    var name = row.insertCell(0);
-    var abbr = row.insertCell(1);
+    var abbr = row.insertCell(0);
+    var name = row.insertCell(1);
 
-    name.innerHTML = project.name;
     abbr.innerHTML = project.abbr;
+    name.innerHTML = project.name;
 
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'project/index.html?project_id=' + id;
     });
 }
 
-// Renders a project in linked_project_list on resource/index.html.
+// Renders a project in linked_project_list on resource details page
 function renderLinkedProjectListElement(project) {
     var table = document.getElementById('project_list');
     var row   = table.insertRow(-1);
@@ -31,13 +31,13 @@ function renderLinkedProjectListElement(project) {
     var desc = row.insertCell(1);
     desc.innerHTML = project.description;
 
+    row.setAttribute("role", "button");
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'project/index.html?project_id=' + id;
     });
 }
 
-// Renders events as list items under project_event_list on
-// project/index.html
+// Renders events as list items under project_event_list on project details page
 function renderProjectEventListElement(event) {
     var eventText = document.createElement('span');
     eventText.innerHTML = '<b>' + event.date + '</b> - ' + event.message;
@@ -142,8 +142,8 @@ function submitCreateOrUpdateProject(e) {
     var abbr = form.elements['project_abbr'].value;
 
     var desc = form.elements['project_description'].value;
-    if (desc) { desc = notes.replace(/[\u2018\u2019]/g, "'"); } // replace smart quotes
-    if (desc) { desc = notes.replace(/[\u201C\u201D]/g, '"'); } // replace smart quotes
+    if (desc) { desc = desc.replace(/[\u2018\u2019]/g, "'"); } // replace smart quotes
+    if (desc) { desc = desc.replace(/[\u201C\u201D]/g, '"'); } // replace smart quotes
 
     var owner = form.elements['project_owner'].value;
     var email = form.elements['project_email'].value;

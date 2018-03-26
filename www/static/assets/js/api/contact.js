@@ -24,10 +24,13 @@ function sendContactEmail(name, org, email, phone, msg) {
             alert("There was a problem sending your email.");
         }    
         else { 
-            ///msg_sent_div.innerHTML = "<br><p style='color:green;'>Your message has been sent.<br>Thank you!</p>";
-            alert("Your message has been sent. Thank you!\nYou will now be returned to the previous page.");
-            window.history.back();
-        }
+            msg_sent_div.innerHTML = "<br><p style='color:green;'>Your message has been sent.<br>Thank you!</p>";
+            // have a small delay before opening the popup so the innerHTML has time to be updated first.
+            setTimeout(function(){
+                alert("Your message has been sent.\nYou will now be returned to the previous page.");
+                window.history.back();
+            }, 500);
+       }
     };
 
     function errorCallback(txt) {

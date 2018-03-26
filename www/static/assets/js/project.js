@@ -211,7 +211,7 @@ function project() {
 
     getResourcesByProjectId(id, function(resources) {
         for (var i = 0; i < resources.length; i++) {
-            renderResourceListElement(resources[i]);
+            renderProjResourceListElement(resources[i]);
         }
 
         renderMap(resources);
@@ -397,7 +397,7 @@ function organization() {
         // put this here to be sure org exists before calling renderMap, in case getting org takes too long.
         getResourcesByOrganizationId(id, function(resources) {
             for (var i = 0; i < resources.length; i++) {
-                renderResourceListElement(resources[i]);
+                renderOrgResourceListElement(resources[i]);
             }
             renderMap(resources,[org]);
         });

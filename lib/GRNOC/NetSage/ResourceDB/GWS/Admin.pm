@@ -30,6 +30,18 @@ sub new {
     return $self;
 }
 
+sub _get_dynamic_where_parameters {
+    my ( $self, $method ) = @_;
+    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        # add the optional 'name_id' input param to the get_$names() method
+        $method->add_input_parameter( name        => "${name}_id",
+            pattern     => $INTEGER,
+            required    => 0,
+            multiple    => 1,
+            description => "The id of the $name");
+    }
+}
+
 sub _init_email_methods {
     my $self = shift;
 
@@ -224,6 +236,32 @@ sub _init_add_methods {
                                   multiple    => 0,
                                   description => 'The email of the contact');
     $self->websvc()->register_method($method);
+
+    #-- set_project_ip_block_links
+    $method = GRNOC::WebService::Method->new(
+        name => 'set_project_ip_block_links',
+        description => "Updates project project_id.",
+        expires => "-1d",
+        callback => sub { $self->_set_project_ip_block_links( @_ ) } );
+
+    $method->add_input_parameter(
+        name        => 'project_id',
+        pattern     => $INTEGER,
+        required    => 1,
+        multiple    => 0,
+        description => 'The id of the project'
+    );
+
+    $method->add_input_parameter(
+        name        => 'ip_block_id',
+        pattern     => $INTEGER,
+        required    => 1,
+        multiple    => 1,
+        description => 'The id of the IP blocks to add'
+    );
+
+    $self->_get_dynamic_where_parameters($method);
+    $self->websvc()->register_method($method);
 }
 
 sub _init_update_methods {
@@ -258,6 +296,78 @@ sub _init_update_methods {
 
     $self->_add_ip_block_params( $method );
     $self->websvc()->register_method( $method );
+
+    #-- update_project
+    $method = GRNOC::WebService::Method->new(
+        name => 'update_project',
+        description => "Updates project project_id.",
+        expires => "-1d",
+        callback => sub { $self->_update_project( @_ ) } );
+
+    $method->add_input_parameter(
+        name        => 'project_id',
+        pattern     => $INTEGER,
+        required    => 1,
+        multiple    => 0,
+        description => 'The id of the project'
+    );
+
+    $method->add_input_parameter(
+        name        => 'name',
+        pattern     => $TEXT,
+        required    => 1,
+        multiple    => 0,
+        description => 'The name of the project'
+    );
+
+    $method->add_input_parameter(
+        name        => 'abbr',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'A short name for the project'
+    );
+
+    $method->add_input_parameter(
+        name        => 'description',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'The description of the project'
+    );
+    $method->add_input_parameter(
+        name        => 'owner',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'The main contact for the project'
+    );
+
+    $method->add_input_parameter(
+        name        => 'email',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'The email of the main contact'
+    );
+
+    $method->add_input_parameter(
+        name        => 'url',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'The webpage for the project'
+    );
+
+    $method->add_input_parameter(
+        name        => 'notes',
+        pattern     => $TEXT,
+        required    => 0,
+        multiple    => 0,
+        description => 'The notes for the project'
+    );
+
+    $self->websvc()->register_method($method);
 }
 
 sub _init_delete_methods {
@@ -579,9 +689,7 @@ sub _init_dynamic_update_methods {
         $self->_add_dynamic_add_update_parameters( $name, $method );
 
         $self->websvc()->register_method( $method );
-
     }
-
 
 }
 
@@ -608,27 +716,36 @@ sub _init_dynamic_delete_methods {
 
     }
 
-
 }
 
 
 ### callbacks ###
 
 sub _send_us_email {
-
     my ( $self, $method, $args ) = @_;
 
     my $result = $self->admin_ds()->send_us_email( $self->process_args( $args ) );
-
-    # handle error
     if ( !$result ) {
-
         $method->set_error( $self->admin_ds()->error() );
         return;
     }
 
     return { 'results' => $result };
 }
+
+sub _set_project_ip_block_links {
+    my ($self, $method, $args) = @_;
+
+    my $result = $self->admin_ds()->set_project_ip_block_links( $self->process_args( $args ) );
+    if (!$result) {
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return $result;
+}
+
+### CALLBACKS - dynamic tables
 
 sub _add_table_dynamically {
 
@@ -679,6 +796,8 @@ sub _delete_table_dynamically {
 }
 
 
+### CALLBACKS - get methods
+
 sub _get_ip_blocks {
 
     my ( $self, $method, $args ) = @_;
@@ -697,9 +816,6 @@ sub _get_ip_blocks {
             'offset' => $result->offset(),
             'warning' => $result->warning()};
 }
-
-
-### CALLBACKS - get methods
 
 sub _get_users {
     my ( $self, $method, $args ) = @_;
@@ -794,6 +910,18 @@ sub _update_ip_blocks {
     }
 
     return { 'results' => $result };
+}
+
+sub _update_project {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->update_project($self->process_args( $args ));
+    if (!$result) {
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return $result;
 }
 
 ### CALLBACKS - delete methods
