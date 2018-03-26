@@ -1,17 +1,17 @@
 // GlobalNOC 2017
 
-// Renders a project in my_project_list on index.html.
+// Renders a project in the main list (id=my_project_list) on the homepage
 function renderMyProjectListElement(project) {
     var table = document.getElementById('my_project_list');
     var row   = table.insertRow(-1);
 
     var id = project.project_id.toString();
 
-    var name = row.insertCell(0);
-    var abbr = row.insertCell(1);
+    var abbr = row.insertCell(0);
+    var name = row.insertCell(1);
 
-    name.innerHTML = project.name;
     abbr.innerHTML = project.abbr;
+    name.innerHTML = project.name;
 
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'project/index.html?project_id=' + id;

@@ -19,6 +19,7 @@ use GRNOC::WebService::Client;
 use GRNOC::MetaParameter;
 use GRNOC::MetaParameter::OrderBy;
 use GRNOC::NetSage::ResourceDB::DataService::Result;
+use GRNOC::NetSage::ResourceDB::DataService::Data;
 
 use String::MkPasswd qw( mkpasswd );
 use MIME::Lite::TT;
@@ -241,6 +242,16 @@ sub get_table_dynamically {
     }
 
     my $num_rows = $self->dbq_rw()->num_rows();
+
+    # add country_names for organizations
+    if ($name eq "organization") {
+        my $data = GRNOC::NetSage::ResourceDB::DataService::Data->new;
+        my $countries = $data->get_countries();
+        foreach my $res (@$results) {
+            my $code = $res->{'country_code'}; 
+            $res->{'country_name'} = $countries->{$code};
+        }
+    }
 
     my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
                                                                  total => $num_rows,

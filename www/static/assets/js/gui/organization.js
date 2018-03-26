@@ -16,8 +16,7 @@ function renderLinkedOrganizationListElement(org) {
     });
 }
 
-// Renders a organization in organization_list 
-// Main org list on Organizations tab
+// Renders an orgnaization in the main list (id=organization_list) on the homepage
 function renderOrganizationListElement(org) {
     var table = document.getElementById('organization_list');
     var row   = table.insertRow(-1);
@@ -26,11 +25,11 @@ function renderOrganizationListElement(org) {
 
     var abbr = row.insertCell(0);
     var name = row.insertCell(1);
-    var location = row.insertCell(2);
+    var country = row.insertCell(2);
 
     abbr.innerHTML = org.abbr;
     name.innerHTML = org.name;
-    location.innerHTML = org.country_code;
+    country.innerHTML = org.country_name;
 
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'organization/index.html?organization_id=' + id;
@@ -61,6 +60,7 @@ function renderOrganizationHeader(organization) {
     desc.innerHTML = organization.description;
 }
 
+// Organization details page -
 // Given a organization record, set the innerHTML of the elements
 function renderOrganizationRecord(organization) {
   var link = document.getElementById('organization_edit_link');
@@ -75,7 +75,7 @@ function renderOrganizationRecord(organization) {
   }
 
   document.getElementById('organization_abbr').innerHTML = organization.abbr;
-  document.getElementById('organization_country').innerHTML = organization.country_code;
+  document.getElementById('organization_country').innerHTML = organization.country_name;
   document.getElementById('organization_owner').innerHTML = organization.owner;
   document.getElementById('organization_email').innerHTML = organization.email;
   if (organization.notes) { document.getElementById('organization_notes').innerHTML = organization.notes.replace(/ @@ /g,"<br>"); } // new-lines are @@ in db.

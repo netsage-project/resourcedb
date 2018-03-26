@@ -1,43 +1,80 @@
 // GlobalNOC 2017
 
-// Renders a resource in my_resource_list on index.html.
-function renderMyResourceListElement(resource) {
-    var table = document.getElementById('my_resource_list');
-    var row   = table.insertRow(-1);
 
-    var id = resource.ip_block_id.toString();
-
-    var name = row.insertCell(0);
-    var addr = row.insertCell(1);
-
-    name.innerHTML = resource.name;
-    addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
-
-    row.addEventListener('click', function(e) {
-        window.location.href = basePath + 'resource/index.html?resource_id=' + id;
-    });
-}
-
-// Renders a resource in resource_list on index.html.
+// Renders a resource in the main list (id=resource_list) on the homepage
 function renderResourceListElement(resource) {
     var table = document.getElementById('resource_list');
     var row   = table.insertRow(-1);
 
     var id = resource.ip_block_id.toString();
 
-    var type = row.insertCell(0);
-    var org_abbr = row.insertCell(1);
-    var name = row.insertCell(2);
-    var addr = row.insertCell(3);
-    var org = row.insertCell(4);
-    var location = row.insertCell(5);
+    var name = row.insertCell(0);
+    var addr = row.insertCell(1);
+    var org_abbr = row.insertCell(2);
+    var org = row.insertCell(3);
+    var discipline = row.insertCell(4);
+    var role = row.insertCell(5);
+    var country = row.insertCell(6);
+    var latlong = row.insertCell(7);
 
-    type.innerHTML = resource.role_name;
     name.innerHTML = resource.name;
     addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
-    org.innerHTML = resource.organization_name;
     org_abbr.innerHTML =  resource.org_abbr; 
-    location.innerHTML = resource.country_name;
+    org.innerHTML = resource.organization_name;
+    discipline.innerHTML = resource.discipline_name;
+    role.innerHTML = resource.role_name;
+    country.innerHTML = resource.country_name;
+    latlong.innerHTML = resource.latitude + ", " + resource.longitude;
+
+    row.addEventListener('click', function(e) {
+        window.location.href = basePath + 'resource/index.html?resource_id=' + id;
+    });
+}
+
+// Renders a resource list on an Org Details page (id=orgs_resource_list)
+function renderOrgResourceListElement(resource) {
+    var table = document.getElementById('orgs_resource_list');
+    var row   = table.insertRow(-1);
+
+    var id = resource.ip_block_id.toString();
+
+    var name = row.insertCell(0);
+    var addr = row.insertCell(1);
+    var discipline = row.insertCell(2);
+    var role = row.insertCell(3);
+    var latlong = row.insertCell(4);
+
+    name.innerHTML = resource.name;
+    addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
+    discipline.innerHTML = resource.discipline_name;
+    role.innerHTML = resource.role_name;
+    latlong.innerHTML = resource.latitude + ", " + resource.longitude;
+
+    row.addEventListener('click', function(e) {
+        window.location.href = basePath + 'resource/index.html?resource_id=' + id;
+    });
+}
+
+// Renders a resource list on an Project Details page (id=projs_resource_list)
+function renderProjResourceListElement(resource) {
+    var table = document.getElementById('projs_resource_list');
+    var row   = table.insertRow(-1);
+
+    var id = resource.ip_block_id.toString();
+
+    var name = row.insertCell(0);
+    var country = row.insertCell(1);
+    var org = row.insertCell(2);
+    var addr = row.insertCell(3);
+    var role = row.insertCell(4);
+    var discipline = row.insertCell(5);
+
+    name.innerHTML = resource.name;
+    country.innerHTML = resource.country_name;
+    org.innerHTML = resource.organization_name;
+    addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
+    role.innerHTML = resource.role_name;
+    discipline.innerHTML = resource.discipline_name;
 
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'resource/index.html?resource_id=' + id;
@@ -65,17 +102,15 @@ function renderResourceListSelectableElement(resource) {
 
     var id = resource.ip_block_id.toString();
 
-    var type = row.insertCell(0);
-    var name = row.insertCell(1);
-    var addr = row.insertCell(2);
+    var name = row.insertCell(0);
+    var addr = row.insertCell(1);
+    var country = row.insertCell(2);
     var org = row.insertCell(3);
-    var location = row.insertCell(4);
 
-    type.innerHTML = resource.role_name;
     name.innerHTML = resource.name;
     addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
+    country.innerHTML = resource.country_name;
     org.innerHTML = resource.organization_name;
-    location.innerHTML = resource.country_name;
 
     row.addEventListener('click', function(e) {
         addResourceListSelectableElement(resource);
@@ -97,17 +132,15 @@ function addResourceListSelectableElement(resource) {
     var row   = table.insertRow(-1);
     row.setAttribute('data-id', resource.ip_block_id);
 
-    var type = row.insertCell(0);
-    var name = row.insertCell(1);
-    var addr = row.insertCell(2);
+    var name = row.insertCell(0);
+    var addr = row.insertCell(1);
+    var country = row.insertCell(2);
     var org = row.insertCell(3);
-    var location = row.insertCell(4);
 
-    type.innerHTML = resource.role_name;
     name.innerHTML = resource.name;
     addr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
+    country.innerHTML = resource.country_name;
     org.innerHTML = resource.organization_name;
-    location.innerHTML = resource.country_name;
 
     row.addEventListener('click', function(e) {
         for (var i = 0; i < table.rows.length; i++) {
@@ -130,6 +163,7 @@ function renderResourceCount(count) {
     text.innerHTML = count.toString() + ' records found';
 }
 
+// Resource details page -
 // Given a resource record, set the innerHTML of the elements
 // identified by resource_name and resource_description.
 function renderResourceHeader(resource) {
@@ -140,6 +174,7 @@ function renderResourceHeader(resource) {
     desc.innerHTML = resource.description;
 }
 
+// Resource details page -
 // Given a resource record, set the innerHTML of the elements
 // identified by resource_cidr, resource_country, etc
 function renderResourceRecord(resource) {
@@ -148,6 +183,7 @@ function renderResourceRecord(resource) {
     var country = document.getElementById('resource_country');
     var geolocation = document.getElementById('resource_geolocation');
     var organization = document.getElementById('resource_organization');
+    var org_description = document.getElementById('org_description');
     var url = document.getElementById('resource_url');
     var notes = document.getElementById('resource_notes');
     var role = document.getElementById('resource_role');
@@ -158,6 +194,7 @@ function renderResourceRecord(resource) {
     abbr.innerHTML = resource.abbr;
     country.innerHTML = resource.country_name;
     organization.innerHTML = resource.organization_name;
+    org_description.innerHTML = resource.org_description;
     url.innerHTML = resource.url;
     if (resource.notes) { notes.innerHTML = resource.notes.replace(/ @@ /g,"<br>"); } // new-lines are @@ in db.
     role.innerHTML = resource.role_name;
