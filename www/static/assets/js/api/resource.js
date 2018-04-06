@@ -182,6 +182,7 @@ function createOrEditResource(id, name, abbr, desc, cidr, asn, org_id, country_c
 
     }).catch(function(err) {
         console.log("createOrEditResource error: " + err);
+        alert("Error or permission problem. Could not save.");
     });
 }
 
@@ -206,5 +207,6 @@ function deleteResource(id) {
 
     }).catch(function(err) {
         console.log("delete_ip_blocks error: " + err);
+        alert("Error or permission problem. Could not delete.");
     });
 }

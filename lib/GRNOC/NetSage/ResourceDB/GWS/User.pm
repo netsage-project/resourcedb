@@ -169,6 +169,14 @@ sub _init_get_methods {
                                   multiple    => 0,
                                   description => 'The event user_id');
     $self->websvc()->register_method($method);
+
+    # --get_loggedin_user
+    $method = GRNOC::WebService::Method->new( name => 'get_loggedin_user',
+                                                   description => "Returns info about the user that is currently logged in and adds them to the database if they are not there.",
+                                                   expires => "-1d",
+                                                   callback => sub { $self->_get_loggedin_user( @_ ) } );
+
+    $self->websvc()->register_method($method);
 }
 
 sub _get_dynamic_where_parameters {
@@ -241,6 +249,50 @@ sub _init_dynamic_get_methods {
     }
 }
 
+sub _init_email_methods {
+    my $self = shift;
+
+    my $method;
+
+    # --send_us_email
+    $method = GRNOC::WebService::Method->new( name => 'send_us_email',
+                                                   description => "Sends email to us with contact form entries.",
+                                                   expires => "-1d",
+                                                   callback => sub { $self->_send_us_email( @_ ) } );
+
+    # add the required 'name' input param to the send_us_email() method
+    $method->add_input_parameter( name        => 'name',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The name of the user');
+    # add the required 'org' input param to the send_us_email() method
+    $method->add_input_parameter( name        => 'org',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The org/position of the user');
+    # add the required 'email' input param to the send_us_email() method
+    $method->add_input_parameter( name        => 'email',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The email address of the user');
+    # add the optional 'phone' input param to the send_us_email() method
+    $method->add_input_parameter( name        => 'phone',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The phone no. of the user');
+    # add the required 'msg' input param to the send_us_email() method
+    $method->add_input_parameter( name        => 'msg',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The message the user wants to send');
+
+    $self->websvc()->register_method($method);
+}
 
 ### callbacks ###
 
@@ -314,6 +366,18 @@ sub _get_events {
         'offset' => $result->offset(),
         'warning' => $result->warning()
     };
+}
+
+sub _send_us_email {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->user_ds()->send_us_email( $self->process_args( $args ) );
+    if ( !$result ) {
+        $method->set_error( $self->user_ds()->error() );
+        return;
+    }
+
+    return { 'results' => $result };
 }
 
 1;

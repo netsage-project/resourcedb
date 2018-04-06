@@ -31,7 +31,7 @@ function getOrganizationEvents(organizationId, onSuccess) {
             onSuccess(json.results);
         });
     }).catch(function(err) {
-        console.log(err);
+        console.log("getOrganizationEvents error: " + err);
     });
 }
 
@@ -49,7 +49,7 @@ function getOrganizations(onSuccess) {
         });
 
     }).catch(function(err) {
-        console.log("getOrganizationS error:" + err);
+        console.log("getOrganizationS error: " + err);
     });
 }
 
@@ -68,7 +68,7 @@ function getOrganizationsLike(text, on_success) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getOrganizationsLike error: " + err);
     });
 }
 
@@ -87,7 +87,7 @@ function getOrgWithAbbr(text, on_success) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getOrgWithAbbr Error: " + err);
     });
 }
 
@@ -133,6 +133,7 @@ function createOrEditOrganization(id, name, abbr, desc, owner, email, country_co
 
     }).catch(function(err) {
         console.log("createOrEditOrganization error: " + err);
+        alert("Error or permission problem. Could not save.");
     });
 }
 
@@ -155,6 +156,7 @@ function deleteOrganization(id) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("deleteOrganization Error: " + err);
+        alert("Error or permission problem. Could not delete.");
     });
 }

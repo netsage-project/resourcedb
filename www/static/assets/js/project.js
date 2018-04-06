@@ -7,13 +7,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
     var url = window.location;
 
     // first get info about the logged-in user. Adds them to the db if they are not in it.
-    getUserInfo(function(info) {
-        console.log("Getting user info");
-        console.log("username = " + info['user_id']);
+    ///getUserInfo(function(info) {
+    ///    console.log("Getting user info");
+    ///    console.log("username = " + info['user_id']);
         //for(key in info) {
         //    console.log(key + " " + info[key]);    
         //}
-    });
+    ///});
 
     console.log(url.href);
     console.log(url.pathname);

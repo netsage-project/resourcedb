@@ -1,5 +1,8 @@
 // GlobalNOC 2017
 
+// These functions are for users in the resourcedb database 
+// (not the database that allows shibboleth logins)
+
 // Get info about the logged-in user. 
 function getUserInfo(onSuccess) {
     var url = baseUrl + 'api/admin/index.cgi?method=get_loggedin_user'; 
@@ -13,7 +16,7 @@ function getUserInfo(onSuccess) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getUserInfo Error: " + err);
     });
 }
 

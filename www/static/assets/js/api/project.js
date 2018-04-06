@@ -52,7 +52,7 @@ function getProjectsLike(text, on_success) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getProjectsLike Error: " + err);
     });
 }
 
@@ -71,7 +71,7 @@ function getProjectsWithAbbr(text, on_success) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getProjectsWithAbbr Error: " + err);
     });
 }
 
@@ -89,7 +89,7 @@ function getProjectsByResourceID(resourceID, on_success) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getProjectsByResourceID Error: " + err);
     });
 }
 
@@ -106,7 +106,7 @@ function getProjectEvents(projectId, onSuccess) {
             onSuccess(json.results);
         });
     }).catch(function(err) {
-        console.log(err);
+        console.log("getProjectEvents Error: " + err);
     });
 }
 
@@ -126,7 +126,8 @@ function setProjectResourceLinks(projectID, resourceIDs) {
             window.location.href = basePath + 'project/index.html?project_id=' + projectID;
         });
     }).catch(function(err) {
-        console.log(err);
+        console.log("setProjectResourceLinks Error: " + err);
+        alert("Error or permission problem. Could not save.");
     });
 }
 
@@ -167,7 +168,8 @@ function createOrEditProject(id, name, abbr, desc, owner, email, projUrl, notes)
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("createdOrEdit Project Error: " + err);
+        alert("Error or permission problem. Could not save.");
     });
 }
 
@@ -190,6 +192,7 @@ function deleteProject(id) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("deleteProject Error: " + err);
+        alert("Error or permission problem. Could not delete.");
     });
 }
