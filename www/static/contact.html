@@ -39,6 +39,7 @@
                             </div>
                         </form>
                         <ul class="nav navbar-nav navbar-right">
+                            <li role="presentation"><a href="login" id="login_link">Login </a></li>
                             <li role="presentation"><a href="index.html" id="contact_back">Back </a></li>
                         </ul>
                         <p class="navbar-text navbar-right"> </p>
@@ -83,9 +84,9 @@
                 </div>
                 <div class="col-md-6" style="padding-left:0px;padding-right:0px;margin-right:0px;width:452px;margin-left:25px;">
                     <div style="background-color:#e4eef9;margin:-1px;padding:10px;border:1px solid lightgray;">
-                        <p><strong><span style="font-size:16px;">Owners of resources! </span> <br>We'd greatly appreciate submissions of new resources to include in the registry and corrections to existing information!</strong>                            </p>
-                        <p> See the reminders below when composing your message; copy and paste may be useful! &nbsp;Be sure to include exact names of any existing entities involved. If you have many resources to submit, let us know and we'll work out a way
-                            to get the information more conveniently.</p>
+                        <p><strong><span style="font-size:16px;">Owners of resources...</span> <br>We'd greatly appreciate submissions of new resources to include in the registry and corrections to existing information!</strong>                            </p>
+                        <p> See the reminders below when composing your message. Copy and paste may be useful! &nbsp;Be sure to include exact names of any existing Science Registry entities involved. If you have many resources to submit, let us know and we'll
+                            work out a way to import the information more conveniently.</p>
                     </div>
                     <h3 style="color:rgb(95,94,94);margin-top:23px;">Reminders of information needed</h3>
                     <div class="panel-group" role="tablist" aria-multiselectable="true" id="accordion-1">
@@ -102,20 +103,20 @@
                                             <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>IU is a public research university...</span></li>
                                             <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>https://www.indiana.edu </span></li>
                                             <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>United States</span></li>
-                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> 39.166100, -86.526500</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> 39.166100, -86.526500 ( if unknown, an address would be helpful)</span></li>
                                             <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>Univ. IT Services = UITS</span>
                                                 <div></div>
                                             </li>
-                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><em>IPs or names of resources that this organization manages</em></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><em>IPs/names of resources that this organization manages</em></li>
                                         </ul>
                                     </div>
                                     <ul class="list-group" style="width:40%;">
-                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Name </span></li>
-                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Abbreviation </span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Name **</span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Abbreviation *</span></li>
                                         <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Description </span></li>
                                         <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Homepage URL</span></li>
-                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Country </span></li>
-                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Latitude, Longitude</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Country</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>Latitude, Longitude of headquarters</span></li>
                                         <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Notes </span>
                                             <div></div>
                                         </li>
@@ -126,7 +127,7 @@
                         </div>
                         <div class="panel panel-default">
                             <div class="panel-heading" role="tab">
-                                <h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion-1" aria-expanded="false" href="#accordion-1 .item-2" style="color:rgb(96,127,205);">Resources (flow origins and destinations)</a></h4></div>
+                                <h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion-1" aria-expanded="false" href="#accordion-1 .item-2" style="color:rgb(96,127,205);">Resources (flow origin and destination hosts)</a></h4></div>
                             <div class="panel-collapse collapse item-2" role="tabpanel">
                                 <div class="panel-body" style="padding-bottom:0px;">
                                     <p>A resource can cover multiple IP's, in a CIDR block or as a list of individuals, if they all have the same info, including lat/long. </p>
@@ -134,11 +135,11 @@
                                         <ul class="list-group">
                                             <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>149.165.238.1/24 </span></li>
                                             <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Indiana University </span></li>
-                                            <li class="list-group-item" style="padding-top:15px;padding-bottom:15px;"><span style="padding-top:0px;">IU - UITS - Big Red II</span></li>
+                                            <li class="list-group-item" style="padding-top:15px;padding-bottom:15px;"><span style="padding-top:0px;">IU - UITS - Big Red II compute node</span></li>
                                             <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Big Red</span></li>
                                             <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>Big Red II is IU's main system for... </span></li>
                                             <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>none </span></li>
-                                            <li class="list-group-item" style="padding-bottom:15px;padding-top:15px;"><span> 39.174500, -86.500800</span></li>
+                                            <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;padding-right:12px;"><span> 39.174500, -86.500800 ( if unknown, a city would be helpful )</span></li>
                                             <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span>United States</span></li>
                                             <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;">
                                                 <select id="discipline_select">
@@ -163,16 +164,16 @@
                                         </ul>
                                     </div>
                                     <ul class="list-group" style="width:40%;">
-                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> IP / CIDR</span></li>
-                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Organization</span></li>
-                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Name (preface with sub-organizations)</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> IP / CIDR **</span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Organization **</span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Resource Name (with sub-organizations) **</span></li>
                                         <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Short Name (optional)</span></li>
                                         <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Description </span></li>
                                         <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> URL of the resource </span></li>
-                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Latitude, Longitude of this resource</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Latitude, Longitude of this resource *</span></li>
                                         <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Country of resource</span></li>
-                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Science Discipline</span></li>
-                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Role</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Science Discipline *</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Role *</span></li>
                                         <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Notes </span></li>
                                         <li class="list-group-item" style="padding-bottom:15px;padding-top:15px;"><em>Projects </em></li>
                                     </ul>
@@ -198,12 +199,12 @@
                                         </ul>
                                     </div>
                                     <ul class="list-group" style="width:40%;">
-                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Name </span></li>
-                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Abbreviation </span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Name **</span></li>
+                                        <li class="list-group-item" style="padding-top:5px;padding-bottom:5px;"><span>Abbreviation **</span></li>
                                         <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Description </span></li>
                                         <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Homepage URL</span></li>
-                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Contact Person</span></li>
-                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Contact Email</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Contact Person *</span></li>
+                                        <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Contact Email *</span></li>
                                         <li class="list-group-item" style="padding-bottom:5px;padding-top:5px;"><span> Notes </span>
                                             <div></div>
                                         </li>
@@ -213,6 +214,9 @@
                             </div>
                         </div>
                     </div>
+                    <p>Please supply as much information as possible.</p>
+                    <p>** Essential to enter a record into the Science Registry</p>
+                    <p>* Also needed and difficult or impossible for us to determine</p>
                 </div>
             </div>
         </div>
