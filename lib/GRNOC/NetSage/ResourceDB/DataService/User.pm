@@ -263,19 +263,26 @@ sub get_events {
 }
 
 sub get_loggedin_user {
-    # get the user's username from $ENV then look for it in the resourcedb database.
-
     my ( $self, %args ) = @_;
 
+    # if they are logged in, get the user's username from $ENV 
+    my $env_user = $ENV{'REMOTE_USER'};
+
+    # if no user is logged in, return total= -1
+    if (!$env_user) {
+        my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
+            results => [{}],
+            total => -1
+        );
+        return $result;
+    }
+
+    # if user is logged in, look for them in our db. If found, total will be 1; if not, total will be 0.
     my $from_sql = 'user ';
-
     my $select_fields = [ 'user_id', 'name' ];
-
     my @where = ();
 
-    # handle required user_id param - always the username in .htpasswd
-    $args{'user_id'} = $ENV{'REMOTE_USER'};
-
+    $args{'user_id'} = $env_user;
     my $id_param = GRNOC::MetaParameter->new( name => 'user_id',
                                               field =>  'user.user_id');
     @where = $id_param->process( args => \%args,
@@ -286,7 +293,7 @@ sub get_loggedin_user {
                                            where => [-or => \@where],
                                            );
     if (!$results) {
-        $self->error( 'An unknown error occurred getting users.' );
+        $self->error( 'An unknown error occurred searching for a user in resourcedb.' );
         return;
     }
 

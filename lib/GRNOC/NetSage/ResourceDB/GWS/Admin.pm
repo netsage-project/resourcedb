@@ -767,22 +767,6 @@ sub _get_users {
             'warning' => $result->warning()};
 }
 
-sub _get_loggedin_user {
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->admin_ds()->get_loggedin_user( $self->process_args( $args ) );
-
-    if ( !$result ) {
-        $method->set_error( $self->admin_ds()->error() );
-        return;
-    }
-
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'offset' => $result->offset(),
-            'warning' => $result->warning()};
-}
-
 ### CALLBACKS - add methods
 
 sub _add_user {

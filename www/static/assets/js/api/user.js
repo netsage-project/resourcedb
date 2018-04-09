@@ -5,14 +5,14 @@
 
 // Get info about the logged-in user. 
 function getUserInfo(onSuccess) {
-    var url = baseUrl + 'api/admin/index.cgi?method=get_loggedin_user'; 
+    var url = baseUrl + 'api/index.cgi?method=get_loggedin_user'; 
     fetch(url, {
         method: 'get',
         credentials: 'include'
     }).then(function(response) {
         response.json().then(function(json) {
             console.log(json);
-            onSuccess(json.results[0]);
+            onSuccess(json);
         });
 
     }).catch(function(err) {

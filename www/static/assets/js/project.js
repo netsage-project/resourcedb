@@ -1,4 +1,3 @@
-
 // Called when page is ready for work. Because i'm unable to set an
 // onload attribute to the body tag in our UI editor, this function
 // checks what the URL's pathname is and executes Javascript based on
@@ -6,16 +5,33 @@
 document.addEventListener('DOMContentLoaded', function(event) {
     var url = window.location;
 
-    // first get info about the logged-in user. Adds them to the db if they are not in it.
-    ///getUserInfo(function(info) {
-    ///    console.log("Getting user info");
-    ///    console.log("username = " + info['user_id']);
-        //for(key in info) {
-        //    console.log(key + " " + info[key]);    
-        //}
-    ///});
+    // Try to get info about user from the resource db and savce to localStorage. 
+    // (The user_id in our db needs to be the username they log in with via shibboleth!)
+    // Saved_user (in localStorage) will be null [not logged in], a username [found in our db], or 
+    // "not in db" [logged in but not in our db].
+    // GetUserInfo will return result['total'] = -1 [not logged in], 0 [not in db], or 1 [in db]
+    var saved_user = localStorage.getItem('saved_user');
+    console.log("ORIG SAVED USER: " + saved_user);
+    if (saved_user == null) {
+        getUserInfo( function(result) {
+            console.log("***");
+            console.log(result);
+            result_total = result['total'];
+            if (result_total == 1) {
+                user_id = result['results'][0]['user_id'];
+                console.log("Found user - username: " + user_id);
+                localStorage.setItem('saved_user', user_id);
+                saved_user = user_id;
+            } else if (result_total == 0) {
+                console.log("Did not find user in db");
+                localStorage.setItem('saved_user', 'not in db');
+                saved_user = 'not in db';
+            } 
+            console.log("NEW SAVED USER: " + saved_user);
+        });
+    } 
 
-    console.log(url.href);
+    console.log("page url: " + url.href);
     console.log(url.pathname);
 
     if (url.pathname === basePath || url.pathname === basePath + 'index.html') {
@@ -66,18 +82,30 @@ var index = function() {
                 renderResourceListElement(resources[i]);
             }
             renderResourceCount(resources.length);
+
+            var link = document.getElementById('new-resource');
+            var href = basePath + 'resource/new.html';
+            renderPublicPrivate(link,href);
         });
         getOrganizations(function(organizations) {
             for (var i = 0; i < organizations.length; i++) {
                 renderOrganizationListElement(organizations[i]);
             }
             renderOrganizationCount(organizations.length);
+
+            var link = document.getElementById('new-org');
+            var href = basePath + 'organization/new.html';
+            renderPublicPrivate(link,href);
         });
         getProjects(function(projects) {
             for (var i = 0; i < projects.length; i++) {
                 renderMyProjectListElement(projects[i]);
             }
             renderProjectCount(projects.length);
+
+            var link = document.getElementById('new-project');
+            var href = basePath + 'project/new.html';
+            renderPublicPrivate(link,href);
         });
     } 
     else {
@@ -88,6 +116,10 @@ var index = function() {
                 renderResourceListElement(resources[i]);
             }
             renderResourceCount(resources.length);
+
+            var link = document.getElementById('new-resource');
+            var href = basePath + 'resource/new.html';
+            renderPublicPrivate(link,href);
         });
         getOrganizationsLike(query, function(organizations) {
             renderEmptyOrganizationList();
@@ -95,6 +127,10 @@ var index = function() {
                 renderOrganizationListElement(organizations[i]);
             }
             renderOrganizationCount(organizations.length);
+
+            var link = document.getElementById('new-org');
+            var href = basePath + 'organization/new.html';
+            renderPublicPrivate(link,href);
         });
         getProjectsLike(query, function(projects) {
             renderEmptyProjectList();
@@ -102,6 +138,10 @@ var index = function() {
                 renderMyProjectListElement(projects[i]);
             }
             renderProjectCount(projects.length);
+
+            var link = document.getElementById('new-project');
+            var href = basePath + 'project/new.html';
+            renderPublicPrivate(link,href);
         });
     }
 
@@ -445,5 +485,20 @@ function organizationEdit() {
     onSearchSubmit(function(query) {
         submitSearch(query);
     });
+}
+
+// Hides or shows the passed document element and adds the passed href (if any), depending on the logged-in user.
+// 'saved_user' in "localStorage" will be null [not logged in], a username [found in our db],
+// or "not in db" [logged in but not in our db].
+// FOR NOW, ANY LOGGED IN USER CAN ADD AND EDIT
+function renderPublicPrivate(item, url) {
+    var saved_user = localStorage.getItem('saved_user');
+    if (saved_user != null) {
+      if (url) item.href = url; 
+      item.style.visibility = "visible";
+    } else {
+      item.href = "";
+      item.style.visibility = "hidden";
+    }
 }
 

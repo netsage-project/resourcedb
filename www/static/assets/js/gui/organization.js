@@ -63,8 +63,15 @@ function renderOrganizationHeader(organization) {
 // Organization details page -
 // Given a organization record, set the innerHTML of the elements
 function renderOrganizationRecord(organization) {
+
+  // Show an active "edit" icon for logged-in users only
   var link = document.getElementById('organization_edit_link');
-  link.href = basePath + 'organization/edit.html?organization_id=' + organization.organization_id.toString();
+  var href = basePath + 'organization/edit.html?organization_id=' + organization.organization_id.toString();
+  renderPublicPrivate(link, href);
+  // Show an active "Add resource" icon for logged-in users only
+  var new_res_link = document.getElementById('org_new_resource');
+  var new_res_href = basePath + '/resource/new.html';
+  renderPublicPrivate(new_res_link, new_res_href);
 
   if (organization.url != null) {
     var url = document.createElement('a');
@@ -80,7 +87,6 @@ function renderOrganizationRecord(organization) {
   document.getElementById('organization_email').innerHTML = organization.email;
   if (organization.notes) { document.getElementById('organization_notes').innerHTML = organization.notes.replace(/ @@ /g,"<br>"); } // new-lines are @@ in db.
 
-
   geolocation = document.getElementById('organization_geolocation');
   if (organization.latitude == null || organization.longitude == null) {
         geolocation.innerHTML = 'Location unknown';
@@ -88,6 +94,7 @@ function renderOrganizationRecord(organization) {
         geolocation.innerHTML = organization.latitude.toString() + ', ' + organization.longitude.toString();
   }
 
+    
 }
 
 // Empty organization_list

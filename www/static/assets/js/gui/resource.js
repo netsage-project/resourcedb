@@ -178,8 +178,13 @@ function renderResourceHeader(resource) {
 
 // Resource details page -
 // Given a resource record, set the innerHTML of the elements
-// identified by resource_cidr, resource_country, etc
 function renderResourceRecord(resource) {
+
+    // Show an active "edit" icon for logged-in users only
+    var link = document.getElementById('resource_edit_link');
+    var href = basePath + 'resource/edit.html?resource_id=' + resource.ip_block_id.toString();
+    renderPublicPrivate(link, href);
+
     var abbr = document.getElementById('resource_abbr');
     var cidr = document.getElementById('resource_cidr');
     var country = document.getElementById('resource_country');
@@ -189,7 +194,6 @@ function renderResourceRecord(resource) {
     var notes = document.getElementById('resource_notes');
     var role = document.getElementById('resource_role');
     var discipline = document.getElementById('resource_discipline');
-    var link = document.getElementById('resource_edit_link');
 
     cidr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
     abbr.innerHTML = resource.abbr;
@@ -211,7 +215,6 @@ function renderResourceRecord(resource) {
         window.location.href = basePath + 'organization/index.html?organization_id=' + resource.org_id;
     });
 
-    link.href = basePath + 'resource/edit.html?resource_id=' + resource.ip_block_id.toString();
 }
 
 var countries = {

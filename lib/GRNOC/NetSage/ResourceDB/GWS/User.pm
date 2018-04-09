@@ -172,7 +172,7 @@ sub _init_get_methods {
 
     # --get_loggedin_user
     $method = GRNOC::WebService::Method->new( name => 'get_loggedin_user',
-                                                   description => "Returns info about the user that is currently logged in and adds them to the database if they are not there.",
+                                                   description => "Tries to get info about the user that is currently logged in.",
                                                    expires => "-1d",
                                                    callback => sub { $self->_get_loggedin_user( @_ ) } );
 
@@ -366,6 +366,23 @@ sub _get_events {
         'offset' => $result->offset(),
         'warning' => $result->warning()
     };
+}
+
+sub _get_loggedin_user {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->user_ds()->get_loggedin_user( $self->process_args( $args ) );
+
+    if ( !$result ) {
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    # if total=0, the logged in user in not in our database; if -1, no user is logged in.
+    return {'results' => $result->results(),
+            'total' => $result->total(),
+            'offset' => $result->offset(),
+            'warning' => $result->warning()};
 }
 
 sub _send_us_email {
