@@ -8,9 +8,9 @@ function renderResourceListElement(resource) {
 
     var id = resource.ip_block_id.toString();
 
-    var name = row.insertCell(0);
-    var addr = row.insertCell(1);
-    var org_abbr = row.insertCell(2);
+    var org_abbr = row.insertCell(0);
+    var name = row.insertCell(1);
+    var addr = row.insertCell(2);
     var org = row.insertCell(3);
     var discipline = row.insertCell(4);
     var role = row.insertCell(5);
@@ -451,6 +451,7 @@ var countries = {
       'GB' : 'United Kingdom',
       'US' : 'United States',
       'UM' : 'United States Outlying Islands',
+      '??' : 'UNKNOWN',
       'UY' : 'Uruguay',
       'UZ' : 'Uzbekistan',
       'VU' : 'Vanuatu',
@@ -484,7 +485,7 @@ function setupCreateResourceForm() {
         var opt = document.createElement('option');
 
         opt.innerHTML = countries[i];
-        opt.setAttribute('value', i);
+        opt.setAttribute('value', i); //country code
         country.appendChild(opt);
     }
     country.selectedIndex = -1;

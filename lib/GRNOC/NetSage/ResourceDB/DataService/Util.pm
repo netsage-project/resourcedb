@@ -220,9 +220,84 @@ sub update_schema {
     if ($version eq '0.0.11') {
         ($version, $err) = $self->upgrade_to_0_0_12($db, $version);
     }
+    if ($version eq '0.0.12') {
+        ($version, $err) = $self->upgrade_to_0_0_13($db, $version);
+    }
 
-    if ($version eq '0.0.12') { warn ("Schema is now up-to-date - version $version"); }
+    if ($version eq '0.0.13') { warn ("Schema is now up-to-date - version $version"); }
 
+    return ($version, $err);
+}
+
+sub upgrade_to_0_0_13 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+
+    # make org abbr not unique
+    my $query = "ALTER TABLE organization DROP INDEX abbr";
+    my $ok = $db->do( $query );
+    if ($ok) {
+        warn "removed abbr index from organization table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't remove abbr index from organization table: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+
+    # make org name unique unique
+    $query = "ALTER TABLE organization ADD UNIQUE INDEX (name)";
+    $ok = $db->do( $query );
+    if ($ok) {
+        warn "added name unique index to organization table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add name unique index to organization table: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+
+    # make org abbr 12 chars
+    $query = "ALTER TABLE organization MODIFY abbr VARCHAR(12)";
+    $ok = $db->do( $query );
+    if ($ok) {
+        warn "set abbr to 12 chars in organization table";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't set abbr to 12 chars in organization table: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+
+    # add country UKNOWN
+    $query = "INSERT INTO country SET name='UNKNOWN', country_code='??'";
+    $ok = $db->do( $query );
+    if ($ok) {
+        warn "Added country UNKNOWN";
+    } else {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't add country UNKNOWN: $err";
+        } else {
+            warn "Database schema version is undefined.";
+        }
+        return ($version, $err);
+    }
+
+    $version = '0.0.13';
+    my $updated_ok = $self->_update_version( $db, $version );
     return ($version, $err);
 }
 

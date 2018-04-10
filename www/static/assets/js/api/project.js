@@ -11,7 +11,11 @@ function getProject(projectId, onSuccess) {
         response.json().then(function(json) {
             console.log("getProject json: ");
             console.log(json);
-            onSuccess(json.results[0]);
+            if (json.error_text) {
+                alert (json.error_text);
+            } else {
+                onSuccess(json.results[0]);
+            }
         });
 
     }).catch(function(err) {
@@ -127,7 +131,7 @@ function setProjectResourceLinks(projectID, resourceIDs) {
         });
     }).catch(function(err) {
         console.log("setProjectResourceLinks Error: " + err);
-        alert("Error or permission problem. Could not save.");
+        alert("Error or permission problem. Could not save.\nBe sure you are (still) logged in.");
     });
 }
 
@@ -164,12 +168,16 @@ function createOrEditProject(id, name, abbr, desc, owner, email, projUrl, notes)
 
         response.json().then(function(json) {
             console.log(json);
-            successCallback(json.results[0]);
+            if (json.error_text) {
+                alert (json.error_text + ".\nOne cause could be a short name which is not unique.");
+            } else {
+                successCallback(json.results[0]);
+            }
         });
 
     }).catch(function(err) {
         console.log("createdOrEdit Project Error: " + err);
-        alert("Error or permission problem. Could not save.");
+        alert("Error or permission problem. Could not save.\nBe sure you are (still) logged in.");
     });
 }
 
@@ -188,11 +196,15 @@ function deleteProject(id) {
 
         response.json().then(function(json) {
             console.log(json);
-            successCallback(json.results[0]);
+            if (json.error_text) {
+                alert (json.error_text);
+            } else {
+                successCallback(json.results[0]);
+            }
         });
 
     }).catch(function(err) {
         console.log("deleteProject Error: " + err);
-        alert("Error or permission problem. Could not delete.");
+        alert("Error or permission problem. Could not delete.\nBe sure you are (still) logged in.");
     });
 }

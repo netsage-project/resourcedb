@@ -78,7 +78,7 @@ sub _init_add_methods {
                                                    expires => "-1d",
                                                    callback => sub { $self->_add_user( @_ ) } );
 
-    # add the required user_id (ie, username from .htaccess file) input param to the  method
+    # add the REQUIRED user_id (ie, username) input param to the  method
     $method->add_input_parameter( name        => 'user_id',
                                   pattern     => $TEXT,
                                   required    => 1,
@@ -100,7 +100,7 @@ sub _init_add_methods {
                                                    expires => "-1d",
                                                    callback => sub { $self->_add_ip_blocks( @_ ) } );
 
-    # add the required 'addr_str' input param to the  method
+    # add the REQUIRED 'addr_str' input param to the  method
     $method->add_input_parameter( name        => 'addr_str',
                                   pattern     => $TEXT,
                                   required    => 1,
@@ -154,7 +154,7 @@ sub _init_add_methods {
                                   description => 'The project name');
     $method->add_input_parameter( name        => 'abbr',
                                   pattern     => $TEXT,
-                                  required    => 0,
+                                  required    => 1,
                                   multiple    => 0,
                                   description => 'A short name for the project');
     $method->add_input_parameter( name        => 'description',
@@ -270,7 +270,7 @@ sub _init_update_methods {
     $method->add_input_parameter(
         name        => 'abbr',
         pattern     => $TEXT,
-        required    => 0,
+        required    => 1,
         multiple    => 0,
         description => 'A short name for the project'
     );
@@ -389,10 +389,10 @@ sub _add_ip_block_params {
                                   multiple    => 0,
                                   description => 'The ASN of the IP block');
 
-    # add the optional 'organization_id' input param to the  method
+    # add the REQUIRED 'organization_id' input param to the  method
     $method->add_input_parameter( name        => 'organization_id',
                                   pattern     => $INTEGER,
-                                  required    => 0,
+                                  required    => 1,
                                   multiple    => 0,
                                   description => 'The organization id');
 
@@ -460,7 +460,7 @@ sub _init_dynamic_add_methods {
             callback => sub { $self->_add_table_dynamically( $name, @_ ) } );
 
 
-        # add the required 'name' input param to all the basic dynamic methods
+        # add the REQUIRED 'name' input param to all the basic dynamic methods
         $method->add_input_parameter( 
             name        => 'name',
             pattern     => $TEXT,
@@ -609,7 +609,7 @@ sub _init_dynamic_update_methods {
             expires => "-1d",
             callback => sub { $self->_update_table_dynamically( $name, @_ ) } );
 
-        # add the required 'id' input param to all the basic dynamic methods
+        # add the REQUIRED 'id' input param to all the basic dynamic methods
         $method->add_input_parameter(
             name        => "${name}_id",
             pattern     => $NUMBER_ID,
@@ -617,11 +617,11 @@ sub _init_dynamic_update_methods {
             multiple    => 0,
             description => "The id of the $name");
 
-        # add the required 'name' input param to all the basic dynamic methods
+        # add the REQUIRED 'name' input param to all the basic dynamic methods
         $method->add_input_parameter(
             name        => 'name',
             pattern     => $TEXT,
-            required    => 0,
+            required    => 1,
             multiple    => 0,
             description => "The name of the $name");
 
@@ -651,7 +651,7 @@ sub _init_dynamic_delete_methods {
             expires => "-1d",
             callback => sub { $self->_delete_table_dynamically( $name, @_ ) } );
 
-        # add the required 'id' input param to all the basic dynamic methods
+        # add the REQUIRED 'id' input param to all the basic dynamic methods
         $method->add_input_parameter(
             name        => "${name}_id",
             pattern     => $NUMBER_ID,

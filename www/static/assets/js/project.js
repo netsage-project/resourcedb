@@ -5,32 +5,45 @@
 document.addEventListener('DOMContentLoaded', function(event) {
     var url = window.location;
 
-    // Try to get info about user from the resource db and savce to localStorage. 
+    // If user is not logged in or the login has expired, try to get info about user. (Logins last 23 hr)
+    // GetUserInfo will return result['total'] = -1 [not logged in], 0 [not in db], or 1 [in db]
     // (The user_id in our db needs to be the username they log in with via shibboleth!)
     // Saved_user (in localStorage) will be null [not logged in], a username [found in our db], or 
     // "not in db" [logged in but not in our db].
-    // GetUserInfo will return result['total'] = -1 [not logged in], 0 [not in db], or 1 [in db]
     var saved_user = localStorage.getItem('saved_user');
+    var expiration = localStorage.getItem('expiration') || 955381260;
+    var now = Date.now();
+    var new_expiration = now + (23*3600*1000);
     console.log("ORIG SAVED USER: " + saved_user);
-    if (saved_user == null) {
+    if (saved_user == null || now > expiration ) {
         getUserInfo( function(result) {
-            console.log("***");
-            console.log(result);
             result_total = result['total'];
             if (result_total == 1) {
                 user_id = result['results'][0]['user_id'];
                 console.log("Found user - username: " + user_id);
                 localStorage.setItem('saved_user', user_id);
+                localStorage.setItem('expiration', new_expiration);
                 saved_user = user_id;
             } else if (result_total == 0) {
                 console.log("Did not find user in db");
                 localStorage.setItem('saved_user', 'not in db');
+                localStorage.setItem('expiration', new_expiration);
                 saved_user = 'not in db';
+            } else {
+                console.log("Not logged in");
+                localStorage.removeItem('saved_user');
+                localStorage.removeItem('expiration', new_expiration);
+                saved_user = null;
             } 
             console.log("NEW SAVED USER: " + saved_user);
+            fixLoginLink(basePath, url);
         });
-    } 
+    }  else {
+        // be sure login link is up-to-date
+        fixLoginLink(basePath, url);
+    }
 
+    // load the variable page contents
     console.log("page url: " + url.href);
     console.log(url.pathname);
 
@@ -263,84 +276,99 @@ function project() {
 }
 
 function projectNew() {
-    console.log('Loading the new project page');
-    setupCreateProjectForm();
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the new project page');
+        setupCreateProjectForm();
 
-    onProjAbbrChange(function(newAbbr) {
-        checkProjAbbr(newAbbr);
-    });
-
-    onSearchSubmit(function(query) {
-        submitSearch(query);
-    });
+        onProjAbbrChange(function(newAbbr) {
+            checkProjAbbr(newAbbr);
+        });
+    
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
 }
 
 function projectEdit() {
-    console.log('Loading the edit project page');
-    var searchParams = new URLSearchParams(window.location.search);
-    var id = searchParams.get('project_id');
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the edit project page');
+        var searchParams = new URLSearchParams(window.location.search);
+        var id = searchParams.get('project_id');
+    
+        getProject(id, function(project) {
+            setupEditProjectForm(project);
+        });
+    
+        getResourcesByProjectId(id, function(resources) {
+            renderMap(resources);
+        });
 
-    getProject(id, function(project) {
-        setupEditProjectForm(project);
-    });
+        onProjAbbrChange(function(newAbbr) {
+            checkProjAbbr(newAbbr);
+        });
 
-    getResourcesByProjectId(id, function(resources) {
-        renderMap(resources);
-    });
-
-    onProjAbbrChange(function(newAbbr) {
-        checkProjAbbr(newAbbr);
-    });
-
-    onSearchSubmit(function(query) {
-        submitSearch(query);
-    });
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
 }
 
 function projectLink() {
-    console.log('Loading the link project page');
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the link project page');
 
-    var searchParams = new URLSearchParams(window.location.search);
-    var id = searchParams.get('project_id');
+        var searchParams = new URLSearchParams(window.location.search);
+        var id = searchParams.get('project_id');
+    
+        getProject(id, function(project) {
+            renderProjectHeader(project);
+            setupProjectLinkResourceForm(project);
+        });
 
-    getProject(id, function(project) {
-        renderProjectHeader(project);
-        setupProjectLinkResourceForm(project);
-    });
+        getResources(function(resources) {
+            for (var i = 0; i < resources.length; i++) {
+                renderResourceListSelectableElement(resources[i]);
+            }
+        });
 
-    getResources(function(resources) {
-        for (var i = 0; i < resources.length; i++) {
-            renderResourceListSelectableElement(resources[i]);
-        }
-    });
-
-    getResourcesByProjectId(id, function(resources) {
-        for (var i = 0; i < resources.length; i++) {
-            addResourceListSelectableElement(resources[i]);
-        }
-    });
-
-    onProjectLinkResourceSearchKeyUp(function(input) {
-        if (input === null || input === '') {
-            getResources(function(resources) {
-                renderEmptyResourceList();
-                for (var i = 0; i < resources.length; i++) {
-                    renderResourceListSelectableElement(resources[i]);
-                }
-            });
-        } else {
-            getResourcesLike(input, function(resources) {
-                renderEmptyResourceList();
-                for (var i = 0; i < resources.length; i++) {
-                    renderResourceListSelectableElement(resources[i]);
-                }
-            });
-        }
-    });
-
-    onSearchSubmit(function(query) {
-        submitSearch(query);
-    });
+        getResourcesByProjectId(id, function(resources) {
+            for (var i = 0; i < resources.length; i++) {
+                addResourceListSelectableElement(resources[i]);
+            }
+        });
+    
+        onProjectLinkResourceSearchKeyUp(function(input) {
+            if (input === null || input === '') {
+                getResources(function(resources) {
+                    renderEmptyResourceList();
+                    for (var i = 0; i < resources.length; i++) {
+                        renderResourceListSelectableElement(resources[i]);
+                    }
+                });
+            } else {
+                getResourcesLike(input, function(resources) {
+                    renderEmptyResourceList();
+                    for (var i = 0; i < resources.length; i++) {
+                        renderResourceListSelectableElement(resources[i]);
+                    }
+                });
+            }
+        });
+    
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
 }
 
 function resource() {
@@ -379,50 +407,60 @@ function resource() {
 }
 
 function resourceNew() {
-    console.log('Loading the new resource page');
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the new resource page');
 
-    setupCreateResourceForm();
+        setupCreateResourceForm();
 
-    onResourceCIDRChange(function(cidr) {
-        checkIP(cidr);
-        getGeoIP(cidr, renderGeoIPTable_autopop);
-        getReverseDNS(cidr, renderReverseDNSTable);
-    });
+        onResourceCIDRChange(function(cidr) {
+            checkIP(cidr);
+            getGeoIP(cidr, renderGeoIPTable_autopop);
+            getReverseDNS(cidr, renderReverseDNSTable);
+        });
+    
+        onResAbbrChange(function(newAbbr) {
+            checkResAbbr(newAbbr);
+        });
 
-    onResAbbrChange(function(newAbbr) {
-        checkResAbbr(newAbbr);
-    });
-
-    onSearchSubmit(function(query) {
-        submitSearch(query);
-    });
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
 }
 
 function resourceEdit() {
-    console.log('Loading the edit resource page');
-    var searchParams = new URLSearchParams(window.location.search);
-    var id = searchParams.get('resource_id');
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the edit resource page');
+        var searchParams = new URLSearchParams(window.location.search);
+        var id = searchParams.get('resource_id');
 
-    getResource(id, function(resource) {
-        setupEditResourceForm(resource);
+        getResource(id, function(resource) {
+            setupEditResourceForm(resource);
 
-        getGeoIP(resource.addr_str, renderGeoIPTable);
-        getReverseDNS(resource.addr_str, renderReverseDNSTable);
-        renderMap([resource]);
-    });
+            getGeoIP(resource.addr_str, renderGeoIPTable);
+            getReverseDNS(resource.addr_str, renderReverseDNSTable);
+            renderMap([resource]);
+        });
+    
+        onResourceCIDRChange(function(cidr) {
+            getGeoIP(cidr, renderGeoIPTable);
+            getReverseDNS(cidr, renderReverseDNSTable);
+        });
 
-    onResourceCIDRChange(function(cidr) {
-        getGeoIP(cidr, renderGeoIPTable);
-        getReverseDNS(cidr, renderReverseDNSTable);
-    });
-
-    onResAbbrChange(function(newAbbr) {
-        checkResAbbr(newAbbr);
-    });
-
-    onSearchSubmit(function(query) {
-        submitSearch(query);
-    });
+        onResAbbrChange(function(newAbbr) {
+            checkResAbbr(newAbbr);
+        });
+    
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
 }
 
 function organization() {
@@ -453,38 +491,54 @@ function organization() {
 }
 
 function organizationNew() {
-    console.log('Loading the new organization page');
-    setupCreateOrganizationForm();
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the new organization page');
+        setupCreateOrganizationForm();
 
-    onOrgAbbrChange(function(newAbbr) {
-        checkOrgAbbr(newAbbr);
-    });
-
-    onSearchSubmit(function(query) {
-        submitSearch(query);
-    });
+        onOrgAbbrChange(function(newAbbr) {
+            checkOrgAbbr(newAbbr);
+        });
+        onOrgNameChange(function(newName) {
+            checkOrgName(newName);
+        });
+    
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
 }
 
 function organizationEdit() {
-    console.log('Loading the edit organization page');
-    var searchParams = new URLSearchParams(window.location.search);
-    var id = searchParams.get('organization_id');
-
-    getOrganization(id, function(org) {
-        setupEditOrganizationForm(org);
-
-        getResourcesByOrganizationId(id, function(resources) {
-            renderMap(resources, [org]);
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the edit organization page');
+        var searchParams = new URLSearchParams(window.location.search);
+        var id = searchParams.get('organization_id');
+    
+        getOrganization(id, function(org) {
+            setupEditOrganizationForm(org);
+    
+            getResourcesByOrganizationId(id, function(resources) {
+                renderMap(resources, [org]);
+            });
         });
-    });
 
-    onOrgAbbrChange(function(newAbbr) {
-        checkOrgAbbr(newAbbr);
-    });
+        onOrgAbbrChange(function(newAbbr) {
+            checkOrgAbbr(newAbbr);
+        });
+        onOrgNameChange(function(newName) {
+            checkOrgName(newName);
+        });
 
-    onSearchSubmit(function(query) {
-        submitSearch(query);
-    });
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
 }
 
 // Hides or shows the passed document element and adds the passed href (if any), depending on the logged-in user.
@@ -499,6 +553,19 @@ function renderPublicPrivate(item, url) {
     } else {
       item.href = "";
       item.style.visibility = "hidden";
+    }
+}
+
+// Fix Login link depending on whether user is logged in. Also makes the url work correctly.
+function fixLoginLink(basePath, url) {
+    var saved_user = localStorage.getItem('saved_user');
+    var login_link = document.getElementById("login_link");
+    if (saved_user) {
+        login_link.innerHTML = "You are logged in";
+        login_link.href = url;
+    } else {
+        login_link.innerHTML = "Login";
+        login_link.href = basePath + "login";
     }
 }
 

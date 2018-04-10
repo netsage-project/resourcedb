@@ -224,20 +224,44 @@ function setupEditOrganizationForm(org) {
     };
 }
 
-// Calls onChange and passes the updated value of abbr as the
-// first argument.
+// Calls onChange and passes the updated value of abbr as the first argument.
 function onOrgAbbrChange(onChange) {
     var abbr = document.getElementById('organization_abbr');
     abbr.addEventListener('change', function(e) {
         onChange(e.target.value);
     });
 }
-
 // Checks to see if an Abbr is already in the db and warns the user
+// ORG ABBR'S CAN BE and are expected to be NON-UNIQUE.
 function checkOrgAbbr(newAbbr) {
-    getOrgWithAbbr(newAbbr, function (organizations) {
+    getOrgsByAbbr(newAbbr, function (organizations) {
         if (organizations.length > 0) {
-            alert("Abbreviations must be unique but " + newAbbr + " is already in the registry! \nSee organization '" + organizations[0].name + "'");
+            var alert_msg = "\nOrg. abbreviations do not need to be unique but must refer to the same actual org.  ";
+            alert_msg = alert_msg + "Organizations already using '" + newAbbr + "': \n" 
+            for (i=0; i<organizations.length; i++) {
+                alert_msg = alert_msg + "    " + organizations[i].name + "\n";
+            }
+            alert(alert_msg);
+       }
+    } );
+}
+
+// Calls onChange and passes the updated value of org name as the first argument.
+function onOrgNameChange(onChange) {
+    var name = document.getElementById('organization_name');
+    name.addEventListener('change', function(e) {
+        onChange(e.target.value);
+    });
+}
+// Checks to see if Similar Org Name is already in the db and warns the user
+function checkOrgName(newName) {
+    getOrganizationsLike(newName, function (organizations) {
+        if (organizations.length > 0) {
+            var alert_msg = "Organization Names must be unique, but variations are allowed. \nHere are names already used in the registry like that entered:\n";  
+            for (i=0; i<organizations.length; i++) {
+                alert_msg = alert_msg + "    " + organizations[i].name + "\n";
+            }
+            alert(alert_msg);
        }
     } );
 }
