@@ -1,5 +1,9 @@
 package GRNOC::NetSage::ResourceDB::DataService::User;
 
+#########################################
+# Functions that DO NOT require a logged-in user
+#########################################
+
 use strict;
 use warnings;
 
@@ -256,6 +260,107 @@ sub get_events {
     );
 
     return $result;
+}
+
+sub get_loggedin_user {
+    my ( $self, %args ) = @_;
+
+    # if they are logged in, get the user's username from $ENV 
+    my $env_user = $ENV{'REMOTE_USER'};
+
+    # if no user is logged in, return total= -1
+    if (!$env_user) {
+        my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
+            results => [{}],
+            total => -1
+        );
+        return $result;
+    }
+
+    # if user is logged in, look for them in our db. If found, total will be 1; if not, total will be 0.
+    my $from_sql = 'user ';
+    my $select_fields = [ 'user_id', 'name' ];
+    my @where = ();
+
+    $args{'user_id'} = $env_user;
+    my $id_param = GRNOC::MetaParameter->new( name => 'user_id',
+                                              field =>  'user.user_id');
+    @where = $id_param->process( args => \%args,
+                                 where => \@where );
+
+    my $results = $self->dbq_ro()->select( table => $from_sql,
+                                           fields => $select_fields,
+                                           where => [-or => \@where],
+                                           );
+    if (!$results) {
+        $self->error( 'An unknown error occurred searching for a user in resourcedb.' );
+        return;
+    }
+
+    my $num_rows = $self->dbq_ro()->num_rows();
+
+    # if user was not found, add them to the db with user_id=name=username, and no other info.
+#    if ($num_rows == 0) {
+#
+#        warn("LOGGED IN USER $ENV{'REMOTE_USER'} NOT FOUND. ADDING TO DB.");
+#        my $add_result = $self->add_user(
+#                           user_id => $ENV{'REMOTE_USER'},
+#                           name => $ENV{'REMOTE_USER'}
+#        );
+#
+#        if (!$add_result) {
+#            $self->error( 'An unknown error occurred adding the user to the db.' );
+#            return;
+#        }
+#        # if ok, set $results to return the same info we put in the db instead of querying.
+#        $results = [ {
+#                    "user_id" => $ENV{'REMOTE_USER'},
+#                    "name" => $ENV{'REMOTE_USER'}
+#                    } ];
+#        $num_rows = 1;
+#    }
+#
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
+        results => $results,
+        total => $num_rows
+    );
+
+    return $result;
+}
+
+sub send_us_email {
+    # from contact form
+    my ( $self, %args ) = @_;
+
+    my $to = $self->{'config'}->get('/config/contacts');
+
+    if (!$args{'phone'}) { $args{'phone'} = " "; }
+    my $body =  "FROM:  ".$args{'name'}."\nORG:    ".$args{'org'}."\nEMAIL:  ".$args{'email'}.
+                    "\nPHONE:  ".$args{'phone'}."\n\n".$args{'msg'};
+
+    my $email = MIME::Lite->new(
+        To => $to,
+        From => 'ScienceRegistry',
+        Subject => 'Message from Science Registry Contact Form',
+        Data => $body
+    );
+
+    # Send email. return 1 for success, 0 for error. $self->error('xx') will be displayed to the user.
+    eval { $email->send; };
+    if($@) {
+        warn( 'An error occurred sending an email: '.$@ );
+        $self->error( 'An error occurred sending the email.' );
+        return 0;
+    }
+
+    # this just checks to see if the email was dispatched ok, not if it arrived ok.
+    if (!$email->last_send_successful) {
+        warn( 'An error occurred sending an email. ' );
+        $self->error( 'An error occurred sending the email.' );
+        return 0;
+    }
+
+    return 1;
 }
 
 sub _add_dynamic_parameters {

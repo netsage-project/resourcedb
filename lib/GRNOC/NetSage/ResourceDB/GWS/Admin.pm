@@ -42,51 +42,6 @@ sub _get_dynamic_where_parameters {
     }
 }
 
-sub _init_email_methods {
-    my $self = shift;
-
-    my $method;
-
-    # --send_us_email
-    $method = GRNOC::WebService::Method->new( name => 'send_us_email',
-                                                   description => "Sends email to us with contact form entries.",
-                                                   expires => "-1d",
-                                                   callback => sub { $self->_send_us_email( @_ ) } );
-
-    # add the required 'name' input param to the send_us_email() method
-    $method->add_input_parameter( name        => 'name',
-                                  pattern     => $TEXT,
-                                  required    => 1,
-                                  multiple    => 0,
-                                  description => 'The name of the user');
-    # add the required 'org' input param to the send_us_email() method
-    $method->add_input_parameter( name        => 'org',
-                                  pattern     => $TEXT,
-                                  required    => 1,
-                                  multiple    => 0,
-                                  description => 'The org/position of the user');
-    # add the required 'email' input param to the send_us_email() method
-    $method->add_input_parameter( name        => 'email',
-                                  pattern     => $TEXT,
-                                  required    => 1,
-                                  multiple    => 0,
-                                  description => 'The email address of the user');
-    # add the optional 'phone' input param to the send_us_email() method
-    $method->add_input_parameter( name        => 'phone',
-                                  pattern     => $TEXT,
-                                  required    => 0,
-                                  multiple    => 0,
-                                  description => 'The phone no. of the user');
-    # add the required 'msg' input param to the send_us_email() method
-    $method->add_input_parameter( name        => 'msg',
-                                  pattern     => $TEXT,
-                                  required    => 1,
-                                  multiple    => 0,
-                                  description => 'The message the user wants to send');
-
-    $self->websvc()->register_method($method);
-}
-
 sub _init_get_methods {
     my $self = shift;
 
@@ -106,14 +61,6 @@ sub _init_get_methods {
                                   description => 'The id (username) of the user');
 
     $self->websvc()->register_method($method);
-
-    # --get_loggedin_user
-    $method = GRNOC::WebService::Method->new( name => 'get_loggedin_user',
-                                                   description => "Returns info about the user that is currently logged in and adds them to the database if they are not there.",
-                                                   expires => "-1d",
-                                                   callback => sub { $self->_get_loggedin_user( @_ ) } );
-
-    $self->websvc()->register_method($method);
 }
 
 sub _init_add_methods {
@@ -131,7 +78,7 @@ sub _init_add_methods {
                                                    expires => "-1d",
                                                    callback => sub { $self->_add_user( @_ ) } );
 
-    # add the required user_id (ie, username from .htaccess file) input param to the  method
+    # add the REQUIRED user_id (ie, username) input param to the  method
     $method->add_input_parameter( name        => 'user_id',
                                   pattern     => $TEXT,
                                   required    => 1,
@@ -153,7 +100,7 @@ sub _init_add_methods {
                                                    expires => "-1d",
                                                    callback => sub { $self->_add_ip_blocks( @_ ) } );
 
-    # add the required 'addr_str' input param to the  method
+    # add the REQUIRED 'addr_str' input param to the  method
     $method->add_input_parameter( name        => 'addr_str',
                                   pattern     => $TEXT,
                                   required    => 1,
@@ -207,7 +154,7 @@ sub _init_add_methods {
                                   description => 'The project name');
     $method->add_input_parameter( name        => 'abbr',
                                   pattern     => $TEXT,
-                                  required    => 0,
+                                  required    => 1,
                                   multiple    => 0,
                                   description => 'A short name for the project');
     $method->add_input_parameter( name        => 'description',
@@ -323,7 +270,7 @@ sub _init_update_methods {
     $method->add_input_parameter(
         name        => 'abbr',
         pattern     => $TEXT,
-        required    => 0,
+        required    => 1,
         multiple    => 0,
         description => 'A short name for the project'
     );
@@ -442,10 +389,10 @@ sub _add_ip_block_params {
                                   multiple    => 0,
                                   description => 'The ASN of the IP block');
 
-    # add the optional 'organization_id' input param to the  method
+    # add the REQUIRED 'organization_id' input param to the  method
     $method->add_input_parameter( name        => 'organization_id',
                                   pattern     => $INTEGER,
-                                  required    => 0,
+                                  required    => 1,
                                   multiple    => 0,
                                   description => 'The organization id');
 
@@ -513,7 +460,7 @@ sub _init_dynamic_add_methods {
             callback => sub { $self->_add_table_dynamically( $name, @_ ) } );
 
 
-        # add the required 'name' input param to all the basic dynamic methods
+        # add the REQUIRED 'name' input param to all the basic dynamic methods
         $method->add_input_parameter( 
             name        => 'name',
             pattern     => $TEXT,
@@ -662,7 +609,7 @@ sub _init_dynamic_update_methods {
             expires => "-1d",
             callback => sub { $self->_update_table_dynamically( $name, @_ ) } );
 
-        # add the required 'id' input param to all the basic dynamic methods
+        # add the REQUIRED 'id' input param to all the basic dynamic methods
         $method->add_input_parameter(
             name        => "${name}_id",
             pattern     => $NUMBER_ID,
@@ -670,11 +617,11 @@ sub _init_dynamic_update_methods {
             multiple    => 0,
             description => "The id of the $name");
 
-        # add the required 'name' input param to all the basic dynamic methods
+        # add the REQUIRED 'name' input param to all the basic dynamic methods
         $method->add_input_parameter(
             name        => 'name',
             pattern     => $TEXT,
-            required    => 0,
+            required    => 1,
             multiple    => 0,
             description => "The name of the $name");
 
@@ -704,7 +651,7 @@ sub _init_dynamic_delete_methods {
             expires => "-1d",
             callback => sub { $self->_delete_table_dynamically( $name, @_ ) } );
 
-        # add the required 'id' input param to all the basic dynamic methods
+        # add the REQUIRED 'id' input param to all the basic dynamic methods
         $method->add_input_parameter(
             name        => "${name}_id",
             pattern     => $NUMBER_ID,
@@ -720,18 +667,6 @@ sub _init_dynamic_delete_methods {
 
 
 ### callbacks ###
-
-sub _send_us_email {
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->admin_ds()->send_us_email( $self->process_args( $args ) );
-    if ( !$result ) {
-        $method->set_error( $self->admin_ds()->error() );
-        return;
-    }
-
-    return { 'results' => $result };
-}
 
 sub _set_project_ip_block_links {
     my ($self, $method, $args) = @_;
@@ -821,22 +756,6 @@ sub _get_users {
     my ( $self, $method, $args ) = @_;
 
     my $result = $self->admin_ds()->get_users( $self->process_args( $args ) );
-    if ( !$result ) {
-        $method->set_error( $self->admin_ds()->error() );
-        return;
-    }
-
-    return {'results' => $result->results(),
-            'total' => $result->total(),
-            'offset' => $result->offset(),
-            'warning' => $result->warning()};
-}
-
-sub _get_loggedin_user {
-    my ( $self, $method, $args ) = @_;
-
-    my $result = $self->admin_ds()->get_loggedin_user( $self->process_args( $args ) );
-
     if ( !$result ) {
         $method->set_error( $self->admin_ds()->error() );
         return;

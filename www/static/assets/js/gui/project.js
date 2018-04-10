@@ -60,11 +60,18 @@ function renderProjectHeader(project) {
     desc.innerHTML = project.description;
 }
 
+// Project Details Page - 
 // Given a project record, set the innerHTML of the elements
-// identified by project_owner, and project_email, etc.
 function renderProjectRecord(project) {
+
+  // Show an active "edit" icon for logged-in users only
   var link = document.getElementById('project_edit_link');
-  link.href = basePath + 'project/edit.html?project_id=' + project.project_id.toString();
+  var href = basePath + 'project/edit.html?project_id=' + project.project_id.toString();
+  renderPublicPrivate(link, href);
+  // Show Edit Resources link for logged-in users only
+  var edit_res_link = document.getElementById('project_edit_resources');
+  var edit_res_href = basePath + 'project/link.html?project_id=' + project.project_id.toString();
+  renderPublicPrivate(edit_res_link, edit_res_href);
 
   if (project.url != null) {
     var url = document.createElement('a');
@@ -79,8 +86,6 @@ function renderProjectRecord(project) {
   document.getElementById('project_email').innerHTML = project.email;
   if (project.notes) { document.getElementById('project_notes').innerHTML = project.notes.replace(/ @@ /g,"<br>"); } // new-lines are @@ in db.
 
-  var edit_link = document.getElementById('project_edit_resources');
-  edit_link.href = basePath + 'project/link.html?project_id=' + project.project_id.toString();
 }
 
 // Empty my_project_list

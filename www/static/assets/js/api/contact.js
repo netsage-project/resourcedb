@@ -1,7 +1,7 @@
 
 function sendContactEmail(name, org, email, phone, msg) {
     var url = baseUrl;
-    url += 'api/admin/index.cgi?method=send_us_email';
+    url += 'api/index.cgi?method=send_us_email';
 
     url += '&name=' + encodeURIComponent(name);
     url += '&org=' + encodeURIComponent(org);
@@ -56,7 +56,7 @@ function sendContactEmail(name, org, email, phone, msg) {
         }
 
     }).catch(function(err) {
-        // don't know when this will be executed
         console.log("sendContactEmail error: " + err);  
+        alert("Error or permission problem. Could not send.");
     });
 }

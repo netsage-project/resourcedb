@@ -11,7 +11,11 @@ function getResource(resourceId, onSuccess) {
         response.json().then(function(json) {
             console.log("getResource json: ");
             console.log(json);
-            onSuccess(json.results[0]);
+            if (json.error_text) {
+                alert (json.error_text);
+            } else {
+                onSuccess(json.results[0]);
+            }
         });
 
     }).catch(function(err) {
@@ -177,11 +181,16 @@ function createOrEditResource(id, name, abbr, desc, cidr, asn, org_id, country_c
         response.json().then(function(json) {
             console.log("createOrEditResource json: ");
             console.log(json);
-            successCallback(json.results[0]);
+            if (json.error_text) {
+                alert (json.error_text + "./nOne cause could be that the CIDR field or short name is not unique.");
+            } else {
+                successCallback(json.results[0]);
+            }
         });
 
     }).catch(function(err) {
         console.log("createOrEditResource error: " + err);
+        alert("Error or permission problem. Could not save.\nBe sure you are (still) logged in.");
     });
 }
 
@@ -201,10 +210,15 @@ function deleteResource(id) {
         response.json().then(function(json) {
             console.log("delete_ip_blocks json: ");
             console.log(json);
-            successCallback(json.results[0]);
+            if (json.error_text) {
+                alert (json.error_text);
+            } else {
+                successCallback(json.results[0]);
+            }
         });
 
     }).catch(function(err) {
         console.log("delete_ip_blocks error: " + err);
+        alert("Error or permission problem. Could not delete.\nBe sure you are (still) logged in.");
     });
 }

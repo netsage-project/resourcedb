@@ -11,7 +11,11 @@ function getOrganization(organizationId, onSuccess) {
         response.json().then(function(json) {
             console.log("getOrganization json:");
             console.log(json);
-            onSuccess(json.results[0]);
+            if (json.error_text) {
+                alert (json.error_text);
+            } else {
+                onSuccess(json.results[0]);
+            }
         });
 
     }).catch(function(err) {
@@ -31,7 +35,7 @@ function getOrganizationEvents(organizationId, onSuccess) {
             onSuccess(json.results);
         });
     }).catch(function(err) {
-        console.log(err);
+        console.log("getOrganizationEvents error: " + err);
     });
 }
 
@@ -49,7 +53,7 @@ function getOrganizations(onSuccess) {
         });
 
     }).catch(function(err) {
-        console.log("getOrganizationS error:" + err);
+        console.log("getOrganizationS error: " + err);
     });
 }
 
@@ -68,12 +72,12 @@ function getOrganizationsLike(text, on_success) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getOrganizationsLike error: " + err);
     });
 }
 
 // Gets a list of organizations from the backend where abbreviation = text.
-function getOrgWithAbbr(text, on_success) {
+function getOrgsByAbbr(text, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_organizations';
     url += '&abbr=' + encodeURIComponent( text );
     fetch(url, {
@@ -87,7 +91,7 @@ function getOrgWithAbbr(text, on_success) {
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("getOrgsByAbbr Error: " + err);
     });
 }
 
@@ -126,13 +130,17 @@ function createOrEditOrganization(id, name, abbr, desc, owner, email, country_co
     }).then(function(response) {
 
         response.json().then(function(json) {
-            console.log("createOrEditOrganization json: ");
-            console.log(json);
-            successCallback(json.results[0]);
+            console.log("createOrEditOrganization json: "); console.log(json);
+            if (json.error_text) {
+                alert (json.error_text + ".\nOne cause could be an org. name which is not unique.");
+            } else {
+                successCallback(json.results[0]);
+            }
         });
 
     }).catch(function(err) {
         console.log("createOrEditOrganization error: " + err);
+        alert("Error or permission problem. Could not save. \n Be sure you are (still) logged in.");
     });
 }
 
@@ -151,10 +159,15 @@ function deleteOrganization(id) {
 
         response.json().then(function(json) {
             console.log(json);
-            successCallback(json.results[0]);
+            if (json.error_text) {
+                alert (json.error_text);
+            } else {
+                successCallback(json.results[0]);
+            }
         });
 
     }).catch(function(err) {
-        console.log(err);
+        console.log("deleteOrganization Error: " + err);
+        alert("Error or permission problem. Could not delete.\nBe sure you are (still) logged in.");
     });
 }
