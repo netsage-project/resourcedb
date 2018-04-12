@@ -1,6 +1,6 @@
 Summary:   NetSage Resource Database
 Name:      resourcedb
-Version:   0.7.0
+Version:   0.8.0
 Release:   %{_buildno}%{?dist}
 License:   Apache
 Group:     GRNOC
@@ -38,6 +38,7 @@ Requires: perl-Net-DNS
 Requires: perl-JSON
 Requires: perl-Email-Send
 Requires: perl-MIME-Lite
+Requires: perl-Text-CSV
 
 %description
 NetSage Resource Database (Science Registry)
@@ -105,6 +106,8 @@ cp -ar www/* %{buildroot}%{_datadir}/resourcedb/www
 %{__install} -m 544 bin/resourcedb-init-db %{buildroot}%{_bindir}
 %{__install} -m 544 bin/resourcedb-update-db %{buildroot}%{_bindir}
 %{__install} -m 544 bin/resourcedb-export.pl %{buildroot}%{_bindir}
+%{__install} -m 544 bin/organization-import.pl %{buildroot}%{_bindir}
+%{__install} -m 544 bin/organization-export.pl %{buildroot}%{_bindir}
 
 %check
 make test_jenkins
@@ -145,3 +148,5 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/resourcedb-update-db
 %{_bindir}/resourcedb-init-db
 %{_bindir}/resourcedb-export.pl
+%{_bindir}/organization-import.pl 
+%{_bindir}/organization-export.pl 
