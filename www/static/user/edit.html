@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>registry</title>
+    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bitter:400,700">
+    <link rel="stylesheet" href="../assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../assets/css/Contact-Form-Clean.css">
+    <link rel="stylesheet" href="../assets/css/custom.css">
+    <link rel="stylesheet" href="../assets/css/Footer-Basic.css">
+    <link rel="stylesheet" href="../assets/css/Footer-Clean.css">
+    <link rel="stylesheet" href="../assets/css/Header-Dark.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css">
+    <link rel="stylesheet" href="../assets/css/Map-Clean.css">
+<link rel="icon" href="../assets/img/logoNoShadow.png" type="image/x-icon" />
+</head>
+
+<body>
+    <div>
+        <div class="header-dark">
+            <nav class="navbar navbar-default navigation-clean-search">
+                <div class="container">
+                    <div class="navbar-header">
+                        <a class="navbar-brand navbar-link" href="../index.html"> <img class="img-rounded" src="../assets/img/logo_text.png"> </a>
+                        <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navcol-1">
+                        <form class="navbar-form navbar-left" target="_self" id="search_form">
+                            <div class="form-group">
+                                <label class="control-label" for="search-field"><i class="glyphicon glyphicon-search"></i></label>
+                                <input class="form-control input-lg search-field" type="search" name="search" autocomplete="on" id="search_field">
+                            </div>
+                        </form>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li role="presentation"><a href="login" id="login_link">Login </a></li>
+                            <li role="presentation"><a href="/rdb/contact.html" id="contact_back">Contact Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-left">Edit Admin User</h3>
+                    <hr>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <form id="create_user_form">
+                        <fieldset name="Awesome">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group hidden-xs hidden-sm hidden-md hidden-lg">
+                                        <label class="control-label">Resource ID</label>
+                                        <input class="form-control" type="number" value="-1" id="project_id">
+                                        <p class="help-block text-left hidden">Help text for a form field.</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Username </label>
+                                        <input class="form-control input-sm" type="text" required="" placeholder="username (must be same as used for shibboleth)" maxlength="32" minlength="4" id="user_id">
+                                        <p class="help-block text-left hidden">Help text for a form field.</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Full Name </label>
+                                        <input class="form-control input-sm" type="text" required="" placeholder="First Last" maxlength="50" minlength="4" id="user_name">
+                                        <p class="help-block text-left hidden">Help text for a form field.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <p class="text-right">
+                                        <button class="btn btn-primary" type="submit" id="edit_user_submit">update </button>
+                                        <button class="btn btn-danger" type="button" id="delete_user_submit">delete </button>
+                                        <button class="btn btn-default" type="button" id="cancel_user_submit">cancel </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-basic">
+        <footer>
+            <ul class="list-inline">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="http://www.netsage.global/home/netsage-privacy-policy">Privacy Policy</a></li>
+            </ul>
+            <p class="copyright">Indiana University © 2017</p>
+        </footer>
+    </div>
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/config.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/polyfill/urlsearchparams.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/polyfill/fetch.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/geoip.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/gui/geoip.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/project.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/organization.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/gui/organization.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/gui/project.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/project.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/role.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/discipline.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/gui/resource.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/resource.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/search.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/gui/search.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/map.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/gui/map.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/contact.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/revdns.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/api/user.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/gui/contact.js"></script>
+    <script src="http://lensman-dev7.grnoc.iu.edu/rdb/assets/js/gui/revdns.js"></script>
+</body>
+
+</html>
