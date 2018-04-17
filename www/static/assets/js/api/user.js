@@ -1,7 +1,6 @@
 // GlobalNOC 2017
 
-// These functions are for users in the resourcedb database 
-// (not the database that allows shibboleth logins)
+// These functions get admin users in the resourcedb database 
 
 // Get info about the logged-in user. 
 function getUserInfo(onSuccess) {
@@ -20,24 +19,6 @@ function getUserInfo(onSuccess) {
     });
 }
 
-/*
-// Gets a user from the backend by user_id.
-function getUser(userId, onSuccess) {
-    var url = baseUrl + 'api/admin/index.cgi?method=get_users' + '&user_id=' + userId.toString();
-    fetch(url, {
-        method: 'get',
-        credentials: 'include'
-    }).then(function(response) {
-
-        response.json().then(function(json) {
-            console.log(json);
-            onSuccess(json.results[0]);
-        });
-
-    }).catch(function(err) {
-        console.log(err);
-    });
-}
 
 // Gets a list of users from the backend.
 function getUsers(OnSuccess) {
@@ -49,6 +30,24 @@ function getUsers(OnSuccess) {
         response.json().then(function(json) {
             console.log(json);
             on_success(json.results);
+        });
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+
+// Gets a user from the backend by user_id.
+function getUser(userId, onSuccess) {
+    var url = baseUrl + 'api/admin/index.cgi?method=get_users' + '&user_id=' + userId.toString();
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+
+        response.json().then(function(json) {
+            console.log(json);
+            onSuccess(json.results[0]);
         });
 
     }).catch(function(err) {
@@ -73,24 +72,7 @@ function add(user_id, name) {
     }).catch(function(err) {
         console.log(err);
     });
-} */
-/*
-// Gets an user's events from the backend by userId.
-function getUserEvents(userId, onSuccess) {
-    var url = baseUrl + 'api/index.cgi?method=get_events' + '&user_id=' + userId.toString();
-    fetch(url, {
-        method: 'get',
-        credentials: 'include'
-    }).then(function(response) {
-        response.json().then(function(json) {
-            console.log(json);
-            onSuccess(json.results);
-        });
-    }).catch(function(err) {
-        console.log(err);
-    });
 }
-
 
 function deleteUser(id) {
     var url = baseUrl + 'api/admin/index.cgi?method=delete_user';
@@ -114,4 +96,19 @@ function deleteUser(id) {
         console.log(err);
     });
 }
-*/
+
+// Gets an user's events from the backend by userId.
+function getUserEvents(userId, onSuccess) {
+    var url = baseUrl + 'api/index.cgi?method=get_events' + '&user_id=' + userId.toString();
+    fetch(url, {
+        method: 'get',
+        credentials: 'include'
+    }).then(function(response) {
+        response.json().then(function(json) {
+            console.log(json);
+            onSuccess(json.results);
+        });
+    }).catch(function(err) {
+        console.log(err);
+    });
+}

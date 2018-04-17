@@ -73,6 +73,18 @@ document.addEventListener('DOMContentLoaded', function(event) {
         organizationNew();
     } else if (url.pathname === basePath + 'organization/edit.html') {
         organizationEdit();
+    } else if (url.pathname === basePath + 'discipline/new.html') {
+        disciplineNew();
+    } else if (url.pathname === basePath + 'discipline/edit.html') {
+        disciplineEdit();
+    } else if (url.pathname === basePath + 'role/new.html') {
+        roleNew();
+    } else if (url.pathname === basePath + 'role/edit.html') {
+        roleEdit();
+    } else if (url.pathname === basePath + 'user/new.html') {
+        userNew();
+    } else if (url.pathname === basePath + 'user/edit.html') {
+        userEdit();
     } else {
         console.log('There is no Javascript available for this page.');
     }
@@ -118,6 +130,15 @@ var index = function() {
 
             var link = document.getElementById('new-project');
             var href = basePath + 'project/new.html';
+            renderPublicPrivate(link,href);
+        });
+        getDisciplines(function(disciplines) {
+            for (var i = 0; i < disciplines.length; i++) {
+                renderDisciplineListElement(disciplines[i]);
+            }
+
+            var link = document.getElementById('new-discipline');
+            var href = basePath + 'discipline/new.html';
             renderPublicPrivate(link,href);
         });
     } 
@@ -541,6 +562,104 @@ function organizationEdit() {
     }
 }
 
+function disciplineNew() {
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the new discipline page');
+        setupCreateDisciplineForm();
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+
+function disciplineEdit() {
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the edit discipline page');
+        var searchParams = new URLSearchParams(window.location.search);
+        var id = searchParams.get('discipline_id');
+
+        getDiscipline(id, function(discipline) {
+            setupEditDiscipline(discipline);
+        });
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+
+function roleNew() {
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the new role page');
+        setupCreateRoleForm();
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+
+function roleEdit() {
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the edit role page');
+        var searchParams = new URLSearchParams(window.location.search);
+        var id = searchParams.get('role_id');
+
+        getRole(id, function(role) {
+            setupEditRole(role);
+        });
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+
+function userNew() {
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the new user page');
+        setupCreateUserForm();
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+
+function userEdit() {
+    var saved_user = localStorage.getItem('saved_user');
+    if( saved_user == null) {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the edit user page');
+        var searchParams = new URLSearchParams(window.location.search);
+        var id = searchParams.get('user_id');
+
+        getUser(id, function(user) {
+            setupEditUser(user);
+        });
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
 // Hides or shows the passed document element and adds the passed href (if any), depending on the logged-in user.
 // 'saved_user' in "localStorage" will be null [not logged in], a username [found in our db],
 // or "not in db" [logged in but not in our db].
