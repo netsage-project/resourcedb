@@ -10,7 +10,11 @@ function getDisciplines(onSuccess) {
         response.json().then(function(json) {
             console.log("getDisciplineS json:");
             console.log(json);
-            onSuccess(json.results);
+            if (json.error_text) {
+                alert ("ERROR: " + json.error_text);
+            } else {
+                onSuccess(json.results);
+            }
         });
 
     }).catch(function(err) {
@@ -30,7 +34,7 @@ function getDiscipline(disciplineId, onSuccess) {
             console.log("getDiscipline json:");
             console.log(json);
             if (json.error_text) {
-                alert (json.error_text);
+                alert ("ERROR: " + json.error_text);
             } else {
                 onSuccess(json.results[0]);
             }
@@ -82,9 +86,9 @@ function getDisciplinesLike(text, on_success) {
 function createOrEditDiscipline(id, name, desc) {
     var url = baseUrl;
     if (id === null) {
-        url += 'api/admin/index.cgi?method=add_disciplines';
+        url += 'api/admin/index.cgi?method=add_discipline';
     } else {
-        url += 'api/admin/index.cgi?method=update_disciplines';
+        url += 'api/admin/index.cgi?method=update_discipline';
         url += '&discipline_id=' + id.toString();
     }
 
@@ -94,6 +98,7 @@ function createOrEditDiscipline(id, name, desc) {
     function successCallback(discipline) {
         var id = discipline.discipline_id;
         console.log("Added Discipline " + id);
+        // return to main list
         window.location.href = basePath + 'index.html';
     };
 
@@ -107,7 +112,7 @@ function createOrEditDiscipline(id, name, desc) {
         response.json().then(function(json) {
             console.log("createOrEditDiscipline json: "); console.log(json);
             if (json.error_text) {
-                alert (json.error_text);
+                alert ("ERROR: " + json.error_text);
             } else {
                 successCallback(json.results[0]);
             }
@@ -120,10 +125,12 @@ function createOrEditDiscipline(id, name, desc) {
 }
 
 function deleteDiscipline(id) {
-    var url = baseUrl + 'api/admin/index.cgi?method=delete_disciplines';
+    var url = baseUrl + 'api/admin/index.cgi?method=delete_discipline';
     url += '&discipline_id=' + id.toString();
 
     function successCallback(discipline) {
+        console.log("Deleted Discipline");
+        // return to main list
         window.location.href = basePath + 'index.html';
     };
 
@@ -135,7 +142,7 @@ function deleteDiscipline(id) {
         response.json().then(function(json) {
             console.log(json);
             if (json.error_text) {
-                alert (json.error_text);
+                alert ("ERROR: " + json.error_text);
             } else {
                 successCallback(json.results[0]);
             }

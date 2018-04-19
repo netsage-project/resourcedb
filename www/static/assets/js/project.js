@@ -141,6 +141,24 @@ var index = function() {
             var href = basePath + 'discipline/new.html';
             renderPublicPrivate(link,href);
         });
+        getRoles(function(roles) {
+            for (var i = 0; i < roles.length; i++) {
+                renderRoleListElement(roles[i]);
+            }
+
+            var link = document.getElementById('new-role');
+            var href = basePath + 'role/new.html';
+            renderPublicPrivate(link,href);
+        });
+        getUsers(function(users) {
+            for (var i = 0; i < users.length; i++) {
+                renderUserListElement(users[i]);
+            }
+
+            var link = document.getElementById('new-user');
+            var href = basePath + 'user/new.html';
+            renderPublicPrivate(link,href);
+        });
     } 
     else {
         // If a search query is in the url (search was entered when on another page):
@@ -586,7 +604,7 @@ function disciplineEdit() {
         var id = searchParams.get('discipline_id');
 
         getDiscipline(id, function(discipline) {
-            setupEditDiscipline(discipline);
+            setupEditDisciplineForm(discipline);
         });
 
         onSearchSubmit(function(query) {
@@ -619,7 +637,7 @@ function roleEdit() {
         var id = searchParams.get('role_id');
 
         getRole(id, function(role) {
-            setupEditRole(role);
+            setupEditRoleForm(role);
         });
 
         onSearchSubmit(function(query) {
@@ -652,7 +670,7 @@ function userEdit() {
         var id = searchParams.get('user_id');
 
         getUser(id, function(user) {
-            setupEditUser(user);
+            setupEditUserForm(user);
         });
 
         onSearchSubmit(function(query) {

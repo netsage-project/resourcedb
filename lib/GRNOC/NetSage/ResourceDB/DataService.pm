@@ -262,12 +262,12 @@ sub get_table_dynamically {
 }
 
 
-=head2 add_events
+=head2 add_event
 
 Records an event with the current timestamp.
 
 =cut
-sub add_events {
+sub add_event {
     my ( $self, %args ) = @_;
 
     my $from_sql = 'event ';
@@ -283,7 +283,7 @@ sub add_events {
 
     if ( !$results ) {
 
-        $self->error( 'An unknown error occurred adding the events.' );
+        $self->error( 'An unknown error occurred adding the event.' );
         return;
     }
 

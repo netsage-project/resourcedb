@@ -95,8 +95,5 @@ function submitCreateOrUpdateDiscipline(e) {
         console.log('Editing discipline ' + id.toString());
         createOrEditDiscipline(id, name, desc);
     }
-
-    // return to homepage
-    window.location.href = basePath + 'index.html';
 }
 
