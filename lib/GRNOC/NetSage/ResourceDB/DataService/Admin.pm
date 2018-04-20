@@ -1,7 +1,7 @@
 package GRNOC::NetSage::ResourceDB::DataService::Admin;
 
 #########################################
-# Functions that require a logged-in user
+# Methods that require a logged-in user according to the apache config
 #########################################
 
 use strict;
@@ -47,12 +47,16 @@ sub get_users {
     my ( $self, %args ) = @_;
 
     my $from_sql = 'user';
-    my $select_fields = [ 'username', 'name' ];
+    my $select_fields = [ 'user_id', 'username', 'name' ];
     my @where = ();
 
-    # handle optional user_id param
+    # handle optional userid param
     my $user_id_param = GRNOC::MetaParameter->new(name => 'user_id', field => 'user.user_id');
     @where = $user_id_param->process(args => \%args, where => \@where);
+
+    # handle optional username param (add_events() uses this)
+    my $username_param = GRNOC::MetaParameter->new(name => 'username', field => 'user.username');
+    @where = $username_param->process(args => \%args, where => \@where);
 
     my $results = $self->dbq_ro()->select( table => $from_sql,
                                            fields => $select_fields,
@@ -62,6 +66,7 @@ sub get_users {
         $self->error( 'An unknown error occurred getting users.' );
         return;
     }
+
 
     my $num_rows = $self->dbq_ro()->num_rows();
     my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
@@ -196,6 +201,33 @@ sub add_table_dynamically {
     );
 
     return [{ "${name}_id" => $results }];
+}
+
+sub add_event {
+    my ( $self, %args ) = @_;
+
+    # To add an event, we need to set 'user' in the args (the user_id of the person making the change)
+    # To get the id, call get_users with the viewer's username.
+    my %userargs = ( 'username' => $ENV{'REMOTE_USER'} );
+    my $viewer_result = $self->get_users( %userargs );
+    my $viewer_info = $viewer_result->{'results'}->[0];
+    my $viewer_id = $viewer_info->{'user_id'}; 
+    $args{'user'} = $viewer_id;
+
+    my $from_sql = 'event ';
+    my $fields = $self->_get_event_args( %args );
+
+    my $results = $self->dbq_rw()->insert( table => $from_sql,
+                                           fields => $fields
+                                         );
+    if ( !$results ) {
+        $self->error( 'An unknown error occurred adding the event.' );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    return [{'event_id' => $results}];
 }
 
 
@@ -637,4 +669,30 @@ sub _get_ip_block_args {
     return \%args_out;
 }
 
+sub _get_event_args {
+    my ( $self, %args_in ) = @_;
+
+    my %args = ();
+
+    my @all_args = (
+        'user',
+        'message',
+        'organization_id',
+        'project_id',
+        'ip_block_id',
+        'discipline_id',
+        'role_id',
+        'user_id'
+    );
+
+    foreach my $arg( @all_args ) {
+        if ( not defined $args_in{ $arg } ) {
+            next;
+        }
+        $args{ $arg } = $args_in{ $arg };
+
+    }
+
+    return \%args;
+}
 1;

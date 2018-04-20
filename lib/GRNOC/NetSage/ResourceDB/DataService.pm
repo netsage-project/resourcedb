@@ -29,9 +29,11 @@ use Time::HiRes;
 use constant SERVICE_CACHE_FILE => '/etc/grnoc/name-service-cacher/name-service.xml';
 use constant COOKIE_FILE => '/tmp/netsage_resourcedb_cookies';
 
+# Use get_table_dynamically(), etc for these quantities.
+# See below for where fields in these tables are listed.
 use constant VALID_DYNAMIC_DB_NAMES => {
-    'role' => 1,
     'organization' => 1,
+    'role' => 1,
     'discipline' => 1,
     'country' => 1,
     'continent' => 1
@@ -174,153 +176,6 @@ sub format_find {
     return $find;
 }
 
-### public methods ###
-
-sub get_table_dynamically {
-
-    my ( $self, $name, %args ) = @_;
-
-    if ( !$self->_is_dbname_valid( $name ) ) {
-        $self->error( "Invalid db name specified: $name" );
-        return;
-    }
-
-    my $remote_user = $args{'remote_user'};
-
-    my @select_fields = ( "${name}_id");
-
-    my $field_obj = $self->dynamic_fields();
-    my @field_list = keys %{ $field_obj->{ $name } };
-    foreach my $field ( @field_list ) {
-        # add to @select_fields list
-        push @select_fields, $field;
-    }
-
-    my @where = ();
-
-    # handle optional $name_id param
-    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
-                                              field => "${name}.${name}_id" );
-    @where = $id_param->process( args => \%args,
-                                 where => \@where );
-
-    # handle optional 'name' param
-    my $name_param = GRNOC::MetaParameter->new( name => "name",
-                                              field => "name" );
-
-    @where = $name_param->process( args => \%args,
-                                 where => \@where );
-
-    # handle optional 'abbr' param
-    my $abbr_param = GRNOC::MetaParameter->new( name => "abbr",
-                                              field => "abbr" );
-
-    @where = $abbr_param->process( args => \%args,
-                                 where => \@where );
-
-    # get the order_by value
-    my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
-    my $order_by = $order_by_param->parse( %args );
-    if (! $order_by) { $order_by = "name"; }
-
-    my $limit = $args{'limit'};
-    my $offset = $args{'offset'};
-
-    my $from_sql = "$name ";
-
-    my $results = $self->dbq_rw()->select( table => $from_sql,
-                                           fields => \@select_fields,
-                                           where => [-and => \@where],
-                                           order_by => $order_by,
-                                           limit => $limit,
-                                           offset => $offset );
-
-    if ( !$results ) {
-
-        $self->error( "An unknown error occurred getting the ${name}s" );
-        return;
-    }
-
-    my $num_rows = $self->dbq_rw()->num_rows();
-
-    # add country_names for organizations
-    if ($name eq "organization") {
-        my $data = GRNOC::NetSage::ResourceDB::DataService::Data->new;
-        my $countries = $data->get_countries();
-        foreach my $res (@$results) {
-            my $code = $res->{'country_code'}; 
-            $res->{'country_name'} = $countries->{$code};
-        }
-    }
-
-    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
-                                                                 total => $num_rows,
-                                                                 offset => $offset );
-
-    return $result;
-
-}
-
-
-=head2 add_event
-
-Records an event with the current timestamp.
-
-=cut
-sub add_event {
-    my ( $self, %args ) = @_;
-
-    my $from_sql = 'event ';
-
-    if (!defined $args{'user_id'}) {
-        $args{'user_id'} = $ENV{'REMOTE_USER'};
-    }
-    my $fields = $self->_get_event_args( %args );
-
-    my $results = $self->dbq_rw()->insert( table => $from_sql,
-                                           fields => $fields
-                                       );
-
-    if ( !$results ) {
-
-        $self->error( 'An unknown error occurred adding the event.' );
-        return;
-    }
-
-    my $num_rows = $self->dbq_rw()->num_rows();
-
-    return [{'event_id' => $results}];
-}
-
-sub _get_event_args {
-    my ( $self, %args_in ) = @_;
-
-    my %args = ();
-
-    my @all_args = (
-        'message',
-        'organization_id',
-        'project_id',
-        'ip_block_id',
-        'user_id'
-    );
-
-    foreach my $arg( @all_args ) {
-        if ( not defined $args_in{ $arg } ) {
-            next;
-        }
-        $args{ $arg } = $args_in{ $arg };
-
-    }
-
-    return \%args;
-}
-
-sub get_continent_from_country_code {
-    my ( $self, $country_code ) = @_;
-
-};
-
 ### private methods ###
 
 sub _is_dbname_valid {
@@ -406,16 +261,6 @@ sub _init_dynamic_fields {
         'continent_name' => 1,
         'notes' => 1
     };
-
-# this is apparently not a dynamic table, but leaving here till I'm sure
-    #$fields->{'project'} = {
-    #    'name' => 1,
-    #    'abbr' => 1,
-    #    'description' => 1,
-    #    'url' => 1,
-    #    'owner' => 1,
-    #    'email' => 1
-    #};
 
     $fields->{'discipline'} = {
         'name' => 1,

@@ -2,8 +2,8 @@
 
 // These functions get admin users from the resourcedb database 
 
-// Get info about the LOGGED-IN user. 
-function getUserInfo(on_success) {
+// Get info about the person viewing the user interface
+function getViewerInfo(on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_loggedin_user'; 
     fetch(url, {
         method: 'get',
@@ -16,7 +16,7 @@ function getUserInfo(on_success) {
         });
 
     }).catch(function(err) {
-        console.log("getUserInfo Error: " + err);
+        console.log("getViewerInfo Error: " + err);
     });
 }
 
@@ -40,8 +40,8 @@ function getUsers(on_success) {
 }
 
 // Gets a user from the backend by user_id.
-function getUser(userId, on_success) {
-    var url = baseUrl + 'api/admin/index.cgi?method=get_users' + '&user_id=' + userId.toString();
+function getUser(user_id, on_success) {
+    var url = baseUrl + 'api/admin/index.cgi?method=get_users' + '&user_id=' + user_id.toString();
     fetch(url, {
         method: 'get',
         credentials: 'include'
@@ -72,7 +72,7 @@ function createOrEditUser(user_id, username, name) {
     console.log("createOrEditUser url: " + url);
 
     function successCallback(user) {
-        ////window.location.href = basePath + 'index.html';
+        window.location.href = basePath + 'index.html';
     };
 
     fetch(url, {
@@ -96,7 +96,7 @@ function createOrEditUser(user_id, username, name) {
 
 // Delete a user
 function deleteUser(user_id) {
-    var url = baseUrl + 'api/admin/admin.cgi?method=delete_user';
+    var url = baseUrl + 'api/admin/index.cgi?method=delete_user';
     url += '&user_id=' + user_id.toString();
 
     function successCallback(user) {

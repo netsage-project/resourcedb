@@ -78,9 +78,8 @@ function submitCreateOrUpdateUser(e) {
     console.log('submitCreateUser');
 
     var name = form.elements['user_name'].value;
-
-    // Hidden field user_id 
-    var user_id = form.elements['user_id'].value;
+    var username = form.elements['user_username'].value;
+    var user_id = parseInt(form.elements['user_id'].value);
 
     if (user_id === -1) {
         console.log('Creating a new user');

@@ -60,6 +60,13 @@ sub _init_get_methods {
                                   multiple    => 1,
                                   description => 'The id of the user');
 
+    # add the optional 'username' input param to the get_users() method
+    $method->add_input_parameter( name        => 'username',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The username of the user');
+
     $self->websvc()->register_method($method);
 }
 
