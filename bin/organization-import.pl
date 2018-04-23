@@ -125,13 +125,26 @@ while (my $line = <$fh>) {
         table => 'organization',
         fields => { 'name' => $input_name,
                     'abbr' => $input_abbr,
-                    'country_code' => $input_country }
+                    'country_code' => $input_country,
+                    'notes' => "Added by organization import script" }
     );
         
     if (!$org_id) {
-        print "Insert query Error: ".Dumper $dbq->get_error();
+        print "Insert org query Error: ".Dumper $dbq->get_error();
         die;
     }
+
+   # insert event
+    my $event_id = $dbq->insert(
+        table => 'event',
+        fields => { 'message' => 'An org import script added this organization.',
+                    'organization_id' => $org_id }
+    );
+    if (!$event_id) {
+        print "Insert event query Error: ".Dumper $dbq->get_error();
+        die;
+    }
+
 }
 
 close($fh);

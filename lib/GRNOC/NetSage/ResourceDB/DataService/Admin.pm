@@ -214,6 +214,7 @@ sub add_event {
     my $viewer_id = $viewer_info->{'user_id'}; 
     $args{'user'} = $viewer_id;
 
+    # add the event
     my $from_sql = 'event ';
     my $fields = $self->_get_event_args( %args );
 

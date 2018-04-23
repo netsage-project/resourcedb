@@ -1,7 +1,7 @@
 package GRNOC::NetSage::ResourceDB::DataService::User;
 
 #########################################
-# Functions that DO NOT require a logged-in user
+# Public Functions - DO NOT require a logged-in user
 #########################################
 
 use strict;
