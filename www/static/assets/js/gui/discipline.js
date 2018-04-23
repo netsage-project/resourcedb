@@ -14,9 +14,11 @@ function renderDisciplineListElement(discipline) {
     name.innerHTML = discipline.name;
     description.innerHTML = discipline.description;
 
-    row.addEventListener('click', function(e) {
-        window.location.href = basePath + 'discipline/edit.html?discipline_id=' + id;
-    });
+    if (viewer.adminuser == "true") {
+        row.addEventListener('click', function(e) {
+         window.location.href = basePath + 'discipline/edit.html?discipline_id=' + id;
+        });
+    }
 }
 
 // Renders events as list items under discipline_event_list on

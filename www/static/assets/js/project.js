@@ -152,48 +152,39 @@ var index = function() {
         });
     }
 
+    getDisciplines(function(disciplines) {
+        for (var i = 0; i < disciplines.length; i++) {
+            renderDisciplineListElement(disciplines[i]);
+        }
+        var link = document.getElementById('new-discipline');
+        var href = basePath + 'discipline/new.html';
+        renderPublicPrivate(link,href);
+    });
+    getRoles(function(roles) {
+        for (var i = 0; i < roles.length; i++) {
+            renderRoleListElement(roles[i]);
+        }
+        var link = document.getElementById('new-role');
+        var href = basePath + 'role/new.html';
+        renderPublicPrivate(link,href);
+    });
+
     if (viewer.adminuser == "true") {
-        // if viewer is an adminuser, add tabs/lists for disciplines,etc
-        getDisciplines(function(disciplines) {
-            for (var i = 0; i < disciplines.length; i++) {
-                renderDisciplineListElement(disciplines[i]);
-            }
-        });
-        getRoles(function(roles) {
-            for (var i = 0; i < roles.length; i++) {
-                renderRoleListElement(roles[i]);
-            }
-        });
+        // if viewer is an adminuser, add tab/list for users table
         getUsers(function(users) {
             for (var i = 0; i < users.length; i++) {
                 renderUserListElement(users[i]);
             }
         });
-        var tabs = document.querySelectorAll("a[href='#tab-4']");
-        tabs[0].style.visibility = "visible";
-        var tabs = document.querySelectorAll("a[href='#tab-5']");
-        tabs[0].style.visibility = "visible";
         var tabs = document.querySelectorAll("a[href='#tab-6']");
         tabs[0].style.visibility = "visible";
-        var tabpane = document.getElementById('tab-4');
-        tabpane.style.visibility = "visible";
-        var tabpane = document.getElementById('tab-5');
-        tabpane.style.visibility = "visible";
         var tabpane = document.getElementById('tab-6');
         tabpane.style.visibility = "visible";
     } 
     else {
-        // not an adminuser
-        var tabs = document.querySelectorAll("a[href='#tab-4']");
-        tabs[0].style.visibility = "hidden";
-        var tabs = document.querySelectorAll("a[href='#tab-5']");
-        tabs[0].style.visibility = "hidden";
+        // if not an adminuser, make sure it's hidden/doesn't exist
         var tabs = document.querySelectorAll("a[href='#tab-6']");
         tabs[0].style.visibility = "hidden";
-        var tabpane = document.getElementById('tab-4');
-        tabpane.style.visibility = "hidden";
-        var tabpane = document.getElementById('tab-5');
-        tabpane.style.visibility = "hidden";
         var tabpane = document.getElementById('tab-6');
         tabpane.style.visibility = "hidden";
     }
@@ -589,7 +580,7 @@ function disciplineNew() {
 
 function disciplineEdit() {
     if (viewer.adminuser != "true") {
-        window.location.replace(basePath + "login");
+        window.location.replace(basePath + "index.html");
     } else {
         console.log('Loading the edit discipline page');
         var searchParams = new URLSearchParams(window.location.search);
@@ -624,7 +615,7 @@ function roleNew() {
 
 function roleEdit() {
     if (viewer.adminuser != "true") {
-        window.location.replace(basePath + "login");
+        window.location.replace(basePath + "index.html");
     } else {
         console.log('Loading the edit role page');
         var searchParams = new URLSearchParams(window.location.search);
@@ -693,7 +684,7 @@ function renderPublicPrivate(item, url) {
 // Fix Login link depending on whether the viewer is logged in. Also makes the url work correctly.
 function fixLoginLink(basePath, url) {
     var login_link = document.getElementById("login_link");
-    if (viewer.loggedin) {
+    if (viewer.loggedin == "true") {
         login_link.innerHTML = "You are logged in";
         login_link.href = url;
     } else {

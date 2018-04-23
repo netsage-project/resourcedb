@@ -14,9 +14,11 @@ function renderRoleListElement(role) {
     name.innerHTML = role.name;
     description.innerHTML = role.description;
 
+    if (viewer.adminuser == "true") {
     row.addEventListener('click', function(e) {
         window.location.href = basePath + 'role/edit.html?role_id=' + id;
-    });
+        });
+    }
 }
 
 // Renders events as list items under role_event_list on
