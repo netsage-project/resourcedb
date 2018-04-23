@@ -170,22 +170,22 @@ var index = function() {
     });
 
     if (viewer.adminuser == "true") {
-        // if viewer is an adminuser, add tab/list for users table
+        // if viewer is an adminuser, add tab/list of users 
         getUsers(function(users) {
             for (var i = 0; i < users.length; i++) {
                 renderUserListElement(users[i]);
             }
         });
-        var tabs = document.querySelectorAll("a[href='#tab-6']");
-        tabs[0].style.visibility = "visible";
-        var tabpane = document.getElementById('tab-6');
+        var tab = document.getElementById('users-tab"); 
+        tab.style.visibility = "visible";
+        var tabpane = document.getElementById('users-pane');
         tabpane.style.visibility = "visible";
     } 
     else {
-        // if not an adminuser, make sure it's hidden/doesn't exist
-        var tabs = document.querySelectorAll("a[href='#tab-6']");
-        tabs[0].style.visibility = "hidden";
-        var tabpane = document.getElementById('tab-6');
+        // if not an adminuser, don't get users and make sure users tab is hidden
+        var tab = document.getElementById('users-tab"); 
+        tab.style.visibility = "hidden";
+        var tabpane = document.getElementById('users-pane');
         tabpane.style.visibility = "hidden";
     }
 
