@@ -176,14 +176,14 @@ var index = function() {
                 renderUserListElement(users[i]);
             }
         });
-        var tab = document.getElementById('users-tab"); 
+        var tab = document.getElementById('users-tab'); 
         tab.style.visibility = "visible";
         var tabpane = document.getElementById('users-pane');
         tabpane.style.visibility = "visible";
     } 
     else {
         // if not an adminuser, don't get users and make sure users tab is hidden
-        var tab = document.getElementById('users-tab"); 
+        var tab = document.getElementById('users-tab'); 
         tab.style.visibility = "hidden";
         var tabpane = document.getElementById('users-pane');
         tabpane.style.visibility = "hidden";
