@@ -1,7 +1,7 @@
 package GRNOC::NetSage::ResourceDB::DataService::User;
 
 #########################################
-# Functions that DO NOT require a logged-in user
+# Public Functions - DO NOT require a logged-in user
 #########################################
 
 use strict;
@@ -216,6 +216,91 @@ sub get_projects {
     return $result;
 }
 
+sub get_table_dynamically {
+
+    my ( $self, $name, %args ) = @_;
+
+    if ( !$self->_is_dbname_valid( $name ) ) {
+        $self->error( "Invalid db name specified: $name" );
+        return;
+    }
+
+    my $remote_user = $args{'remote_user'};
+
+    my @select_fields = ( "${name}_id");
+
+    my $field_obj = $self->dynamic_fields();
+    my @field_list = keys %{ $field_obj->{ $name } };
+    foreach my $field ( @field_list ) {
+        # add to @select_fields list
+        push @select_fields, $field;
+    }
+
+    my @where = ();
+
+    # handle optional $name_id param
+    my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
+                                              field => "${name}.${name}_id" );
+    @where = $id_param->process( args => \%args,
+                                 where => \@where );
+
+    # handle optional 'name' param
+    my $name_param = GRNOC::MetaParameter->new( name => "name",
+                                              field => "name" );
+
+    @where = $name_param->process( args => \%args,
+                                 where => \@where );
+
+    # handle optional 'abbr' param
+    my $abbr_param = GRNOC::MetaParameter->new( name => "abbr",
+                                              field => "abbr" );
+
+    @where = $abbr_param->process( args => \%args,
+                                 where => \@where );
+
+    # get the order_by value
+    my $order_by_param = GRNOC::MetaParameter::OrderBy->new();
+    my $order_by = $order_by_param->parse( %args );
+    if (! $order_by) { $order_by = "name"; }
+
+    my $limit = $args{'limit'};
+    my $offset = $args{'offset'};
+
+    my $from_sql = "$name ";
+
+    my $results = $self->dbq_rw()->select( table => $from_sql,
+                                           fields => \@select_fields,
+                                           where => [-and => \@where],
+                                           order_by => $order_by,
+                                           limit => $limit,
+                                           offset => $offset );
+
+    if ( !$results ) {
+
+        $self->error( "An unknown error occurred getting the ${name}s" );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    # add country_names for organizations
+    if ($name eq "organization") {
+        my $data = GRNOC::NetSage::ResourceDB::DataService::Data->new;
+        my $countries = $data->get_countries();
+        foreach my $res (@$results) {
+            my $code = $res->{'country_code'};
+            $res->{'country_name'} = $countries->{$code};
+        }
+    }
+
+    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new( results => $results,
+                                                                 total => $num_rows,
+                                                                 offset => $offset );
+
+    return $result;
+
+}
+
 sub get_events {
     my ($self, %args) = @_;
 
@@ -223,11 +308,14 @@ sub get_events {
 
     my $fields = [
         'event.event_id as event_id',
-        'event.message as message',
         'event.date as date',
-        'event.project_id as project_id',
+        'event.message as message',
+        'event.user as user',
         'event.ip_block_id as ip_block_id',
+        'event.project_id as project_id',
         'event.organization_id as organization_id',
+        'event.discipline_id as discipline_id',
+        'event.role_id as role_id',
         'event.user_id as user_id'
     ];
 
@@ -264,66 +352,66 @@ sub get_events {
 
 sub get_loggedin_user {
     my ( $self, %args ) = @_;
+    my $result;
 
     # if they are logged in, get the user's username from $ENV 
     my $env_user = $ENV{'REMOTE_USER'};
 
     # if no user is logged in, return total= -1
     if (!$env_user) {
-        my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
-            results => [{}],
+        $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
+            results => [{ loggedin => "false",
+                          adminuser => "false",
+                          username => "",
+                          userid => undef }],
             total => -1
         );
         return $result;
     }
 
-    # if user is logged in, look for them in our db. If found, total will be 1; if not, total will be 0.
+    # if user is logged in, look for them in our db. 
     my $from_sql = 'user ';
-    my $select_fields = [ 'user_id', 'name' ];
+    my $select_fields = [ 'user_id', 'username', 'name' ];
     my @where = ();
 
-    $args{'user_id'} = $env_user;
-    my $id_param = GRNOC::MetaParameter->new( name => 'user_id',
-                                              field =>  'user.user_id');
-    @where = $id_param->process( args => \%args,
+    $args{'username'} = $env_user;
+    my $where_param = GRNOC::MetaParameter->new( name => 'username',
+                                                 field =>  'user.username');
+    @where = $where_param->process( args => \%args,
                                  where => \@where );
 
-    my $results = $self->dbq_ro()->select( table => $from_sql,
+    my $dbresults = $self->dbq_ro()->select( table => $from_sql,
                                            fields => $select_fields,
                                            where => [-or => \@where],
                                            );
-    if (!$results) {
+    if (!$dbresults) {
         $self->error( 'An unknown error occurred searching for a user in resourcedb.' );
-        return;
+        warn( 'An unknown error occurred searching for a user in resourcedb.' );
+        return undef;
     }
 
     my $num_rows = $self->dbq_ro()->num_rows();
 
-    # if user was not found, add them to the db with user_id=name=username, and no other info.
-#    if ($num_rows == 0) {
-#
-#        warn("LOGGED IN USER $ENV{'REMOTE_USER'} NOT FOUND. ADDING TO DB.");
-#        my $add_result = $self->add_user(
-#                           user_id => $ENV{'REMOTE_USER'},
-#                           name => $ENV{'REMOTE_USER'}
-#        );
-#
-#        if (!$add_result) {
-#            $self->error( 'An unknown error occurred adding the user to the db.' );
-#            return;
-#        }
-#        # if ok, set $results to return the same info we put in the db instead of querying.
-#        $results = [ {
-#                    "user_id" => $ENV{'REMOTE_USER'},
-#                    "name" => $ENV{'REMOTE_USER'}
-#                    } ];
-#        $num_rows = 1;
-#    }
-#
-    my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
-        results => $results,
-        total => $num_rows
-    );
+    if ($num_rows == 0) {
+        # viewer is logged in (via shibboleth) but is not in our db
+        $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
+            results => [{ loggedin => "true",
+                          adminuser => "false",
+                          username => $env_user,
+                          userid => undef }],
+            total => 0
+        );
+    } 
+    else {
+        # viewer is logged in (via shibboleth) and is in our db
+        $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
+            results => [{ loggedin => "true",
+                          adminuser => "true",
+                          username => $env_user,
+                          userid => $dbresults->[0]->{'user_id'} }],
+            total => 1
+        );
+    };
 
     return $result;
 }

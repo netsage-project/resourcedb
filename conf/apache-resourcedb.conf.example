@@ -1,0 +1,33 @@
+# Put this file in in /etc/httpd/conf.d/
+Alias /rdb/api /usr/share/resourcedb/www/api
+Alias /rdb     /usr/share/resourcedb/www/static
+Alias /exported  /usr/share/resourcedb/www/exported
+
+# The Shibboleth Puppet module applies shibboleth everywhere (to /)
+# Turn shibboleth off for /rdb
+<Location /rdb>
+  DirectoryIndex index.html
+  AddHandler cgi-script .cgi
+  Options +ExecCGI
+  ShibRequestSetting requireSession false
+</Location>
+
+# Turn shibboleth on for all admin api functions
+<Location /rdb/api/admin>
+  ShibRequestSetting requireSession true
+</Location>
+
+# To get a login request when going to the homepage with http://.../rdb/login
+<Location /rdb/login>
+  ShibRequestSetting requireSession true
+  Redirect /rdb/login /rdb
+</Location>
+
+# Use Basic Auth for location of database export files:
+<Location /rdb/exported>
+  ShibRequestSetting requireSession false
+  AuthType Basic
+  AuthName "Basic Auth Password Required"
+  AuthUserFile "/etc/grnoc/netsage/resourcedb/htpasswd"
+  Require valid-user
+</Location>

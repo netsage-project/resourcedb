@@ -1,52 +1,31 @@
+// Global info about the person viewing the user interface
+// Will be updated on each page load
+  var viewer = { loggedin:  "false",
+                 adminuser: "false",
+                 username:  null,
+                 userid:    null 
+               };
+
 // Called when page is ready for work. Because i'm unable to set an
 // onload attribute to the body tag in our UI editor, this function
 // checks what the URL's pathname is and executes Javascript based on
 // that.
 document.addEventListener('DOMContentLoaded', function(event) {
-    var url = window.location;
 
-    // If user is not logged in or the login has expired, try to get info about user. (Logins last 23 hr)
-    // GetUserInfo will return result['total'] = -1 [not logged in], 0 [not in db], or 1 [in db]
-    // (The user_id in our db needs to be the username they log in with via shibboleth!)
-    // Saved_user (in localStorage) will be null [not logged in], a username [found in our db], or 
-    // "not in db" [logged in but not in our db].
-    var saved_user = localStorage.getItem('saved_user');
-    var expiration = localStorage.getItem('expiration') || 955381260;
-    var now = Date.now();
-    var new_expiration = now + (23*3600*1000);
-    console.log("ORIG SAVED USER: " + saved_user);
-    if (saved_user == null || now > expiration ) {
-        getUserInfo( function(result) {
-            result_total = result['total'];
-            if (result_total == 1) {
-                user_id = result['results'][0]['user_id'];
-                console.log("Found user - username: " + user_id);
-                localStorage.setItem('saved_user', user_id);
-                localStorage.setItem('expiration', new_expiration);
-                saved_user = user_id;
-            } else if (result_total == 0) {
-                console.log("Did not find user in db");
-                localStorage.setItem('saved_user', 'not in db');
-                localStorage.setItem('expiration', new_expiration);
-                saved_user = 'not in db';
-            } else {
-                console.log("Not logged in");
-                localStorage.removeItem('saved_user');
-                localStorage.removeItem('expiration', new_expiration);
-                saved_user = null;
-            } 
-            console.log("NEW SAVED USER: " + saved_user);
-            fixLoginLink(basePath, url);
-        });
-    }  else {
-        // be sure login link is up-to-date
-        fixLoginLink(basePath, url);
-    }
+  var url = window.location;
 
-    // load the variable page contents
-    console.log("page url: " + url.href);
-    console.log(url.pathname);
+  // Do a webservice call to get info about the viewer - most importantly,
+  // whether they are logged in via shibboleth and whether they are also in our database (admin user);
+  // Then load the page.
+  getViewerInfo( function(result) {
 
+    viewer = result['results'][0];
+    console.log("viewer:"); console.log(viewer);
+        
+    // fix Login link in the header
+    fixLoginLink(basePath, url);
+ 
+    // load the page content depending on the url
     if (url.pathname === basePath || url.pathname === basePath + 'index.html') {
         index();
     } else if (url.pathname === basePath + 'about.html') {
@@ -73,21 +52,36 @@ document.addEventListener('DOMContentLoaded', function(event) {
         organizationNew();
     } else if (url.pathname === basePath + 'organization/edit.html') {
         organizationEdit();
+    } else if (url.pathname === basePath + 'discipline/new.html') {
+        disciplineNew();
+    } else if (url.pathname === basePath + 'discipline/edit.html') {
+        disciplineEdit();
+    } else if (url.pathname === basePath + 'role/new.html') {
+        roleNew();
+    } else if (url.pathname === basePath + 'role/edit.html') {
+        roleEdit();
+    } else if (url.pathname === basePath + 'user/new.html') {
+        userNew();
+    } else if (url.pathname === basePath + 'user/edit.html') {
+        userEdit();
     } else {
         console.log('There is no Javascript available for this page.');
     }
 
-});
+  }); // end function to execute after getViewerInfo returns
 
-// Depending on the page, call functions in js/api/* that use api/webservices to get things like organizations, 
+}); // end EventListener function
+
+// ----------------------
+// Depending on the page, call functions in js/api/* that use webservices to get things like organizations, 
 // then on success, run the anonymous function() on the results,
 // eg, getOrganizations(function to run on success) uses api/index.cgi?method=get_organizations.
 
 var index = function() {
     console.log('Loading the index page.');
+
     var searchParams = new URLSearchParams(window.location.search);
     var query = searchParams.get('search');
-
     if (query === null || query === '') {
         // Normal full lists:
         getResources(function(resources) {
@@ -158,14 +152,51 @@ var index = function() {
         });
     }
 
-    // When a search string is entered/removed on the index page:
-    var delayTimer;
+    getDisciplines(function(disciplines) {
+        for (var i = 0; i < disciplines.length; i++) {
+            renderDisciplineListElement(disciplines[i]);
+        }
+        var link = document.getElementById('new-discipline');
+        var href = basePath + 'discipline/new.html';
+        renderPublicPrivate(link,href);
+    });
+    getRoles(function(roles) {
+        for (var i = 0; i < roles.length; i++) {
+            renderRoleListElement(roles[i]);
+        }
+        var link = document.getElementById('new-role');
+        var href = basePath + 'role/new.html';
+        renderPublicPrivate(link,href);
+    });
 
+    if (viewer.adminuser == "true") {
+        // if viewer is an adminuser, add tab/list of users 
+        getUsers(function(users) {
+            for (var i = 0; i < users.length; i++) {
+                renderUserListElement(users[i]);
+            }
+        });
+        var tab = document.getElementById('users-tab'); 
+        tab.style.visibility = "visible";
+        var tabpane = document.getElementById('users-pane');
+        tabpane.style.visibility = "visible";
+    } 
+    else {
+        // if not an adminuser, don't get users and make sure users tab is hidden
+        var tab = document.getElementById('users-tab'); 
+        tab.style.visibility = "hidden";
+        var tabpane = document.getElementById('users-pane');
+        tabpane.style.visibility = "hidden";
+    }
+
+    // When a search string is entered/removed on the index page...
+    // Doing all 3 getXXs after each letter is too slow. 
+    // Add a delay so gets don't start until there is a pause in typing.
+    var delayTimer;
     onSearchKeyUp(function(input) {
-      // Doing all 3 gets after each letter is too slow. 
-      // Add a delay so gets don't start until there is a pause in typing.
-      clearTimeout(delayTimer);
-      delayTimer = setTimeout(function() {
+
+        clearTimeout(delayTimer);
+        delayTimer = setTimeout(function() {
 
         if (input === null || input === '') {
             getResources(function(resources) {
@@ -233,7 +264,8 @@ var index = function() {
     if (selectedTab != null) {
         $('a[data-toggle="tab"][href="' + selectedTab + '"]').tab('show');
     }
-}
+
+} // end index
 
 function about() {
     console.log('Loading the about page.');
@@ -252,7 +284,7 @@ function project() {
     var searchParams = new URLSearchParams(window.location.search);
     var id = searchParams.get('project_id')
 
-    console.log('Loading the project page for project ' + id.toString());
+    console.log('Loading the details page for project ' + id.toString());
     getProject(id, function(project) {
         renderProjectHeader(project);
         renderProjectRecord(project);
@@ -266,7 +298,6 @@ function project() {
         for (var i = 0; i < resources.length; i++) {
             renderProjResourceListElement(resources[i]);
         }
-
         renderMap(resources);
     });
 
@@ -276,8 +307,7 @@ function project() {
 }
 
 function projectNew() {
-    var saved_user = localStorage.getItem('saved_user');
-    if( saved_user == null) {
+    if(viewer.loggedin != "true") {
         window.location.replace(basePath + "login");
     } else {
         console.log('Loading the new project page');
@@ -294,8 +324,7 @@ function projectNew() {
 }
 
 function projectEdit() {
-    var saved_user = localStorage.getItem('saved_user');
-    if( saved_user == null) {
+    if(viewer.loggedin != "true") {
         window.location.replace(basePath + "login");
     } else {
         console.log('Loading the edit project page');
@@ -321,8 +350,7 @@ function projectEdit() {
 }
 
 function projectLink() {
-    var saved_user = localStorage.getItem('saved_user');
-    if( saved_user == null) {
+    if(viewer.loggedin != "true") {
         window.location.replace(basePath + "login");
     } else {
         console.log('Loading the link project page');
@@ -375,7 +403,7 @@ function resource() {
     var searchParams = new URLSearchParams(window.location.search);
     var id = searchParams.get('resource_id')
 
-    console.log('Loading the resource page for resource ' + id.toString());
+    console.log('Loading the details page for resource ' + id.toString());
     getResource(id, function(resource) {
         renderResourceHeader(resource);
         renderResourceRecord(resource);
@@ -407,8 +435,7 @@ function resource() {
 }
 
 function resourceNew() {
-    var saved_user = localStorage.getItem('saved_user');
-    if( saved_user == null) {
+    if (viewer.loggedin != "true") {
         window.location.replace(basePath + "login");
     } else {
         console.log('Loading the new resource page');
@@ -432,8 +459,7 @@ function resourceNew() {
 }
 
 function resourceEdit() {
-    var saved_user = localStorage.getItem('saved_user');
-    if( saved_user == null) {
+    if (viewer.loggedin != "true") {
         window.location.replace(basePath + "login");
     } else {
         console.log('Loading the edit resource page');
@@ -467,7 +493,7 @@ function organization() {
     var searchParams = new URLSearchParams(window.location.search);
     var id = searchParams.get('organization_id')
 
-    console.log('Loading the resource page for organization ' + id.toString());
+    console.log('Loading the details page for organization ' + id.toString());
     getOrganization(id, function(org) {
         renderOrganizationHeader(org);
         renderOrganizationRecord(org);
@@ -491,8 +517,7 @@ function organization() {
 }
 
 function organizationNew() {
-    var saved_user = localStorage.getItem('saved_user');
-    if( saved_user == null) {
+    if (viewer.loggedin != "true") {
         window.location.replace(basePath + "login");
     } else {
         console.log('Loading the new organization page');
@@ -512,8 +537,7 @@ function organizationNew() {
 }
 
 function organizationEdit() {
-    var saved_user = localStorage.getItem('saved_user');
-    if( saved_user == null) {
+    if (viewer.loggedin != "true") {
         window.location.replace(basePath + "login");
     } else {
         console.log('Loading the edit organization page');
@@ -541,13 +565,114 @@ function organizationEdit() {
     }
 }
 
-// Hides or shows the passed document element and adds the passed href (if any), depending on the logged-in user.
-// 'saved_user' in "localStorage" will be null [not logged in], a username [found in our db],
-// or "not in db" [logged in but not in our db].
-// FOR NOW, ANY LOGGED IN USER CAN ADD AND EDIT
+function disciplineNew() {
+    if (viewer.adminuser != "true") {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the new discipline page');
+        setupCreateDisciplineForm();
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+
+function disciplineEdit() {
+    if (viewer.adminuser != "true") {
+        window.location.replace(basePath + "index.html");
+    } else {
+        console.log('Loading the edit discipline page');
+        var searchParams = new URLSearchParams(window.location.search);
+        var id = searchParams.get('discipline_id');
+
+        getDiscipline(id, function(discipline) {
+            setupEditDisciplineForm(discipline);
+        });
+
+        getDisciplineEvents(id, function(events) {
+            events.map(renderDisciplineEventListElement);
+        });
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+
+function roleNew() {
+    if (viewer.adminuser != "true") {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the new role page');
+        setupCreateRoleForm();
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+
+function roleEdit() {
+    if (viewer.adminuser != "true") {
+        window.location.replace(basePath + "index.html");
+    } else {
+        console.log('Loading the edit role page');
+        var searchParams = new URLSearchParams(window.location.search);
+        var id = searchParams.get('role_id');
+
+        getRole(id, function(role) {
+            setupEditRoleForm(role);
+        });
+
+        getRoleEvents(id, function(events) {
+            events.map(renderRoleEventListElement);
+        });
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+
+function userNew() {
+    if (viewer.adminuser != "true") {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the new user page');
+        setupCreateUserForm();
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+
+function userEdit() {
+    if (viewer.adminuser != "true") {
+        window.location.replace(basePath + "login");
+    } else {
+        console.log('Loading the edit user page');
+        var searchParams = new URLSearchParams(window.location.search);
+        var id = searchParams.get('user_id');
+
+        getUser(id, function(user) {
+            setupEditUserForm(user);
+        });
+
+        getUserEvents(id, function(events) {
+            events.map(renderUserEventListElement);
+        });
+
+        onSearchSubmit(function(query) {
+            submitSearch(query);
+        });
+    }
+}
+// Hides or shows the passed document element (eg, New and Edit links) and adds the passed href (if any, relevant to <a>'s), 
+// depending on whether or not the viewer is logged in
 function renderPublicPrivate(item, url) {
-    var saved_user = localStorage.getItem('saved_user');
-    if (saved_user != null) {
+    if (viewer.loggedin == "true") {
       if (url) item.href = url; 
       item.style.visibility = "visible";
     } else {
@@ -556,11 +681,10 @@ function renderPublicPrivate(item, url) {
     }
 }
 
-// Fix Login link depending on whether user is logged in. Also makes the url work correctly.
+// Fix Login link depending on whether the viewer is logged in. Also makes the url work correctly.
 function fixLoginLink(basePath, url) {
-    var saved_user = localStorage.getItem('saved_user');
     var login_link = document.getElementById("login_link");
-    if (saved_user) {
+    if (viewer.loggedin == "true") {
         login_link.innerHTML = "You are logged in";
         login_link.href = url;
     } else {

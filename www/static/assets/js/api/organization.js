@@ -100,9 +100,9 @@ function getOrgsByAbbr(text, on_success) {
 function createOrEditOrganization(id, name, abbr, desc, owner, email, country_code, lat, lon, orgUrl, notes) {
     var url = baseUrl;
     if (id === null) {
-        url += 'api/admin/index.cgi?method=add_organizations';
+        url += 'api/admin/index.cgi?method=add_organization';
     } else {
-        url += 'api/admin/index.cgi?method=update_organizations';
+        url += 'api/admin/index.cgi?method=update_organization';
         url += '&organization_id=' + id.toString();
     }
 
@@ -145,7 +145,7 @@ function createOrEditOrganization(id, name, abbr, desc, owner, email, country_co
 }
 
 function deleteOrganization(id) {
-    var url = baseUrl + 'api/admin/index.cgi?method=delete_organizations';
+    var url = baseUrl + 'api/admin/index.cgi?method=delete_organization';
     url += '&organization_id=' + id.toString();
 
     function successCallback(organization) {

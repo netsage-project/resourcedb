@@ -1,7 +1,7 @@
 // GlobalNOC 2017
 
 // Gets a project from the backend by projectId.
-function getProject(projectId, onSuccess) {
+function getProject(projectId, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_projects' + '&project_id=' + projectId.toString();
     fetch(url, {
         method: 'get',
@@ -14,7 +14,7 @@ function getProject(projectId, onSuccess) {
             if (json.error_text) {
                 alert (json.error_text);
             } else {
-                onSuccess(json.results[0]);
+                on_success(json.results[0]);
             }
         });
 
@@ -99,7 +99,7 @@ function getProjectsByResourceID(resourceID, on_success) {
 
 
 // Gets an project's events from the backend by projectId.
-function getProjectEvents(projectId, onSuccess) {
+function getProjectEvents(projectId, on_success) {
     var url = baseUrl + 'api/index.cgi?method=get_events' + '&project_id=' + projectId.toString();
     fetch(url, {
         method: 'get',
@@ -107,7 +107,7 @@ function getProjectEvents(projectId, onSuccess) {
     }).then(function(response) {
         response.json().then(function(json) {
             console.log(json);
-            onSuccess(json.results);
+            on_success(json.results);
         });
     }).catch(function(err) {
         console.log("getProjectEvents Error: " + err);
@@ -140,7 +140,7 @@ function setProjectResourceLinks(projectID, resourceIDs) {
 function createOrEditProject(id, name, abbr, desc, owner, email, projUrl, notes) {
     var url = baseUrl;
     if (id === null) {
-        url += 'api/admin/index.cgi?method=add_projects';
+        url += 'api/admin/index.cgi?method=add_project';
     } else {
         url += 'api/admin/index.cgi?method=update_project';
         url += '&project_id=' + id.toString();
@@ -182,7 +182,7 @@ function createOrEditProject(id, name, abbr, desc, owner, email, projUrl, notes)
 }
 
 function deleteProject(id) {
-    var url = baseUrl + 'api/admin/index.cgi?method=delete_projects';
+    var url = baseUrl + 'api/admin/index.cgi?method=delete_project';
     url += '&project_id=' + id.toString();
 
     function successCallback(resource) {

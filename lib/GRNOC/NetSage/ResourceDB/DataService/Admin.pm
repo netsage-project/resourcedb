@@ -1,7 +1,7 @@
 package GRNOC::NetSage::ResourceDB::DataService::Admin;
 
 #########################################
-# Functions that require a logged-in user
+# Methods that require a logged-in user according to the apache config
 #########################################
 
 use strict;
@@ -42,22 +42,21 @@ sub new {
     return $self;
 }
 
-# USER FUNCTIONS
-# These functions are for users in the resourcedb database 
-# (not the database used for shibboleth logins)
+# non-public GET FUNCTIONS 
 sub get_users {
-
     my ( $self, %args ) = @_;
 
     my $from_sql = 'user';
-
-    my $select_fields = [ 'user_id', 'name' ];
-
+    my $select_fields = [ 'user_id', 'username', 'name' ];
     my @where = ();
 
-    # handle optional user_id param
+    # handle optional userid param
     my $user_id_param = GRNOC::MetaParameter->new(name => 'user_id', field => 'user.user_id');
     @where = $user_id_param->process(args => \%args, where => \@where);
+
+    # handle optional username param (add_events() uses this)
+    my $username_param = GRNOC::MetaParameter->new(name => 'username', field => 'user.username');
+    @where = $username_param->process(args => \%args, where => \@where);
 
     my $results = $self->dbq_ro()->select( table => $from_sql,
                                            fields => $select_fields,
@@ -68,6 +67,7 @@ sub get_users {
         return;
     }
 
+
     my $num_rows = $self->dbq_ro()->num_rows();
     my $result = GRNOC::NetSage::ResourceDB::DataService::Result->new(
         results => $results,
@@ -77,6 +77,7 @@ sub get_users {
     return $result;
 }
 
+# ADD FUNCTIONS
 sub add_user {
 
     my ( $self, %args ) = @_;
@@ -96,8 +97,9 @@ sub add_user {
         $self->error( 'An unknown error occurred adding the user.' );
         return;
     }
-    $self->add_events(
-        message => "User $ENV{'REMOTE_USER'} was added to the database on login."
+    $self->add_event(
+        user_id => $results,
+        message => "$ENV{'REMOTE_USER'} added this user."
     );
 
     my $num_rows = $self->dbq_rw()->num_rows();
@@ -105,7 +107,6 @@ sub add_user {
     return [{'rows_added' => $results}];
 }
 
-# ADD FUNCTIONS
 sub add_ip_blocks {
 
     my ( $self, %args ) = @_;
@@ -124,7 +125,7 @@ sub add_ip_blocks {
         $self->error( 'An unknown error occurred adding the ip blocks.' );
         return;
     }
-    $self->add_events(
+    $self->add_event(
         ip_block_id => $results,
         message => "$ENV{'REMOTE_USER'} created this resource."
     );
@@ -134,7 +135,7 @@ sub add_ip_blocks {
     return [{'ip_block_id' => $results}];
 }
 
-sub add_projects {
+sub add_project {
 
     my ( $self, %args ) = @_;
 
@@ -149,10 +150,10 @@ sub add_projects {
                                        );
 
     if ( !$results ) {
-        $self->error( 'An unknown error occurred adding the projects.' );
+        $self->error( 'An unknown error occurred adding the project.' );
         return;
     }
-    $self->add_events(
+    $self->add_event(
         project_id => $results,
         message => "$ENV{'REMOTE_USER'} created this project."
     );
@@ -194,7 +195,7 @@ sub add_table_dynamically {
         return;
     }
 
-    $self->add_events(
+    $self->add_event(
         "${name}_id" => $results,
         message => "$ENV{'REMOTE_USER'} created this $name."
     );
@@ -202,15 +203,77 @@ sub add_table_dynamically {
     return [{ "${name}_id" => $results }];
 }
 
+sub add_event {
+    my ( $self, %args ) = @_;
+
+    # To add an event, we need to set 'user' in the args (the user_id of the person making the change)
+    # To get the id, call get_users with the viewer's username.
+    my %userargs = ( 'username' => $ENV{'REMOTE_USER'} );
+    my $viewer_result = $self->get_users( %userargs );
+    my $viewer_info = $viewer_result->{'results'}->[0];
+    my $viewer_id = $viewer_info->{'user_id'}; 
+    $args{'user'} = $viewer_id;
+
+    # add the event
+    my $from_sql = 'event ';
+    my $fields = $self->_get_event_args( %args );
+
+    my $results = $self->dbq_rw()->insert( table => $from_sql,
+                                           fields => $fields
+                                         );
+    if ( !$results ) {
+        $self->error( 'An unknown error occurred adding the event.' );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    return [{'event_id' => $results}];
+}
+
 
 # UPDATE FUNCTIONS
+sub update_user {
+    my ($self, %args) = @_;
+
+    my @where = ();
+
+    my $param = GRNOC::MetaParameter->new(
+        name  => 'user_id',
+        field => 'user.user_id'
+    );
+
+    @where = $param->process(args => \%args, where => \@where);
+
+    my $user_id = $args{'user_id'};
+    delete $args{'user_id'};
+
+    my $result = $self->dbq_rw()->update(
+                                table => 'user',
+                                fields => \%args,
+                                where => [-and => \@where]
+                            );
+
+    if (!defined $result || $result != 1) {
+        $self->error( 'An unknown error occurred updating the user.' );
+        return { error => $self->dbq_rw()->get_error() };
+    }
+
+    $self->add_event(
+        user_id => $user_id,
+        message => "$ENV{'REMOTE_USER'} updated this user."
+    );
+
+    return { results => [{ user_id => $user_id }] };
+}
+
 sub update_ip_blocks {
     my ( $self, %args ) = @_;
 
     my $remote_user = $args{'remote_user'};
     # TODO: check remote_user, what should this be?
 
-    ### just pass everything, in case some field needs to change from something to nothing
+    ### commented this out to just pass everything, in case some field needs to change from something to nothing
     ### my $fields = $self->_get_ip_block_args( %args );
     my $fields = \%args;   
 
@@ -232,7 +295,7 @@ sub update_ip_blocks {
         return { error => $self->dbq_rw()->get_error() };
     }
 
-    $self->add_events(
+    $self->add_event(
         ip_block_id => $args{'ip_block_id'},
         message => "$ENV{'REMOTE_USER'} updated this resource."
     );
@@ -270,7 +333,7 @@ sub update_project {
         return { error => $self->dbq_rw()->get_error() };
     }
 
-    $self->add_events(
+    $self->add_event(
         project_id => $project_id,
         message => "$ENV{'REMOTE_USER'} updated this project."
     );
@@ -326,7 +389,7 @@ sub update_table_dynamically {
         return;
     }
 
-    $self->add_events(
+    $self->add_event(
         "${name}_id" => $args{"${name}_id"},
         message => "$ENV{'REMOTE_USER'} updated this $name."
     );
@@ -336,6 +399,42 @@ sub update_table_dynamically {
 }
 
 # DELETE FUNCTIONS
+sub delete_user {
+
+    my ( $self, %args ) = @_;
+
+    my $remote_user = $args{'remote_user'};
+    # TODO: check remote_user, what should this be?
+
+    my $from_sql = 'user ';
+
+    # handle required user_id param
+    my $id_param = GRNOC::MetaParameter->new( name => 'user_id',
+                                              field => 'user.user_id' );
+    my @where = ();
+    @where = $id_param->process( args => \%args,
+                                 where => \@where );
+
+    my $results = $self->dbq_rw()->delete( table => $from_sql,
+                                           where => [-and => \@where],
+                                       );
+    if ( !$results ) {
+        $self->error( 'An unknown error occurred deleting the user.' );
+        return;
+    }
+
+    if ( $results == 0 ) {
+        $self->error( "No rows affected" );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    $results = [ {'user_id' => $args{'user_id'} }];
+    return $results;
+
+}
+
 sub delete_ip_blocks {
 
     my ( $self, %args ) = @_;
@@ -345,21 +444,17 @@ sub delete_ip_blocks {
 
     my $from_sql = 'ip_block ';
 
-    my @where = ();
-
     # handle required ip_block_id param
     my $id_param = GRNOC::MetaParameter->new( name => 'ip_block_id',
                                                    field => 'ip_block.ip_block_id' );
-
+    my @where = ();
     @where = $id_param->process( args => \%args,
                                       where => \@where );
 
     my $results = $self->dbq_rw()->delete( table => $from_sql,
                                            where => [-and => \@where],
                                        );
-
     if ( !$results ) {
-
         $self->error( 'An unknown error occurred deleting the ip blocks.' );
         return;
     }
@@ -372,6 +467,42 @@ sub delete_ip_blocks {
     my $num_rows = $self->dbq_rw()->num_rows();
 
     $results = [ {'ip_block_id' => $args{'ip_block_id'} }];
+    return $results;
+
+}
+
+sub delete_project {
+
+    my ( $self, %args ) = @_;
+
+    my $remote_user = $args{'remote_user'};
+    # TODO: check remote_user, what should this be?
+
+    my $from_sql = 'project ';
+
+    # handle required project_id param
+    my $id_param = GRNOC::MetaParameter->new( name => 'project_id',
+                                               field => 'project.project_id' );
+    my @where = ();
+    @where = $id_param->process( args => \%args,
+                                 where => \@where );
+
+    my $results = $self->dbq_rw()->delete( table => $from_sql,
+                                           where => [-and => \@where],
+                                       );
+    if ( !$results ) {
+        $self->error( 'An unknown error occurred deleting the project.' );
+        return;
+    }
+
+    if ( $results == 0 ) {
+        $self->error( "No rows affected" );
+        return;
+    }
+
+    my $num_rows = $self->dbq_rw()->num_rows();
+
+    $results = [ {'project_id' => $args{'project_id'} }];
     return $results;
 
 }
@@ -391,19 +522,15 @@ sub delete_table_dynamically {
     my $id_param = GRNOC::MetaParameter->new( name => "${name}_id",
                                               field => "${name}_id" );
 
+    my $from_sql = "$name ";
     my @where = ();
-
     @where = $id_param->process( args => \%args,
                                       where => \@where );
-
-    my $from_sql = "$name ";
 
     my $results = $self->dbq_rw()->delete( table => $from_sql,
                                            where => [-and => \@where],
                                          );
-
     if ( !$results ) {
-
         $self->error( "An unknown error occurred deleting the ${name}" );
         return;
     }
@@ -463,6 +590,7 @@ sub _get_user_args {
 
     my @all_args = (
         'user_id',
+        'username',
         'name',
     );
 
@@ -542,4 +670,30 @@ sub _get_ip_block_args {
     return \%args_out;
 }
 
+sub _get_event_args {
+    my ( $self, %args_in ) = @_;
+
+    my %args = ();
+
+    my @all_args = (
+        'user',
+        'message',
+        'organization_id',
+        'project_id',
+        'ip_block_id',
+        'discipline_id',
+        'role_id',
+        'user_id'
+    );
+
+    foreach my $arg( @all_args ) {
+        if ( not defined $args_in{ $arg } ) {
+            next;
+        }
+        $args{ $arg } = $args_in{ $arg };
+
+    }
+
+    return \%args;
+}
 1;

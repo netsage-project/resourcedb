@@ -163,8 +163,18 @@ sub _init_get_methods {
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The event organization_id');
+    $method->add_input_parameter( name        => 'discipline_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event discipline_id');
+    $method->add_input_parameter( name        => 'role_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event role_id');
     $method->add_input_parameter( name        => 'user_id',
-                                  pattern     => $TEXT,
+                                  pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 0,
                                   description => 'The event user_id');
@@ -172,7 +182,7 @@ sub _init_get_methods {
 
     # --get_loggedin_user
     $method = GRNOC::WebService::Method->new( name => 'get_loggedin_user',
-                                                   description => "Tries to get info about the user that is currently logged in.",
+                                                   description => "Tries to get info about the person viewing the UI.",
                                                    expires => "-1d",
                                                    callback => sub { $self->_get_loggedin_user( @_ ) } );
 

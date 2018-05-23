@@ -55,10 +55,17 @@ sub _init_get_methods {
 
     # add the optional 'user_id' input param to the get_users() method
     $method->add_input_parameter( name        => 'user_id',
-                                  pattern     => $TEXT,
+                                  pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 1,
-                                  description => 'The id (username) of the user');
+                                  description => 'The id of the user');
+
+    # add the optional 'username' input param to the get_users() method
+    $method->add_input_parameter( name        => 'username',
+                                  pattern     => $TEXT,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The username of the user');
 
     $self->websvc()->register_method($method);
 }
@@ -78,17 +85,17 @@ sub _init_add_methods {
                                                    expires => "-1d",
                                                    callback => sub { $self->_add_user( @_ ) } );
 
-    # add the REQUIRED user_id (ie, username) input param to the  method
-    $method->add_input_parameter( name        => 'user_id',
+    # add the REQUIRED username input param to the  method
+    $method->add_input_parameter( name        => 'username',
                                   pattern     => $TEXT,
                                   required    => 1,
                                   multiple    => 0,
-                                  description => 'The user_id (ie, username)');
+                                  description => 'The username');
 
-    # add the optional name input param to the  method
+    # add the REQUIRED name input param to the  method
     $method->add_input_parameter( name        => 'name',
                                   pattern     => $TEXT,
-                                  required    => 0,
+                                  required    => 1,
                                   multiple    => 0,
                                   description => 'The name of the user (first and last)');
 
@@ -110,43 +117,58 @@ sub _init_add_methods {
     $self->_add_ip_block_params( $method );
     $self->websvc()->register_method( $method );
 
-    # --add_events
-    $method = GRNOC::WebService::Method->new( name => 'add_events',
-                                                   description => "Adds the specified events.",
+    # --add_event
+    $method = GRNOC::WebService::Method->new( name => 'add_event',
+                                                   description => "Adds the specified event.",
                                                    expires => "-1d",
-                                                   callback => sub { $self->_add_events( @_ ) } );
+                                                   callback => sub { $self->_add_event( @_ ) } );
     $method->add_input_parameter( name        => 'message',
                                   pattern     => $TEXT,
                                   required    => 1,
                                   multiple    => 0,
                                   description => 'The event message');
+    $method->add_input_parameter( name        => 'user',
+                                  pattern     => $INTEGER,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The id of the user that made the change');
     $method->add_input_parameter( name        => 'ip_block_id',
                                   pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 0,
-                                  description => 'The event ip_block_id');
+                                  description => 'The event ip_block_id, for an ip_block change');
     $method->add_input_parameter( name        => 'project_id',
                                   pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 0,
-                                  description => 'The event project_id');
+                                  description => 'The event project_id, for a project change');
     $method->add_input_parameter( name        => 'organization_id',
                                   pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 0,
-                                  description => 'The event organization_id');
-    $method->add_input_parameter( name        => 'user_id',
-                                  pattern     => $TEXT,
+                                  description => 'The event organization_id, for an organization change');
+    $method->add_input_parameter( name        => 'discipline_id',
+                                  pattern     => $INTEGER,
                                   required    => 0,
                                   multiple    => 0,
-                                  description => 'The event user_id');
+                                  description => 'The event discipline_id, for a discipline change');
+    $method->add_input_parameter( name        => 'role_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event role_id, for a role change');
+    $method->add_input_parameter( name        => 'user_id',
+                                  pattern     => $INTEGER,
+                                  required    => 0,
+                                  multiple    => 0,
+                                  description => 'The event user_id, for a user change');
     $self->websvc()->register_method( $method );
 
-    # --add_projects
-    $method = GRNOC::WebService::Method->new( name => 'add_projects',
-                                              description => "Adds the specified projects.",
+    # --add_project
+    $method = GRNOC::WebService::Method->new( name => 'add_project',
+                                              description => "Add the specified project.",
                                               expires => "-1d",
-                                              callback => sub { $self->_add_projects( @_ ) } );
+                                              callback => sub { $self->_add_project( @_ ) } );
     $method->add_input_parameter( name        => 'name',
                                   pattern     => $TEXT,
                                   required    => 1,
@@ -220,6 +242,35 @@ sub _init_update_methods {
 
     $self->_init_dynamic_update_methods( @_ );
 
+
+    # --update_user
+    $method = GRNOC::WebService::Method->new( name => 'update_user',
+                                                   description => "Updates the specified user.",
+                                                   expires => "-1d",
+                                                   callback => sub { $self->_update_user( @_ ) } );
+
+    # add the required 'user_id' input param to the update_user() method
+    $method->add_input_parameter( name        => 'user_id',
+                                  pattern     => $INTEGER,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The id of the user');
+
+    # add the required 'username' input param to the  method
+    $method->add_input_parameter( name        => 'username',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The username of the person');
+
+    # add the required 'name' input param to the  method
+    $method->add_input_parameter( name        => 'name',
+                                  pattern     => $TEXT,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The full name of the person');
+
+    $self->websvc()->register_method( $method );
 
     # --update_ip_blocks
     $method = GRNOC::WebService::Method->new( name => 'update_ip_blocks',
@@ -322,10 +373,25 @@ sub _init_delete_methods {
 
     my $method;
 
-    #$self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
+    $self->valid_dynamic_db_names( $self->user_ds()->valid_dynamic_db_names() );
 
     $self->_init_dynamic_delete_methods( @_ );
 
+
+    # --delete_user
+    $method = GRNOC::WebService::Method->new( name => 'delete_user',
+                                                   description => "Deletes the specified user.",
+                                                   expires => "-1d",
+                                                   callback => sub { $self->_delete_user( @_ ) } );
+
+    # add the required 'user'_id input param to the delete_user() method
+    $method->add_input_parameter( name        => 'user_id',
+                                  pattern     => $INTEGER,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The id of the user to delete');
+
+    $self->websvc()->register_method( $method );
 
     # --delete_ip_blocks
     $method = GRNOC::WebService::Method->new( name => 'delete_ip_blocks',
@@ -342,8 +408,128 @@ sub _init_delete_methods {
 
     $self->websvc()->register_method( $method );
 
+    # --delete_project
+    $method = GRNOC::WebService::Method->new( name => 'delete_project',
+                                                   description => "Deletes the specified project.",
+                                                   expires => "-1d",
+                                                   callback => sub { $self->_delete_project( @_ ) } );
+
+    # add the required 'project_id' input param to the delete_project() method
+    $method->add_input_parameter( name        => 'project_id',
+                                  pattern     => $INTEGER,
+                                  required    => 1,
+                                  multiple    => 0,
+                                  description => 'The id of the project to delete');
+
+    $self->websvc()->register_method( $method );
+
 }
 
+sub _init_dynamic_add_methods {
+    my $self = shift;
+
+    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $plural = $self->get_plural( $name );
+        my $method;
+        # --add_$name
+        $method = GRNOC::WebService::Method->new( name => "add_$name",
+            description => "Add the ${name}",
+            expires => "-1d",
+            callback => sub { $self->_add_table_dynamically( $name, @_ ) } );
+
+
+        # add the REQUIRED 'name' input param to all the basic dynamic methods
+        $method->add_input_parameter( 
+            name        => 'name',
+            pattern     => $TEXT,
+            required    => 1,
+            multiple    => 0,
+            description => "The name of the $name");
+
+        # add the optional 'description' input param to all the basic dynamic methods
+        $method->add_input_parameter( 
+            name        => 'description',
+            pattern     => $TEXT,
+            required    => 0,
+            multiple    => 0,
+            description => "The description of the $name");
+
+
+        $self->_add_dynamic_add_update_parameters( $name, $method );
+
+        $self->websvc()->register_method( $method );
+    }
+}
+
+sub _init_dynamic_update_methods {
+    my $self = shift;
+
+    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $plural = $self->get_plural( $name );
+        my $method;
+        #--update_$name
+        $method = GRNOC::WebService::Method->new( name => "update_$name",
+            description => "Updates the $plural",
+            expires => "-1d",
+            callback => sub { $self->_update_table_dynamically( $name, @_ ) } );
+
+        # add the REQUIRED 'id' input param to all the basic dynamic methods
+        $method->add_input_parameter(
+            name        => "${name}_id",
+            pattern     => $NUMBER_ID,
+            required    => 1,
+            multiple    => 0,
+            description => "The id of the $name");
+
+        # add the REQUIRED 'name' input param to all the basic dynamic methods
+        $method->add_input_parameter(
+            name        => 'name',
+            pattern     => $TEXT,
+            required    => 1,
+            multiple    => 0,
+            description => "The name of the $name");
+
+        # add the optional 'description' input param to all the basic dynamic methods
+        $method->add_input_parameter( 
+            name        => 'description',
+            pattern     => $TEXT,
+            required    => 0,
+            multiple    => 0,
+            description => "The description of the $name");
+
+        $self->_add_dynamic_add_update_parameters( $name, $method );
+
+        $self->websvc()->register_method( $method );
+    }
+
+}
+
+sub _init_dynamic_delete_methods {
+    my $self = shift;
+
+    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
+        my $method;
+        #-- delete_$name
+        $method = GRNOC::WebService::Method->new( name => "delete_${name}",
+            description => "Deletes the ${name}",
+            expires => "-1d",
+            callback => sub { $self->_delete_table_dynamically( $name, @_ ) } );
+
+        # add the REQUIRED 'id' input param to all the basic dynamic methods
+        $method->add_input_parameter(
+            name        => "${name}_id",
+            pattern     => $NUMBER_ID,
+            required    => 1,
+            multiple    => 0,
+            description => "The id of the $name");
+
+        $self->websvc()->register_method( $method );
+
+    }
+
+}
+
+#--------------------
 sub _add_ip_block_params {
     my ( $self, $method ) = @_;
 
@@ -447,44 +633,6 @@ sub _add_ip_block_params {
     return $method;
 }
 
-sub _init_dynamic_add_methods {
-    my $self = shift;
-
-    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
-        my $plural = $self->get_plural( $name );
-        my $method;
-        # add
-        $method = GRNOC::WebService::Method->new( name => "add_$plural",
-            description => "Adds the ${name}",
-            expires => "-1d",
-            callback => sub { $self->_add_table_dynamically( $name, @_ ) } );
-
-
-        # add the REQUIRED 'name' input param to all the basic dynamic methods
-        $method->add_input_parameter( 
-            name        => 'name',
-            pattern     => $TEXT,
-            required    => 1,
-            multiple    => 0,
-            description => "The name of the $name");
-
-        # add the optional 'description' input param to all the basic dynamic methods
-        $method->add_input_parameter( 
-            name        => 'description',
-            pattern     => $TEXT,
-            required    => 0,
-            multiple    => 0,
-            description => "The description of the $name");
-
-
-        $self->_add_dynamic_add_update_parameters( $name, $method );
-
-        $self->websvc()->register_method( $method );
-
-    }
-
-
-}
 
 sub _add_dynamic_add_update_parameters {
     my ( $self, $name, $method ) = @_;
@@ -596,75 +744,7 @@ sub _add_dynamic_add_update_parameters {
         }
     }
 }
-
-sub _init_dynamic_update_methods {
-    my $self = shift;
-
-    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
-        my $plural = $self->get_plural( $name );
-        my $method;
-        # add
-        $method = GRNOC::WebService::Method->new( name => "update_$plural",
-            description => "Updates the $plural",
-            expires => "-1d",
-            callback => sub { $self->_update_table_dynamically( $name, @_ ) } );
-
-        # add the REQUIRED 'id' input param to all the basic dynamic methods
-        $method->add_input_parameter(
-            name        => "${name}_id",
-            pattern     => $NUMBER_ID,
-            required    => 1,
-            multiple    => 0,
-            description => "The id of the $name");
-
-        # add the REQUIRED 'name' input param to all the basic dynamic methods
-        $method->add_input_parameter(
-            name        => 'name',
-            pattern     => $TEXT,
-            required    => 1,
-            multiple    => 0,
-            description => "The name of the $name");
-
-        # add the optional 'description' input param to all the basic dynamic methods
-        $method->add_input_parameter( 
-            name        => 'description',
-            pattern     => $TEXT,
-            required    => 0,
-            multiple    => 0,
-            description => "The description of the $name");
-
-        $self->_add_dynamic_add_update_parameters( $name, $method );
-
-        $self->websvc()->register_method( $method );
-    }
-
-}
-
-sub _init_dynamic_delete_methods {
-    my $self = shift;
-
-    foreach my $name ( keys %{ $self->valid_dynamic_db_names() } ) {
-        my $method;
-        # add
-        $method = GRNOC::WebService::Method->new( name => "delete_${name}s",
-            description => "Deletes the ${name}",
-            expires => "-1d",
-            callback => sub { $self->_delete_table_dynamically( $name, @_ ) } );
-
-        # add the REQUIRED 'id' input param to all the basic dynamic methods
-        $method->add_input_parameter(
-            name        => "${name}_id",
-            pattern     => $NUMBER_ID,
-            required    => 1,
-            multiple    => 0,
-            description => "The id of the $name");
-
-        $self->websvc()->register_method( $method );
-
-    }
-
-}
-
+#--------------------
 
 ### callbacks ###
 
@@ -793,10 +873,10 @@ sub _add_ip_blocks {
     return { 'results' => $result };
 }
 
-sub _add_events {
+sub _add_event {
     my ( $self, $method, $args ) = @_;
 
-    my $result = $self->admin_ds()->add_events( $self->process_args( $args ) );
+    my $result = $self->admin_ds()->add_event( $self->process_args( $args ) );
     if ( !$result ) {
         $method->set_error( $self->admin_ds()->error() );
         return;
@@ -805,10 +885,10 @@ sub _add_events {
     return { 'results' => $result };
 }
 
-sub _add_projects {
+sub _add_project {
     my ( $self, $method, $args ) = @_;
 
-    my $result = $self->admin_ds()->add_projects( $self->process_args( $args ) );
+    my $result = $self->admin_ds()->add_project( $self->process_args( $args ) );
     if ( !$result ) {
         $method->set_error( $self->admin_ds()->error() );
         return;
@@ -818,6 +898,18 @@ sub _add_projects {
 }
 
 ### CALLBACKS - update methods
+
+sub _update_user {
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->update_user( $self->process_args( $args ) );
+    if ( !$result ) {
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return { 'results' => $result };
+}
 
 sub _update_ip_blocks {
     my ( $self, $method, $args ) = @_;
@@ -845,11 +937,45 @@ sub _update_project {
 
 ### CALLBACKS - delete methods
 
+sub _delete_user {
+
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->delete_user( $self->process_args( $args ) );
+
+    # handle error
+    if ( !$result ) {
+
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return { 'results' => $result };
+
+}
+
 sub _delete_ip_blocks {
 
     my ( $self, $method, $args ) = @_;
 
     my $result = $self->admin_ds()->delete_ip_blocks( $self->process_args( $args ) );
+
+    # handle error
+    if ( !$result ) {
+
+        $method->set_error( $self->admin_ds()->error() );
+        return;
+    }
+
+    return { 'results' => $result };
+
+}
+
+sub _delete_project {
+
+    my ( $self, $method, $args ) = @_;
+
+    my $result = $self->admin_ds()->delete_project( $self->process_args( $args ) );
 
     # handle error
     if ( !$result ) {

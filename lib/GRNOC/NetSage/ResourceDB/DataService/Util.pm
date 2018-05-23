@@ -223,9 +223,86 @@ sub update_schema {
     if ($version eq '0.0.12') {
         ($version, $err) = $self->upgrade_to_0_0_13($db, $version);
     }
+    if ($version eq '0.0.13') {
+        ($version, $err) = $self->upgrade_to_0_0_14($db, $version);
+    }
 
-    if ($version eq '0.0.13') { warn ("Schema is now up-to-date - version $version"); }
+    if ($version eq '0.0.14') { warn ("Schema is now up-to-date - version $version"); }
 
+    return ($version, $err);
+}
+
+
+sub upgrade_to_0_0_14 {
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+
+    my $err = undef;
+    # recreate table 'user' with a numerical key
+
+    my $query = "DROP TABLE IF EXISTS user";
+    my $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't drop users table: $err";
+            return ($version, $err);
+        }
+        warn "Database schema version is undefined.";
+    }
+    
+    $query = "CREATE TABLE user (
+        user_id int AUTO_INCREMENT PRIMARY KEY,
+        username varchar(20) UNIQUE,
+        name varchar(50)
+    )";
+
+    $ok = $db->do( $query );
+    if (!$ok) {
+        $err = $DBI::errstr;
+        if (defined $err) {
+            warn "Couldn't create users table: $err";
+            return ($version, $err);
+        }
+        warn "Database schema version is undefined.";
+    }
+    warn "Table users created. ";
+
+    my @queries;
+    # insert demo and lensman users
+    $query = "insert into user set user_id=1, username='demo', name='old single user'";
+    push(@queries, $query);
+    $query = "insert into user set user_id=2, username='lensman', name='Lisa Ensman'";
+    push(@queries, $query);
+    # change 'user_id' field to 'user' to record the id of the person who made the change.
+    $query = "ALTER TABLE event ADD COLUMN user int AFTER date";
+    push(@queries, $query);
+    $query = "UPDATE event SET user=1 WHERE user_id='demo'";
+    push(@queries, $query);
+    $query = "UPDATE event SET user=2 WHERE user_id='lensman'";
+    push(@queries, $query);
+    $query = "ALTER TABLE event DROP COLUMN user_id";
+    push(@queries, $query);
+    # add columns to record id's of disciplines, roles, and users that were added/edited.
+    $query = "ALTER TABLE event ADD COLUMN discipline_id int, ADD COLUMN role_id int, ADD COLUMN user_id int";
+    push(@queries, $query);
+
+    foreach $query (@queries) {
+        $ok = $db->do( $query );
+        if (!$ok) {
+            $err = $DBI::errstr;
+            if (defined $err) {
+                warn "Couldn't do '".$query."'. ERROR: $err";
+                return ($version, $err);
+            }
+            warn "Database schema version is undefined.";
+        }
+        warn "Query '".$query."' DONE ";
+    }
+
+    $version = '0.0.14';
+    my $updated_ok = $self->_update_version($db, $version);
     return ($version, $err);
 }
 

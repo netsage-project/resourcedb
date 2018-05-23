@@ -32,7 +32,7 @@
                         <form class="navbar-form navbar-left" target="_self" id="search_form">
                             <div class="form-group">
                                 <label class="control-label" for="search-field"><i class="glyphicon glyphicon-search"></i></label>
-                                <input class="form-control input-lg search-field" type="search" name="search" autocomplete="on" id="search_field">
+                                <input class="form-control input-lg search-field" type="search" name="search" autocomplete="off" id="search_field">
                             </div>
                         </form>
                         <ul class="nav navbar-nav navbar-right">
@@ -51,13 +51,16 @@
                     <li class="active"><a href="#tab-1" role="tab" data-toggle="tab" style="font-size:16px;"><strong>Resources</strong> </a></li>
                     <li><a href="#tab-2" role="tab" data-toggle="tab" style="font-size:16px;"><strong>Organizations</strong> </a></li>
                     <li><a href="#tab-3" role="tab" data-toggle="tab" style="font-size:16px;"><strong>Projects</strong> </a></li>
+                    <li style="float:right;"><a href="#tab-5" role="tab" data-toggle="tab" style="font-size:16px;">Roles </a></li>
+                    <li style="float:right;"><a href="#tab-4" role="tab" data-toggle="tab" style="font-size:16px;">Disciplines </a></li>
+                    <li id="users-tab" style="visibility:hidden;float:right;"><a href="#users-pane" role="tab" data-toggle="tab" style="font-size:16px;">Users </a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" role="tabpanel" id="tab-1">
                         <div class="row" style="width:none;margin-left:0px;margin-right:0px;">
                             <div class="col-lg-12 col-md-12" style="padding-left:0px;padding-right:0px;">
                                 <div class="row" style="padding-left:17px;margin-left:0px;margin-right:0px;height:30px;padding-top:5px;">
-                                    <div style="padding-left:0px;padding-right:0px;"><a href="resource/new.html" id="new-resource" style="visibility:hidden;"> New</a></div>
+                                    <div style="padding-left:0px;padding-right:0px;"><a href="resource/new.html" id="new-resource" style="visibility:hidden;"> New Resource</a></div>
                                 </div>
                                 <div class="table-responsive" style="padding-left:17px;">
                                     <table class="table table-striped table-hover table-condensed">
@@ -87,7 +90,7 @@
                         <div class="row" style="margin-left:0px;margin-right:0px;">
                             <div class="col-lg-12 col-md-12" style="padding-right:0px;padding-left:0px;">
                                 <div class="row" style="margin-left:0px;margin-right:0px;padding-left:17px;height:30px;padding-top:5px;">
-                                    <div style="padding-right:0px;padding-left:0px;"><a href="organization/new.html" id="new-org" style="visibility:hidden;">New </a></div>
+                                    <div style="padding-right:0px;padding-left:0px;"><a href="organization/new.html" id="new-org" style="visibility:hidden;">New Organization</a></div>
                                 </div>
                                 <div class="row" style="margin-left:0px;margin-right:0px;padding-left:17px;">
                                     <div class="col-md-12" style="/*width:969px;*/padding-right:0px;padding-left:0px;">
@@ -95,7 +98,7 @@
                                             <table class="table table-striped table-hover table-condensed">
                                                 <thead>
                                                     <tr>
-                                                        <th style="width:104px;"> Abbreviation</th>
+                                                        <th style="width:111px;"> Abbreviation</th>
                                                         <th style="padding-left:0px;width:425px;"><strong>Organization Name</strong> </th>
                                                         <th>Country </th>
                                                     </tr>
@@ -116,7 +119,7 @@
                         <div class="row" style="margin-right:0px;margin-left:0px;">
                             <div class="col-lg-12 col-md-12" style="padding:0px;">
                                 <div class="row" style="margin-left:0px;margin-right:0px;padding-left:17px;height:30px;padding-top:5px;">
-                                    <div style="padding-right:0px;padding-left:0px;"><a href="project/new.html" id="new-project" style="visibility:hidden;">New </a></div>
+                                    <div style="padding-right:0px;padding-left:0px;"><a href="project/new.html" id="new-project" style="visibility:hidden;">New Project</a></div>
                                 </div>
                                 <div class="row" style="margin-right:0px;margin-left:0px;">
                                     <div class="col-md-12" style="padding-right:0px;padding-left:0px;">
@@ -138,6 +141,78 @@
                         <div class="row" style="margin-left:0px;margin-right:0px;">
                             <div class="col-md-12" style="padding-left:0px;">
                                 <h5 class="text-right text-primary" id="project_list_count">0 records found</h5></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" role="tabpanel" id="tab-4">
+                        <div class="row" style="margin-right:0px;margin-left:0px;">
+                            <div class="col-lg-12 col-md-12" style="padding:0px;">
+                                <div class="row" style="margin-left:0px;margin-right:0px;padding-left:17px;height:30px;padding-top:5px;">
+                                    <div style="padding-right:0px;padding-left:0px;"><a href="discipline/new.html" id="new-discipline" style="visibility:hidden;">New Discipline</a></div>
+                                </div>
+                                <div class="row" style="margin-right:0px;margin-left:0px;">
+                                    <div class="col-md-12" style="padding-right:0px;padding-left:0px;">
+                                        <div class="table-responsive" style="padding-left:17px;">
+                                            <table class="table table-striped table-hover table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width:323px;">Discipline </th>
+                                                        <th style="padding-left:0px;"><strong>Description </strong></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="discipline_list"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" role="tabpanel" id="tab-5">
+                        <div class="row" style="margin-right:0px;margin-left:0px;">
+                            <div class="col-lg-12 col-md-12" style="padding:0px;">
+                                <div class="row" style="margin-left:0px;margin-right:0px;padding-left:17px;height:30px;padding-top:5px;">
+                                    <div style="padding-right:0px;padding-left:0px;"><a href="role/new.html" id="new-role" style="visibility:hidden;">New Role</a></div>
+                                </div>
+                                <div class="row" style="margin-right:0px;margin-left:0px;">
+                                    <div class="col-md-12" style="padding-right:0px;padding-left:0px;">
+                                        <div class="table-responsive" style="padding-left:17px;">
+                                            <table class="table table-striped table-hover table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width:139px;">Role </th>
+                                                        <th style="padding-left:0px;"><strong>Description </strong></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="role_list"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" role="tabpanel" id="users-pane">
+                        <div class="row" style="margin-right:0px;margin-left:0px;">
+                            <div class="col-lg-12 col-md-12" style="padding:0px;">
+                                <div class="row" style="margin-left:0px;margin-right:0px;padding-left:17px;height:30px;padding-top:5px;">
+                                    <div style="padding-right:0px;padding-left:0px;"><a href="user/new.html" id="new-user">New Admin User</a></div>
+                                </div>
+                                <div class="row" style="margin-right:0px;margin-left:0px;">
+                                    <div class="col-md-12" style="padding-right:0px;padding-left:0px;">
+                                        <div class="table-responsive" style="padding-left:17px;">
+                                            <table class="table table-striped table-hover table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width:139px;">Username</th>
+                                                        <th style="padding-left:0px;"><strong>Name </strong></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="user_list"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -179,7 +254,10 @@
     <script src="assets/js/api/revdns.js"></script>
     <script src="assets/js/api/user.js"></script>
     <script src="assets/js/gui/contact.js"></script>
+    <script src="assets/js/gui/discipline.js"></script>
     <script src="assets/js/gui/revdns.js"></script>
+    <script src="assets/js/gui/role.js"></script>
+    <script src="assets/js/gui/user.js"></script>
 </body>
 
 </html>
