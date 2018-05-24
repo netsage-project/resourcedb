@@ -6,31 +6,34 @@ use warnings;
 use Getopt::Long;
 use GRNOC::Config;
 use GRNOC::DatabaseQuery;
+use NetAddr::IP;
+use List::MoreUtils qw(uniq);
 use JSON;
 use Data::Dumper;
 
-# This script will pull data out of the Science Registry database and write it to a file as JSON.
+# This script will pull data out of the Science Registry database and write it to a file as JSON,
+# AND to a .yaml file (for use with logstash translate filter)
 
 # Defaults
 my $help;
 # Use same config file as resourcedb (Science Registry)
 my $config_file = "/etc/grnoc/netsage/resourcedb/config.xml";
 # Name output file with the current timestamp
-my $output_file = "/etc/grnoc/netsage/resourcedb/datadump_".time().".json";
+my $output_file_yaml = "/etc/grnoc/netsage/resourcedb/datadump_".time().".yaml";
 
 #-----------------------------
 sub usage() {
   print "  USAGE: perl resourcedb-export.pl [-c <config file>] [-o <output file>] [-h] 
   Without parameters, the defaults are 
     config_file = /etc/grnoc/netsage/resourcedb/config.xml 
-    output_file = /etc/grnoc/netsage/resourcedb/datadump_<timestamp>.json (must run as sudo) \n";
+    output_file = /etc/grnoc/netsage/resourcedb/datadump_<timestamp>.yaml (.json file will have same name. Must run as sudo) \n";
   exit;
 }
 #-----------------------------
 
 # defaults can be overridden on command line (-c and -o)
 GetOptions( 'config|c=s' => \$config_file,
-            'output|o=s' => \$output_file,
+            'output|o=s' => \$output_file_yaml,
             'help|h|?' => \$help 
           );
 
@@ -60,12 +63,24 @@ my $dbname   = $config->get( '/config/database-name' );
 my $host     = $config->get( '/config/database-host' );
 my $port     = $config->get( '/config/database-port' );
 
-# Try to open output file
+# Try to open output files
+#yaml file
+$output_file_yaml =~ s/json$/yaml/;  # just in case
+my $fh_yaml;
+if (! open($fh_yaml, '>', $output_file_yaml) ) {
+    print "Could not open output file $output_file_yaml\n";
+    die;
+}
+
+#json - same name with .json
+my $output_file = $output_file_yaml;
+$output_file =~ s/yaml$/json/;
 my $fh;
 if (! open($fh, '>', $output_file) ) {
     print "Could not open output file $output_file\n";
     die;
 }
+
 
 # Connect to db
 my $dbq = GRNOC::DatabaseQuery->new(
@@ -116,12 +131,10 @@ if (!$resources) {
     die;
 }
 
-my @data;
+my @all_resources;
+
 foreach my $res (@$resources) {
-    # Change addr_str from a comma-separated string to an array
-    my @array = split(",",$res->{'addresses_str'});
-    $res->{'addresses'} = \@array;
-    # Get projects that the resource belongs to and add them as an array of hashes
+    # Get projects that the resource belongs to and add them to the resource as an array of hashes
     $res->{'projects'} = [];
     my $projects = $dbq->select(
         table => 'project JOIN ip_block_project ON ip_block_project.project_id = project.project_id',
@@ -142,14 +155,54 @@ foreach my $res (@$resources) {
         push(@{$res->{'projects'}}, $proj);
     }
     ### print Dumper($res); ###
-    push(@data, $res);
-}
 
-# Convert to JSON and write it to the output file
-my $json = encode_json(\@data);
-print ($fh $json);
+    # For json file
+    push(@all_resources, $res);
+
+    # For yaml file
+    # strip /xx's and expand any ip blocks 
+    my @ip_array = split(",", $res->{'addresses_str'});
+    my @final_ips;
+    foreach my $ip (@ip_array) {
+        my $ipblock = new NetAddr::IP($ip);
+        if (! $ipblock) {
+            print "ERROR: invalid IP: $ip \n";
+            next;
+        }
+        my ($base, $slash) = split('/',$ip);
+        if ($slash eq "32" or $slash eq "128") {
+            # single address
+            push(@final_ips, $ipblock->addr());
+        } elsif ($slash < 25 or ($slash >32 and $slash < 121)) {
+            # if there are too many ip's in the block, write a regular expression that matches ip's in the block
+            push(@final_ips, $ipblock->re());
+        } else {
+            # list ips in the CIDR block; don't skip the first or last (possibly network address or broadcast address)
+            for (my $address = $ipblock->network(); $address <= $ipblock->broadcast(); $address ++) {
+                push(@final_ips, $address->addr());
+                # adding 1 wraps around after the broadcast address, so need to quit to avoid infinite loop for 1 or 2 addresses.
+                last if ($address == $ipblock->broadcast);
+            }
+        }
+    }
+    # remove dups and join array elements with |
+    @final_ips = uniq(@final_ips); 
+    my $ip_regex = join( "|", @final_ips );
+
+    # convert resource info to json
+    my $res_json = encode_json($res);
+    # encode single quotes since we'll use them to start and end the string that holds the json ("s are already escaped)
+    $res_json =~ s/'/&apos;/g;
+
+    # write line in file
+    print $fh_yaml  "'".$ip_regex."' : '".$res_json."'\n" ;
+}
+close($fh_yaml);
+
+# Write the .json output file (writes array of JSON objects)
+my $json = encode_json(\@all_resources);
+print  $fh $json ;
 close($fh);
 
-print "Wrote $output_file\n";
-
+print "Wrote $output_file and $output_file_yaml \n";
 

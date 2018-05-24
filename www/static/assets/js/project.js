@@ -26,43 +26,45 @@ document.addEventListener('DOMContentLoaded', function(event) {
     fixLoginLink(basePath, url);
  
     // load the page content depending on the url
-    if (url.pathname === basePath || url.pathname === basePath + 'index.html') {
+    var page = url.pathname;
+        page = page.replace('//','/');
+    if (page === basePath || page === basePath + 'index.html') {
         index();
-    } else if (url.pathname === basePath + 'about.html') {
+    } else if (page === basePath + 'about.html') {
         about();
-    } else if (url.pathname === basePath + 'contact.html') {
+    } else if (page === basePath + 'contact.html') {
         contact();
-    } else if (url.pathname === basePath + 'project/index.html') {
+    } else if (page === basePath + 'project/index.html') {
         project();
-    } else if (url.pathname === basePath + 'project/new.html') {
+    } else if (page === basePath + 'project/new.html') {
         projectNew();
-    } else if (url.pathname === basePath + 'project/edit.html') {
+    } else if (page === basePath + 'project/edit.html') {
         projectEdit();
-    } else if (url.pathname === basePath + 'project/link.html') {
+    } else if (page === basePath + 'project/link.html') {
         projectLink();
-    } else if (url.pathname === basePath + 'resource/index.html') {
+    } else if (page === basePath + 'resource/index.html') {
         resource();
-    } else if (url.pathname === basePath + 'resource/new.html') {
+    } else if (page === basePath + 'resource/new.html') {
         resourceNew();
-    } else if (url.pathname === basePath + 'resource/edit.html') {
+    } else if (page === basePath + 'resource/edit.html') {
         resourceEdit();
-    } else if (url.pathname === basePath + 'organization/index.html') {
+    } else if (page === basePath + 'organization/index.html') {
         organization();
-    } else if (url.pathname === basePath + 'organization/new.html') {
+    } else if (page === basePath + 'organization/new.html') {
         organizationNew();
-    } else if (url.pathname === basePath + 'organization/edit.html') {
+    } else if (page === basePath + 'organization/edit.html') {
         organizationEdit();
-    } else if (url.pathname === basePath + 'discipline/new.html') {
+    } else if (page === basePath + 'discipline/new.html') {
         disciplineNew();
-    } else if (url.pathname === basePath + 'discipline/edit.html') {
+    } else if (page === basePath + 'discipline/edit.html') {
         disciplineEdit();
-    } else if (url.pathname === basePath + 'role/new.html') {
+    } else if (page === basePath + 'role/new.html') {
         roleNew();
-    } else if (url.pathname === basePath + 'role/edit.html') {
+    } else if (page === basePath + 'role/edit.html') {
         roleEdit();
-    } else if (url.pathname === basePath + 'user/new.html') {
+    } else if (page === basePath + 'user/new.html') {
         userNew();
-    } else if (url.pathname === basePath + 'user/edit.html') {
+    } else if (page === basePath + 'user/edit.html') {
         userEdit();
     } else {
         console.log('There is no Javascript available for this page.');

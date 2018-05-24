@@ -1,2 +1,2 @@
-0 * * * root /usr/bin/resourcedb-export.pl -o /usr/share/resourcedb/www/exported/scireg.json
+0 * * * root /usr/bin/resourcedb-export.pl -o /usr/share/resourcedb/www/exported/scireg.yaml
 20 * * * root /usr/bin/organization-export.pl -o /usr/share/resourcedb/www/exported/scireg-orgs.json

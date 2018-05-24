@@ -493,7 +493,7 @@ function setupCreateResourceForm() {
     var cidr = document.getElementById('resource_cidr');
     cidr.addEventListener('input', function(event) {
         if (cidr.validity.patternMismatch) {
-            cidr.setCustomValidity('Check your entry for valid IPv4 and IPv6 addresses in CIDR notation (/32 for a single IP), comma separated if more than one, with or without spaces.');
+            cidr.setCustomValidity('Check your entry for valid IPv4 and IPv6 addresses in CIDR notation (/32 or /128, respectively, for a single IP), comma separated if more than one, with or without spaces.');
         } else {
             cidr.setCustomValidity("");
         }
@@ -558,7 +558,7 @@ function setupEditResourceForm(resource) {
   
     cidr.addEventListener('input', function(event) {
         if (cidr.validity.patternMismatch) {
-            cidr.setCustomValidity('Check your entry for valid IPv4 and IPv6 addresses in CIDR notation (/32 for a single IP), comma separated if more than one, with or without spaces.');
+            cidr.setCustomValidity('Check your entry for valid IPv4 and IPv6 addresses in CIDR notation (/32 or /128, respectively, for a single IP), comma separated if more than one, with or without spaces.');
         } else {
             cidr.setCustomValidity("");
         }
