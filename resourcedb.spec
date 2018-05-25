@@ -32,12 +32,12 @@ Requires: perl-Geo-IP
 Requires: perl-GRNOC-Config
 Requires: perl-GRNOC-Log
 Requires: perl-GRNOC-DatabaseQuery
-Requires: perl-MIME-Lite-TT
 Requires: perl-String-MkPasswd
 Requires: perl-Net-DNS
 Requires: perl-NetAddr-IP
 Requires: perl-JSON
 Requires: perl-Email-Send
+Requires: perl-MIME-Lite-TT
 Requires: perl-MIME-Lite
 Requires: perl-Text-CSV
 Requires: perl-List-MoreUtils
