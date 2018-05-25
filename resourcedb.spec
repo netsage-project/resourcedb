@@ -40,6 +40,7 @@ Requires: perl-JSON
 Requires: perl-Email-Send
 Requires: perl-MIME-Lite
 Requires: perl-Text-CSV
+Requires: perl-List-MoreUtils
 
 %description
 NetSage Resource Database (Science Registry)

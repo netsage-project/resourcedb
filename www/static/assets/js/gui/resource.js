@@ -492,10 +492,26 @@ function setupCreateResourceForm() {
 
     var cidr = document.getElementById('resource_cidr');
     cidr.addEventListener('input', function(event) {
+        // checks against regex set in bootstrap studio
         if (cidr.validity.patternMismatch) {
-            cidr.setCustomValidity('Check your entry for valid IPv4 and IPv6 addresses in CIDR notation (/32 or /128, respectively, for a single IP), comma separated if more than one, with or without spaces.');
+            cidr.setCustomValidity('Check your entry for valid IPv4 and IPv6 addresses in CIDR notation (/32 or /128 for single IPs), comma separated list.');
+            return;
         } else {
             cidr.setCustomValidity("");
+        }
+        // check value of /xxx - for ipv4, allow /32 to /23; for ipv6, allow /128 to /119.
+        var ips = cidr.value.replace(/ /g, '').split(",");
+        for (var i=0; i < ips.length; i++) {
+            var parts = ips[i].split("/");
+            if ( parts[0].indexOf(".") > 0 && (Number(parts[1]) < 23 || Number(parts[1]) > 32) ) {
+                cidr.setCustomValidity('For IPV4 addresses, we require the network prefix to be between /23 and /32');
+                break;
+            } else if ( parts[0].indexOf(":") > 0 && (Number(parts[1]) < 119 || Number(parts[1]) > 128) ) {
+                cidr.setCustomValidity('For IPV6 addresses, we require the network prefix to be between /119 and /128');
+                break;
+            } else {
+            cidr.setCustomValidity("");
+            }
         }
     });
 
@@ -557,10 +573,26 @@ function setupEditResourceForm(resource) {
     var notes = document.getElementById('resource_notes');
   
     cidr.addEventListener('input', function(event) {
+        // checks against regex set in bootstrap studio
         if (cidr.validity.patternMismatch) {
-            cidr.setCustomValidity('Check your entry for valid IPv4 and IPv6 addresses in CIDR notation (/32 or /128, respectively, for a single IP), comma separated if more than one, with or without spaces.');
+            cidr.setCustomValidity('Check your entry for valid IPv4 and IPv6 addresses in CIDR notation (/32 or /128 for single IPs), comma separated list.');
+            return;
         } else {
             cidr.setCustomValidity("");
+        }
+        // check value of /xxx - for ipv4, allow /32 to /23; for ipv6, allow /128 to /119.
+        var ips = cidr.value.replace(/ /g, '').split(",");
+        for (var i=0; i < ips.length; i++) {
+            var parts = ips[i].split("/");
+            if ( parts[0].indexOf(".") > 0 && (Number(parts[1]) < 23 || Number(parts[1]) > 32) ) {
+                cidr.setCustomValidity('For IPV4 addresses, we require the network prefix to be between /23 and /32'); 
+                break;
+            } else if ( parts[0].indexOf(":") > 0 && (Number(parts[1]) < 119 || Number(parts[1]) > 128) ) {
+                cidr.setCustomValidity('For IPV6 addresses, we require the network prefix to be between /119 and /128'); 
+                break;
+            } else {
+            cidr.setCustomValidity("");
+            }
         }
     });
 
