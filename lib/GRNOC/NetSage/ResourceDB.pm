@@ -13,7 +13,7 @@ package GRNOC::NetSage::ResourceDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.8.0';
+our $VERSION = '0.9.0';
 
 sub new {
 
