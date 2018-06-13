@@ -160,7 +160,7 @@ foreach my $res (@$resources) {
     push(@all_resources, $res);
 
     # For yaml file
-    # strip /xx's and expand any ip blocks 
+    # strip /xx's from addresses and expand any ip blocks 
     my @ip_array = split(",", $res->{'addresses_str'});
     my @final_ips;
     foreach my $ip (@ip_array) {
@@ -191,7 +191,7 @@ foreach my $res (@$resources) {
 
     # convert resource info to json
     my $res_json = encode_json($res);
-    # encode single quotes since we'll use them to start and end the string that holds the json ("s are already escaped)
+    # encode simple single quotes since we'll use them to start and end the string that holds the json ("s are already escaped)
     $res_json =~ s/'/&apos;/g;
 
     # write line in file

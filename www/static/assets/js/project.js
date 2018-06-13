@@ -695,3 +695,14 @@ function fixLoginLink(basePath, url) {
     }
 }
 
+// Used when saving desriptions that are possibly copied and pasted to mysql
+// Replace unicode chars for smart quotes, etc. with dumb ones. (logstash doesn't like these in the export file)
+function replace_special_chars(text) {
+    var fixed = text;
+    fixed = fixed.replace(/[\u2018\u2019\u201A\u201B]/g, "'"); // single quotes
+    fixed = fixed.replace(/[\u201C\u201D\u201E\u201F]/g, '"');  // double quotes
+    fixed = fixed.replace(/[\u2010\u2011\u2012\u2013\u2014\u2015]/g, '-'); // dashes
+    fixed = fixed.replace(/[\u2022]/g, '-'); // bullet
+    fixed = fixed.replace(/[\u0080]/g, ' '); // padding character
+    return fixed;
+} 
