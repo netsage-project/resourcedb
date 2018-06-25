@@ -3,10 +3,6 @@
 #-----
 #----- Copyright(C) 2017 The Trustees of Indiana University
 #--------------------------------------------------------------------
-#----- This module contains the functionality to connect to and query
-#----- the backend database.  It contains methods that are used as
-#----- callbacks for the DataService/GWS.pm library.
-#--------------------------------------------------------------------
 
 package GRNOC::NetSage::ResourceDB::DataService::Data;
 
