@@ -147,16 +147,14 @@ function submitCreateOrUpdateProject(e) {
     var abbr = form.elements['project_abbr'].value;
 
     var desc = form.elements['project_description'].value;
-    if (desc) { desc = desc.replace(/[\u2018\u2019]/g, "'"); } // replace smart quotes
-    if (desc) { desc = desc.replace(/[\u201C\u201D]/g, '"'); } // replace smart quotes
+    if (desc) { desc = replace_special_chars(desc); } // replace smart quotes, etc.
 
     var owner = form.elements['project_owner'].value;
     var email = form.elements['project_email'].value;
 
     var notes = form.elements['project_notes'].value;
     if (notes) { notes = notes.replace(/\n/g," @@ "); }  // encode new-lines as @@ in the db
-    if (notes) { notes = notes.replace(/[\u2018\u2019]/g, "'"); } // replace smart quotes
-    if (notes) { notes = notes.replace(/[\u201C\u201D]/g, '"'); } // replace smart quotes
+    if (notes) { notes = replace_special_chars(notes); } // replace smart quotes, etc.
 
     var projUrl = form.elements['project_url'].value;
 

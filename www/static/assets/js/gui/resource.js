@@ -699,8 +699,7 @@ function submitCreateOrUpdateResource(e) {
     var abbr = form.elements['resource_abbr'].value;
 
     var desc = form.elements['resource_description'].value;
-    if (desc) { desc = desc.replace(/[\u2018\u2019]/g, "'"); } // replace smart quotes
-    if (desc) { desc = desc.replace(/[\u201C\u201D]/g, '"'); } // replace smart quotes
+    if (desc) { desc = replace_special_chars(desc); } // replace smart quotes, etc.
 
     var cidr = form.elements['resource_cidr'].value.replace(/ /g, ""); // remove spaces before saving
 
@@ -708,8 +707,7 @@ function submitCreateOrUpdateResource(e) {
 
     var notes= form.elements['resource_notes'].value;
     if (notes) { notes = notes.replace(/\n/g, " @@ "); } // encode new-lines as @@ in db.;
-    if (notes) { notes = notes.replace(/[\u2018\u2019]/g, "'"); } // replace smart quotes
-    if (notes) { notes = notes.replace(/[\u201C\u201D]/g, '"'); } // replace smart quotes
+    if (notes) { notes = replace_special_chars(notes); }  // replace smart quotes, etc.
 
     var asn = form.elements['resource_asn'].value;
 

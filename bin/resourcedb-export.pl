@@ -10,6 +10,7 @@ use NetAddr::IP;
 use List::MoreUtils qw(uniq);
 use JSON;
 use Data::Dumper;
+use Encode;
 
 # This script will pull data out of the Science Registry database and write it to a file as JSON,
 # AND to a .yaml file (for use with logstash translate filter)
@@ -91,12 +92,12 @@ my $dbq = GRNOC::DatabaseQuery->new(
                 'port'      => $port,
                 'debug'     => 0
             );
-
 my $conn_res = $dbq->connect();
 if(!$conn_res){
-    print "Error connecting to DB mysql.";
-    die;
+    die ("Error connecting to mysql.");
 }
+# tells dbq to expect/use unicode which is what's in the db 
+$dbq->{'dbh'}->do("SET NAMES utf8mb4;");
 
 # Get info about resources
 my $resources = $dbq->select(
@@ -160,7 +161,7 @@ foreach my $res (@$resources) {
     push(@all_resources, $res);
 
     # For yaml file
-    # strip /xx's and expand any ip blocks 
+    # strip /xx's from addresses and expand any ip blocks 
     my @ip_array = split(",", $res->{'addresses_str'});
     my @final_ips;
     foreach my $ip (@ip_array) {
@@ -189,18 +190,20 @@ foreach my $res (@$resources) {
     @final_ips = uniq(@final_ips); 
     my $ip_regex = join( "|", @final_ips );
 
-    # convert resource info to json
-    my $res_json = encode_json($res);
-    # encode single quotes since we'll use them to start and end the string that holds the json ("s are already escaped)
+    # convert resource info into a json string, then convert that (which is utf8 from the db) to perl characters 
+    # with internal utf-8 tags, using decode. 
+    my $res_json = decode( 'utf-8', encode_json($res) );
+    # html-encode simple single quotes since we'll use them to start and end the string that holds the json and escaping them 
+    # doesn't work ("s are already escaped)
     $res_json =~ s/'/&apos;/g;
 
-    # write line in file
+    # write  ip:'data'  line to file (perl knows how to write utf8 chars)
     print $fh_yaml  "'".$ip_regex."' : '".$res_json."'\n" ;
 }
 close($fh_yaml);
 
 # Write the .json output file (writes array of JSON objects)
-my $json = encode_json(\@all_resources);
+my $json = decode( 'utf-8', encode_json(\@all_resources) );
 print  $fh $json ;
 close($fh);
 

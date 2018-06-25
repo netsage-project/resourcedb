@@ -235,6 +235,11 @@ sub _init {
         return 0;
     }
 
+    # to handle unicode characters (Says to use utf8mb4 for communication between mysql and this application.
+    # Equivalent to setting character_set_client = character_set_connection = character_set_results = utf8mb4)
+    $dbq_ro->{'dbh'}->do("SET NAMES utf8mb4;");
+    $dbq_rw->{'dbh'}->do("SET NAMES utf8mb4;");
+
     $self->dbq_ro( $dbq_ro );
     $self->dbq_rw( $dbq_rw );
 
