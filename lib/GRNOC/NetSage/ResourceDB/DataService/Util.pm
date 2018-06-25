@@ -247,7 +247,6 @@ sub upgrade_to_0_1_0 {
     my $self    = shift;
     my $db      = shift;
     my $version = shift;
-    my $err = undef;
 
     my @queries = (
     "SET FOREIGN_KEY_CHECKS=0;",
@@ -295,7 +294,9 @@ sub upgrade_to_0_1_0 {
     "SET FOREIGN_KEY_CHECKS=1;"
     );
 
-    foreach $query (@queries) {
+    my $err = undef;
+    my $ok = undef;
+    foreach my $query (@queries) {
         $ok = $db->do( $query );
         if (!$ok) {
             $err = $DBI::errstr;
