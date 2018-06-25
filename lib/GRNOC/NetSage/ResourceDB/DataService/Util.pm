@@ -54,14 +54,14 @@ sub install_database {
                               {PrintError => 0});
     if (!$db) {
         $self->{'logger'}->error($DBI::errstr);
-        $err = "Couldn't connect to database.";
+        $err = "Couldn't connect to mysql.";
         return (undef, $err);
     }
 
     # create the db, if needed, otherwise validate its existence
     $ok = $self->database_created($db);
     if (!$ok) {
-        $err = "Couldn't validate database's existence.";
+        $err = "Couldn't create database.";
         return (undef, $err);
     }
 
@@ -92,7 +92,7 @@ sub database_created {
     $ok = $db->do("create database resourcedb");
     if (!$ok) {
         # An error is created if database already exists, but we can
-        # ignore this case. All others should be handled.
+        # ignore this case (return 2). All others should be handled.
         $err = $DBI::errstr;
         if (index($err, "database exists") != -1) {
             # Database already exists. Will update it.
@@ -118,13 +118,16 @@ sub schema_created {
     my $schema;
     my $version;
 
-
     if ( ! $db_exists ) {
-        # Initialize the database from the Schema located at $path - file has sql to CREATE TABLES
-        warn "Creating db tables";
-        `mysql -u $self->{'username'} --password=$self->{'password'} -D resourcedb < $self->{'schema'}`;
+        warn "ERROR - Couldn't add tables since no resourcedb database exists";
+        return;
     }
 
+    # Initialize the database from the Schema located at $path - file has sql to CREATE TABLES
+    warn "Creating db tables";
+    `mysql -u $self->{'username'} --password=$self->{'password'} -D resourcedb < $self->{'schema'}`;
+
+    # NEW INSTALLS SHOULD USE RESOURCEDB.SQL WHICH SHOULD HAVE THE LATEST SQL WITH VERSION SET!!!!
     ($version, $err) = $self->version($db);
     if (defined $err) {
         warn "Failure occurred while checking version: $err";
@@ -183,7 +186,8 @@ sub update_schema {
         }
     }
 
-    # Place upgrade script for next schema version here.
+    # NEW INSTALLS SHOULD USE RESOURCEDB.SQL WHICH SHOULD HAVE THE LATEST SQL WITH VERSION SET!!!!
+    # so these upgrade scripts are only historical records for fresh installs!
     if ($version eq '0.0.1') {
         ($version, $err) = $self->upgrade_to_0_0_2($db, $version);
     }
@@ -226,12 +230,88 @@ sub update_schema {
     if ($version eq '0.0.13') {
         ($version, $err) = $self->upgrade_to_0_0_14($db, $version);
     }
+    if ($version eq '0.0.14') {
+        ($version, $err) = $self->upgrade_to_0_1_0($db, $version);
+    }
+    # Place upgrade script for next schema version here.
 
-    if ($version eq '0.0.14') { warn ("Schema is now up-to-date - version $version"); }
+    if ($version eq '0.1.0') { warn ("Schema is now up-to-date - version $version"); }
 
     return ($version, $err);
 }
 
+
+sub upgrade_to_0_1_0 {
+    # Convert db to utf8mb4 encoding (have to first convert name, description, and notes column contents)
+
+    my $self    = shift;
+    my $db      = shift;
+    my $version = shift;
+    my $err = undef;
+
+    my @queries = (
+    "SET FOREIGN_KEY_CHECKS=0;",
+    "ALTER TABLE organization CHANGE description description BLOB;",
+    "ALTER TABLE organization CHANGE description description TEXT CHARACTER SET utf8mb4;",
+    "ALTER TABLE organization CHANGE name name VARBINARY(255);",
+    "ALTER TABLE organization CHANGE name name  VARCHAR(190) CHARACTER SET utf8mb4;",
+    "ALTER TABLE organization CHANGE notes notes BLOB;",
+    "ALTER TABLE organization CHANGE notes notes TEXT CHARACTER SET utf8mb4;",
+    "ALTER TABLE project CHANGE name name VARBINARY(255);",
+    "ALTER TABLE project CHANGE name name  VARCHAR(250) CHARACTER SET utf8mb4;",
+    "ALTER TABLE project CHANGE description description BLOB;",
+    "ALTER TABLE project CHANGE description description TEXT CHARACTER SET utf8mb4;",
+    "ALTER TABLE project CHANGE notes notes BLOB;",
+    "ALTER TABLE project CHANGE notes notes TEXT CHARACTER SET utf8mb4;",
+    "ALTER TABLE ip_block CHANGE name name VARBINARY(255);",
+    "ALTER TABLE ip_block CHANGE name name  VARCHAR(250) CHARACTER SET utf8mb4;",
+    "ALTER TABLE ip_block CHANGE description description BLOB;",
+    "ALTER TABLE ip_block CHANGE description description TEXT CHARACTER SET utf8mb4;",
+    "ALTER TABLE ip_block CHANGE notes notes BLOB;",
+    "ALTER TABLE ip_block CHANGE notes notes TEXT CHARACTER SET utf8mb4;",
+    "ALTER TABLE resourcedb.continent CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
+    "ALTER TABLE resourcedb.continent CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", 
+    "ALTER TABLE resourcedb.country CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",  
+    "ALTER TABLE resourcedb.country CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", 
+    "ALTER TABLE resourcedb.discipline CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",  
+    "ALTER TABLE resourcedb.discipline CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", 
+    "ALTER TABLE resourcedb.event CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",  
+    "ALTER TABLE resourcedb.event CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", 
+    "ALTER TABLE resourcedb.ip_block CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",  
+    "ALTER TABLE resourcedb.ip_block CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", 
+    "ALTER TABLE resourcedb.ip_block_project CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; ",  
+    "ALTER TABLE resourcedb.ip_block_project CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", 
+    "ALTER TABLE resourcedb.organization CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",  
+    "ALTER TABLE resourcedb.organization CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", 
+    "ALTER TABLE resourcedb.project CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",  
+    "ALTER TABLE resourcedb.project CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",   
+    "ALTER TABLE resourcedb.role CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",  
+    "ALTER TABLE resourcedb.role CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", 
+    "ALTER TABLE resourcedb.user CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",  
+    "ALTER TABLE resourcedb.user CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", 
+    "ALTER TABLE resourcedb.version CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",  
+    "ALTER TABLE resourcedb.version CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
+    "ALTER DATABASE resourcedb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
+    "SET FOREIGN_KEY_CHECKS=1;"
+    );
+
+    foreach $query (@queries) {
+        $ok = $db->do( $query );
+        if (!$ok) {
+            $err = $DBI::errstr;
+            if (defined $err) {
+                warn "Couldn't do '".$query."'. ERROR: $err";
+                return ($version, $err);
+            }
+            warn "Database schema version is undefined.";
+        }
+        warn "Query '".$query."' DONE ";
+    }
+
+    $version = '0.1.0';
+    my $updated_ok = $self->_update_version($db, $version);
+    return ($version, $err);
+}
 
 sub upgrade_to_0_0_14 {
     my $self    = shift;
