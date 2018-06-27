@@ -72,6 +72,7 @@ sub get_ip_blocks {
                          'organization.name as organization_name',
                          'organization.organization_id as org_id',
                          'organization.abbr as org_abbr',
+                         'organization.description as org_description',
                          'discipline.name as discipline_name'
                          ];
 

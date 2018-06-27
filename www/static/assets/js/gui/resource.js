@@ -166,8 +166,7 @@ function renderResourceCount(count) {
 }
 
 // Resource details page -
-// Given a resource record, set the innerHTML of the elements
-// identified by resource_name and resource_description.
+// Given a resource record, set the innerHTML of the name and description
 function renderResourceHeader(resource) {
     var name = document.getElementById('resource_name');
     var desc = document.getElementById('resource_description');
@@ -187,6 +186,7 @@ function renderResourceRecord(resource) {
 
     var abbr = document.getElementById('resource_abbr');
     var cidr = document.getElementById('resource_cidr');
+    var asn = document.getElementById('resource_asn');
     var country = document.getElementById('resource_country');
     var geolocation = document.getElementById('resource_geolocation');
     var organization = document.getElementById('resource_organization');
@@ -194,8 +194,10 @@ function renderResourceRecord(resource) {
     var notes = document.getElementById('resource_notes');
     var role = document.getElementById('resource_role');
     var discipline = document.getElementById('resource_discipline');
+    var org_descrip = document.getElementById('org_descrip');
 
     cidr.innerHTML = resource.addr_str.replace(/,/g, ", "); // add spaces for viewing
+    asn.innerHTML = resource.asn;
     abbr.innerHTML = resource.abbr;
     country.innerHTML = resource.country_name;
     organization.innerHTML = resource.organization_name;
@@ -203,6 +205,7 @@ function renderResourceRecord(resource) {
     if (resource.notes) { notes.innerHTML = resource.notes.replace(/ @@ /g,"<br>"); } // new-lines are @@ in db.
     role.innerHTML = resource.role_name;
     discipline.innerHTML = resource.discipline_name;
+    org_descrip.innerHTML = resource.org_description;
 
     if (resource.latitude == null || resource.longitude == null) {
         geolocation.innerHTML = 'Location unknown';
@@ -210,7 +213,7 @@ function renderResourceRecord(resource) {
         geolocation.innerHTML = parseFloat(resource.latitude).toFixed(4) + ',<br>' + parseFloat(resource.longitude).toFixed(4);
     }
 
-    // make org a link to the details page
+    // make org a link to the org details page
     organization.addEventListener('click', function(e) {
         window.location.href = basePath + 'organization/index.html?organization_id=' + resource.org_id;
     });
