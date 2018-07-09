@@ -202,6 +202,12 @@ foreach my $res (@$resources) {
 }
 close($fh_yaml);
 
+# Add an array of IPs in addition to the addresses string (for the old pipeline scireg tagger)
+foreach my $resrc (@all_resources) {
+        my @array = split(",", $resrc->{'addresses_str'});
+        $resrc->{'addresses'} = \@array;
+}
+
 # Write the .json output file (writes array of JSON objects)
 my $json = decode( 'utf-8', encode_json(\@all_resources) );
 print  $fh $json ;
