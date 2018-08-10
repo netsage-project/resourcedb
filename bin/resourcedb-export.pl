@@ -174,8 +174,10 @@ foreach my $res (@$resources) {
         if ($slash eq "32" or $slash eq "128") {
             # single address
             push(@final_ips, $ipblock->addr());
-        } elsif ($slash < 25 or ($slash >32 and $slash < 121)) {
+        } elsif ($slash < 28 or ($slash >32 and $slash < 121)) {
             # if there are too many ip's in the block, write a regular expression that matches ip's in the block
+            # NetAddr::IP -> re() - Returns a Perl regular expression that will match an IP address within the given subnet. 
+            # Defaults to ipV4 notation. Will return an ipV6 regex if the address in not in ipV4 space.
             push(@final_ips, $ipblock->re());
         } else {
             # list ips in the CIDR block; don't skip the first or last (possibly network address or broadcast address)
