@@ -502,15 +502,15 @@ function setupCreateResourceForm() {
         } else {
             cidr.setCustomValidity("");
         }
-        // check value of /xxx - for ipv4, allow /32 to /23; for ipv6, allow /128 to /119.
+        // check value of /xxx - for ipv4, allow /32 to /16; for ipv6, allow /128 to /112.
         var ips = cidr.value.replace(/ /g, '').split(",");
         for (var i=0; i < ips.length; i++) {
             var parts = ips[i].split("/");
-            if ( parts[0].indexOf(".") > 0 && (Number(parts[1]) < 23 || Number(parts[1]) > 32) ) {
-                cidr.setCustomValidity('For IPV4 addresses, we require the network prefix to be between /23 and /32');
+            if ( parts[0].indexOf(".") > 0 && (Number(parts[1]) < 16 || Number(parts[1]) > 32) ) {
+                cidr.setCustomValidity('For IPV4 addresses, we require the network prefix to be between /16 and /32');
                 break;
-            } else if ( parts[0].indexOf(":") > 0 && (Number(parts[1]) < 119 || Number(parts[1]) > 128) ) {
-                cidr.setCustomValidity('For IPV6 addresses, we require the network prefix to be between /119 and /128');
+            } else if ( parts[0].indexOf(":") > 0 && (Number(parts[1]) < 112 || Number(parts[1]) > 128) ) {
+                cidr.setCustomValidity('For IPV6 addresses, we require the network prefix to be between /112 and /128');
                 break;
             } else {
             cidr.setCustomValidity("");
@@ -583,15 +583,15 @@ function setupEditResourceForm(resource) {
         } else {
             cidr.setCustomValidity("");
         }
-        // check value of /xxx - for ipv4, allow /32 to /23; for ipv6, allow /128 to /119.
+        // check value of /xxx - for ipv4, allow /32 to /16; for ipv6, allow /128 to /112.
         var ips = cidr.value.replace(/ /g, '').split(",");
         for (var i=0; i < ips.length; i++) {
             var parts = ips[i].split("/");
-            if ( parts[0].indexOf(".") > 0 && (Number(parts[1]) < 23 || Number(parts[1]) > 32) ) {
-                cidr.setCustomValidity('For IPV4 addresses, we require the network prefix to be between /23 and /32'); 
+            if ( parts[0].indexOf(".") > 0 && (Number(parts[1]) < 16 || Number(parts[1]) > 32) ) {
+                cidr.setCustomValidity('For IPV4 addresses, we require the network prefix to be between /16 and /32'); 
                 break;
-            } else if ( parts[0].indexOf(":") > 0 && (Number(parts[1]) < 119 || Number(parts[1]) > 128) ) {
-                cidr.setCustomValidity('For IPV6 addresses, we require the network prefix to be between /119 and /128'); 
+            } else if ( parts[0].indexOf(":") > 0 && (Number(parts[1]) < 112 || Number(parts[1]) > 128) ) {
+                cidr.setCustomValidity('For IPV6 addresses, we require the network prefix to be between /112 and /128'); 
                 break;
             } else {
             cidr.setCustomValidity("");
