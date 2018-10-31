@@ -29,7 +29,7 @@ Requires: httpd
 Requires: perl-Data-Validate-IP
 Requires: perl-DBD-MySQL
 Requires: perl-Geo-IP
-Requires: perl-MaxMind-DB-Writer-Tree
+Requires: perl-MaxMind-DB-Writer
 Requires: perl-MaxMind-DB-Reader
 Requires: perl-Getopt-Long
 Requires: perl-GRNOC-Config
