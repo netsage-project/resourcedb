@@ -1,6 +1,6 @@
 Summary:   NetSage Resource Database / Science Registry
 Name:      resourcedb
-Version:   0.10.0
+Version:   0.11.0
 Release:   %{_buildno}%{?dist}
 License:   Apache
 Group:     GRNOC
