@@ -1,4 +1,4 @@
-Summary:   NetSage Resource Database
+Summary:   NetSage Resource Database / Science Registry
 Name:      resourcedb
 Version:   0.10.0
 Release:   %{_buildno}%{?dist}
@@ -29,22 +29,29 @@ Requires: httpd
 Requires: perl-Data-Validate-IP
 Requires: perl-DBD-MySQL
 Requires: perl-Geo-IP
+Requires: perl-MaxMind-DB-Writer-Tree
+Requires: perl-MaxMind-DB-Reader
+Requires: perl-Getopt-Long
 Requires: perl-GRNOC-Config
 Requires: perl-GRNOC-Log
 Requires: perl-GRNOC-DatabaseQuery
 Requires: perl-String-MkPasswd
 Requires: perl-Net-DNS
 Requires: perl-NetAddr-IP
+Requires: perl-Net-IP
 Requires: perl-JSON
+Requires: perl-JSON-XS
 Requires: perl-Email-Send
 Requires: perl-MIME-Lite-TT
 Requires: perl-MIME-Lite
 Requires: perl-Text-CSV
 Requires: perl-List-MoreUtils
 Requires: perl-Encode
+Requires: perl-GRNOC-Monitoring-Service-Status
+Requires: grnoc-nagios-service-status-check
 
 %description
-NetSage Resource Database (Science Registry)
+NetSage Resource Database and User Interface (ie, Science Registry)
 
 %prep
 %setup -q -n resourcedb-%{version}
@@ -54,7 +61,6 @@ NetSage Resource Database (Science Registry)
 
 
 %install
-
 # Perl modules
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage
 %{__install} lib/GRNOC/NetSage/ResourceDB.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB.pm
@@ -66,7 +72,6 @@ NetSage Resource Database (Science Registry)
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS.pm
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS.pod
 
-# DataService/
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Admin.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Admin.pm
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Admin.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Admin.pod
@@ -81,7 +86,6 @@ NetSage Resource Database (Science Registry)
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Util.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Util.pm
 %{__install} lib/GRNOC/NetSage/ResourceDB/DataService/Util.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/DataService/Util.pod
 
-# GWS/
 %{__install} -d -p %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS/Admin.pm %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/Admin.pm
 %{__install} lib/GRNOC/NetSage/ResourceDB/GWS/Admin.pod %{buildroot}%{perl_vendorlib}/GRNOC/NetSage/ResourceDB/GWS/Admin.pod
@@ -92,23 +96,24 @@ NetSage Resource Database (Science Registry)
 
 # HTTP and web files
 %{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www
-
 cp -ar www/* %{buildroot}%{_datadir}/resourcedb/www
 
-# dir for exported db file
+# dir for exported db files
 %{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www/exported
+
+# dir for status file
+%{__install} -d -p %{buildroot}/var/lib/grnoc/scienceregistry-mmdb-file/
 
 # Configuration and schema files
 %{__install} -d -p %{buildroot}%{_sysconfdir}/grnoc/netsage/resourcedb
-
 %{__install} -m 544 sql/resourcedb.sql %{buildroot}%{_sysconfdir}/grnoc/netsage/resourcedb
 
-# Executables
+# Executable scripts
 %{__install} -d -p %{buildroot}%{_bindir}
-
 %{__install} -m 544 bin/resourcedb-init-db %{buildroot}%{_bindir}
 %{__install} -m 544 bin/resourcedb-update-db %{buildroot}%{_bindir}
 %{__install} -m 544 bin/resourcedb-export.pl %{buildroot}%{_bindir}
+%{__install} -m 544 bin/resourcedb-make-mmdb.pl %{buildroot}%{_bindir}
 %{__install} -m 544 bin/organization-import.pl %{buildroot}%{_bindir}
 %{__install} -m 544 bin/organization-export.pl %{buildroot}%{_bindir}
 
@@ -151,5 +156,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/resourcedb-update-db
 %{_bindir}/resourcedb-init-db
 %{_bindir}/resourcedb-export.pl
+%{_bindir}/resourcedb-make-mmdb.pl
 %{_bindir}/organization-import.pl 
 %{_bindir}/organization-export.pl 

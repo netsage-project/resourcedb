@@ -12,7 +12,7 @@ use JSON;
 use Data::Dumper;
 use Encode;
 
-# This script will pull data out of the Science Registry database and write it to a file as JSON,
+# This script will pull data out of the Science Registry database and write it to a .json file (used by resourcedb-make-mmdb.pl)
 # AND to a .yaml file (for use with logstash translate filter)
 
 # Defaults
@@ -20,7 +20,7 @@ my $help;
 # Use same config file as resourcedb (Science Registry)
 my $config_file = "/etc/grnoc/netsage/resourcedb/config.xml";
 # Name output file with the current timestamp
-my $output_file_yaml = "/etc/grnoc/netsage/resourcedb/datadump_".time().".yaml";
+my $output_file = "/etc/grnoc/netsage/resourcedb/datadump_".time().".json";
 
 #-----------------------------
 sub usage() {
@@ -34,7 +34,7 @@ sub usage() {
 
 # defaults can be overridden on command line (-c and -o)
 GetOptions( 'config|c=s' => \$config_file,
-            'output|o=s' => \$output_file_yaml,
+            'output|o=s' => \$output_file,
             'help|h|?' => \$help 
           );
 
@@ -65,20 +65,19 @@ my $host     = $config->get( '/config/database-host' );
 my $port     = $config->get( '/config/database-port' );
 
 # Try to open output files
-#yaml file
-$output_file_yaml =~ s/json$/yaml/;  # just in case
-my $fh_yaml;
-if (! open($fh_yaml, '>', $output_file_yaml) ) {
-    print "Could not open output file $output_file_yaml\n";
-    die;
-}
-
-#json - same name with .json
-my $output_file = $output_file_yaml;
-$output_file =~ s/yaml$/json/;
+#json file
+$output_file =~ s/yaml$/json/; # just in case
 my $fh;
 if (! open($fh, '>', $output_file) ) {
-    print "Could not open output file $output_file\n";
+    print "Could not open json output file $output_file\n";
+    die;
+}
+#yaml file
+my $output_file_yaml = $output_file; 
+$output_file_yaml =~ s/json$/yaml/;  
+my $fh_yaml;
+if (! open($fh_yaml, '>', $output_file_yaml) ) {
+    print "Could not open yaml output file $output_file_yaml\n";
     die;
 }
 

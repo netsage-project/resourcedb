@@ -1,7 +1,7 @@
 # resourcedb
 NetSage Resource Database (Science Registry or ResourceDB)
 
-Registry for pairing IP addresses or CIDR ranges with discipline, role, project, etc.
+Registry for pairing IP addresses or CIDR ranges with organizations, disciplines, roles, projects, etc.
 
 ## Installation
 
