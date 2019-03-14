@@ -14,8 +14,22 @@ use Data::Dumper;
 # The CSV file must have exact matches to existing organization, country, discipline, and role records.
 # Check the IP blocks in the CSV file. Script will warn you if there is a string match to any of them in the registry already, but go ahead and enter it.
 # The script will skip resources where the name or abbr+org_id are already in the db.
-########## Edit the source spreadsheet file, (user_id, default files) 
+# DO BEFORE RUNNING:  Specify the csv file on the command line with -i or edit default location below. 
+#                     Edit $source below.
 
+# spreadsheet columns
+# A [0] = org name (changes to org_id)
+# B [1] = resource name
+# C [2] = resource abbr
+# D [3] = ip list
+# E [4] = asn
+# F [5] = resource url 
+# G [6] = description
+# H [7] = lat, long
+# I [8] = country (changes to country_code)
+# J [9] = discipline (changes to discipline_id)
+# K [10]= role (changes to role_id)
+# L [11]= notes ($source is appended)
 #-----------------------------
 sub usage() {
   print "  USAGE: perl resource-import.pl 
@@ -28,18 +42,19 @@ sub usage() {
   exit;
 }
 #-----------------------------
-# The "resource import" user's id (create this user first and set the id below)
-# Actually, this is not really necessary. When adding an event, the user_id can be null. The event msg for additions using the website uses
-# the shibboleth username, not the username in our user table.
+# The "resource import" user's id 
 my $script_user_id = 3; ###  3 = "Resource Import Script" on lensman-dev7 and scienceregistry.grnoc
 
-# source of the spreadsheet (used in the Notes)
-my $source = "  Original info from spreadsheet supplied by C. Dodds, UH.";  #######
+# source of the spreadsheet (this is put in the Notes)
+my $source = "Info imported from spreadsheet supplied by C. Dodds, UH.";  #######
 
-# command line option defaults
+#------------------------------
+# command line option defaults:
+# DEFAULT FILE TO IMPORT
+my $input_file = "/etc/grnoc/netsage/resourcedb/resource-import.csv";
 # Use same config file as resourcedb (Science Registry)
 my $config_file = "/etc/grnoc/netsage/resourcedb/config.xml";
-my $input_file = "/etc/grnoc/netsage/resourcedb/resource-import.csv";
+#------------------------------
 
 my $help;
 # Get command line parameters
@@ -48,7 +63,7 @@ GetOptions( 'config|c=s' => \$config_file,
             'help|h|?' => \$help 
           );
 
-# did they ask for help?
+# Need help?
 usage() if $help;
 
 # filename without path. Will be saved in the event msg.
@@ -57,16 +72,14 @@ my $filename = $1;
 
 # Read config file to get db connection info
 if (! -f $config_file) {
-    print "$config_file does not exist\n";
-    die;
+    die "ERROR: $config_file does not exist\n";
     }
 my $config = GRNOC::Config->new(
     config_file => $config_file,
     force_array => 0
 );
 if (!defined $config) {
-    print "Unable to parse the config file.\n";
-    die;
+    die "ERROR: Unable to parse the config file.\n";
 }
 my $username = $config->get( '/config/database-readwrite-username' );
 my $pw       = $config->get( '/config/database-readwrite-password' );
@@ -85,8 +98,7 @@ my $dbq = GRNOC::DatabaseQuery->new(
             );
 my $conn_res = $dbq->connect();
 if(!$conn_res){
-    print "Error connecting to DB mysql.";
-    die;
+    die "Error connecting to DB mysql.";
 }
 # use utf8mb4 for communication between mysql and this application
 $dbq->{'dbh'}->do("SET NAMES utf8mb4");
@@ -98,28 +110,37 @@ my $csv = Text::CSV->new({ sep_char => ',',
                          });
 
 # open input file    SET ENCODING TO UTF8 ?????????
-open(my $fh, '<:encoding(utf8)', $input_file) or die "Could not open input file $input_file\n";
+open(my $fh, '<:encoding(utf8)', $input_file) or die "ERROR: Could not open input file $input_file\n";
 
 # global variables org_id->{org_name},etc - use to avoid having to query for same names more than once
 my $orgs;    
 my $countries;
 my $disciplines;
 my $roles;
-my $headers;
+my $headers = "yes";
 
 # Read CSV File  (this way of reading allows for fields containing embedded newlines)
-while (my $values = $csv->getline( $fh )) {
+my $values;
+while ( $values = $csv->getline( $fh )) {
+
+if (!defined $values){
+    print "BAD LINE\n";
+    next;
+    }
 
     # trim values
     map { s/^\s+|\s+$//g; } @$values;
-    
-    # header line
-    if (!$headers) {
+
+    # skip the header line
+    if ($headers eq "yes") {
+        print ("Skipped header line\n");
         $headers = "done";
         next;
     }
 
+
     # get the org id (make sure org exists already). Exact match is required!
+    # Will die if not found.
     my $org_name = $values->[0];
     next if ($org_name eq '');
     my $org_id = get_org_id($org_name);
@@ -304,11 +325,18 @@ sub do_checks {
         return 1;
     }
 
+    # Make sure all IPs are in CIDR notation (have a / followed by 2-3 digits). 
     # See if any of the CIDRs in the ip list are already in the registry (exact string match)
     # If yes, print out a warning, but continue.
     my @ips = split(',', $ip_list);
     foreach my $ip (@ips) {
-        $ip =~ s/^\s+|\s+$//g;
+        $ip =~ s/^\s+|\s+$//g; # remove spaces at start or end
+        if ( $ip !~ /.*\/\d{2,3}/ ) {
+            die "ERROR: A '/xx' is missing in '$ip_list'";
+        }
+        if ( $ip =~ /.*\/.*\/.*/ ) {
+            die "ERROR: Looks like a missing comma between IPs in '$ip_list'";
+        }
         my $found = $dbq->select(
             table => 'ip_block',
             fields => [ 'ip_block_id', 'name' ],
@@ -335,13 +363,18 @@ sub add_resource {
     my $abbr = substr($values->[2], 0, 50);
     my $ips = $values->[3];
     my $asn = $values->[4];
-    my $desc = $values->[6]. " (See ".$values->[5].".)";
+    my $res_url = $values->[5];
+    my $desc = $values->[6];
     my $location = $values->[7];
-    my ($lat, $long) = split(",", $location);
     my $country_code = $values->[8];
     my $discipline_id = $values->[9];
     my $role_id = $values->[10];
+    if ($values->[11]) { $values->[11] = $values->[11]."   "; }
     my $notes = $values->[11].$source; 
+    # lat and long - keep only up to 4 decimal places
+    my ($lat, $long) = split(",", $location);
+    ($lat)  = $lat  =~ /(-?\d+\.\d{0,4})/; 
+    ($long) = $long =~ /(-?\d+\.\d{0,4})/; 
     
     # insert into db
     my $res_id = $dbq->insert(
@@ -357,28 +390,27 @@ sub add_resource {
                     longitude => $long,
                     discipline_id => $discipline_id,
                     role_id => $role_id,
-                    notes => $notes
+                    notes => $notes,
+                    url => $res_url
                    }
     );
         
     if ($res_id) {
-        print "Inserted resource $res_id ($name)\n";
+        print "Inserted resource $res_id : $name\n";
     } else {
-        print "Insert resource query error: ".Dumper $dbq->get_error();
-        die;
+        die "Insert resource query error: ".Dumper $dbq->get_error();
     }
 
    # insert event (will record current timestamp) (user can be null, but let's keep it for now)
     my $event_id = $dbq->insert(
         table => 'event',
         fields => { user => $script_user_id,
-                    message => "resource import script created this resource. File: $filename",
+                    message => "resource import script created this resource ($filename)",
                     ip_block_id => $res_id
                   }
     );
     if (!$event_id) {
-        print "Insert event query error: ".Dumper $dbq->get_error();
-        die;
+        die "Insert event query error: ".Dumper $dbq->get_error();
     }
 
 }
