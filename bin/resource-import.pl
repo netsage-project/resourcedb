@@ -146,6 +146,9 @@ if (!defined $values){
     my $org_id = get_org_id($org_name);
     $values->[0] = $org_id;
 
+    # remove all spaces from the IP list before saving to the db (this is important for make-mmdb.pl)
+    $values->[3] =~ s/\s//g;    
+
     # check if the resource name is already in the registry [if yes, skip this resource]
     # or if the org + resource abbr is already in the registry [if yes, skip this resource]
     # or if any of the ips and blocks are already in [if yes, warn user] (just string matching)
@@ -330,12 +333,11 @@ sub do_checks {
     # If yes, print out a warning, but continue.
     my @ips = split(',', $ip_list);
     foreach my $ip (@ips) {
-        $ip =~ s/^\s+|\s+$//g; # remove spaces at start or end
         if ( $ip !~ /.*\/\d{2,3}/ ) {
-            die "ERROR: A '/xx' is missing in '$ip_list'";
+            die "ERROR: A '/xx' is missing in '$ip'";
         }
         if ( $ip =~ /.*\/.*\/.*/ ) {
-            die "ERROR: Looks like a missing comma between IPs in '$ip_list'";
+            die "ERROR: Looks like a missing comma between IPs : '$ip'";
         }
         my $found = $dbq->select(
             table => 'ip_block',
