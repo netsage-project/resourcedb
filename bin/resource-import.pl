@@ -331,7 +331,6 @@ sub do_checks {
     # Make sure all IPs are in CIDR notation (have a / followed by 2-3 digits). 
     # See if any of the CIDRs in the ip list are already in the registry (exact string match)
     # If yes, print out a warning, but continue.
-print $ip_list."\n";
     my @ips = split(',', $ip_list);
     foreach my $ip (@ips) {
         if ( $ip !~ /.*\/\d{2,3}/ ) {
