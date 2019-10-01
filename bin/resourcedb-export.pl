@@ -16,6 +16,7 @@ use Encode;
 # .json file (used by resourcedb-make-mmdb.pl !! )
 # AND to a .yaml file (used with logstash translate filter at one point; maybe still useful someday)
 # AND to a .csv file  (to parse or send to a human; delimiter is | )
+# RUNS FROM CRON
 
 # Defaults
 my $help;

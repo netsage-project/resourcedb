@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+# When first installing the Science Registry (resourcedb), and after every upgrade, 
+# run a script to set up the database tables and/or make any changes needed.
+# RUN MANUALLY
+
 use strict;
 use warnings;
 

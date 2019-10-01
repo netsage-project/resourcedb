@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+# This is a script to run when installing Science Registry for the first time.
+# It will create database users for the scripts to use and write /etc/grnoc/resourcedb/config.xml
+# RUN MANUALLY with sudo
+
 use strict;
 use warnings;
 
