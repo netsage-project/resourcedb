@@ -55,8 +55,20 @@ my $response = $es->cat->indices (
 ); 
 my @indices = split("\n",$response);
 
+########## need to use this in future!  10/2/19 ############
+# some index names start with "shrink-", some don't! There are aliases for the ones with shrink,
+# we need to use those to sort right.
+my @renamed_indices;
+foreach my $index (@indices) {
+    $index =~ s/shrink-//;
+   push(@renamed_indices, $index);
+}
+my @sorted_indices = reverse sort @renamed_indices;
+###print Dumper \@sorted_indices; exit;
+####################
 # Loop over indices, going from most recent into the past
 my @sorted_indices = reverse sort @indices;
+####################
 
 my $total_docs = 0;
 my $total_docs_done = 0;

@@ -8,29 +8,36 @@ use Getopt::Long;
 use Data::Dumper;
 
 # This script updates flows in ElasticSearch from the time the script is run, going back in time.
-# This version will replace science registry disciplines with new ones based on the given mapping.
-# (Update the discipline descriptions hash to match what's in the resourcedb database!)
-# RUN MANUALLY   
+# This version will replace science registry disciplines (eg, Astronomy and Astrophysics) with new ones (eg, MPS.Astronomy)
+# based on the given mapping.
+# (Be sure the discipline descriptions hash matches what's in the resourcedb database!)
+# RUN MANUALLY    (with '-es dev' to update es ES, '-es prod' to update production ES)
 
-# Get info to access elasticsearch from command line
+# Get info to access elasticsearch, from command line
 my $username;  # eg, netsage_service
 my $pw;
-my $dev;  
+my $esver;  
 
 GetOptions( 'username|u=s' => \$username, 
             'password|p=s' => \$pw,
-            'dev|d=s' => \$dev ) 
-            or die("ERROR. On the command line, enter the elasticsearch username and password with -u, -p, \n ".
-                   "       and '-d 0' to use production ES, -d 1 (or other value) to use dev ES\n"); 
+            'es=s' => \$esver );
+if (!$esver or !$username or !$pw) {
+            die("ERROR. On the command line, enter the elasticsearch username and password with -u, -p, \n ".
+                   "       and '-es prod' to use production Elasticsearch, '-es dev' to use dev ES\n"); 
+}
 
 # elasticsearch url with username, pw, host
 my $es_url;
-if ($dev eq '0') {
+if ($esver eq 'prod') {
     $es_url = 'https://'.$username.':'.$pw.'@netsage-elk1.grnoc.iu.edu/esproxy2';
-} else {
+    print ("UPDATING * production * NETSAGE ELASTICSEARCH INDICES\n");
+} elsif ($esver eq 'dev') {
     $es_url = 'https://'.$username.':'.$pw.'@netsage-elk1.grnoc.iu.edu/esproxy_dev';
+    print ("UPDATING * dev * NETSAGE ELASTICSEARCH INDICES\n");
+} else {
+    die ("ERROR: Use '-es dev' for dev ES, '-es prod' to use production ES\n"); 
 }
-    
+
 my $index_names = "om-ns-netsage-";   # first part of names
 
 # Default mapping of old to new
@@ -149,20 +156,34 @@ my $response = $es->cat->indices (
 ); 
 my @indices = split("\n",$response);
 
-# Loop over indices, going from most recent into the past
-my @sorted_indices = reverse sort @indices;
+# some index names start with "shrink-", some don't! There are aliases for the ones with shrink,
+# we need to use those to sort right.
+my @renamed_indices;
+foreach my $index (@indices) {
+    $index =~ s/shrink-//;
+   push(@renamed_indices, $index);
+} 
+my @sorted_indices = reverse sort @renamed_indices;
+###print Dumper \@sorted_indices; exit;
 
+# Loop over indices, going from most recent into the past
 my $total_docs = 0;
 my $total_docs_done = 0;
 foreach my $index (@sorted_indices) {
 
-    # bulk_helper for this index - will use to do many updates in one request
+########
+##if ($index =~ /2019\.10\./) { print ("SKIPPING $index\n"); next; }
+##if ($index =~ /2019\.09\.[23-30]/) { print ("SKIPPING $index\n"); next; }
+##if ($index =~ /2019\.08\./) { print ("QUITTING AT AUG 2019\n"); last; }
+########
+
+    # bulk_helper for updates of this index - will use to do many updates in one request
     # ####  NOTE: THE CURRENT VERSION OF BULK_HELPER REQUIRES "type" BUT ES VER 7 DOESN'T SUPPORT IT
     # ####  UNTIL A NEW VERSION COMPATIBLE WITH ES 7 COMES OUT, I'VE MADE A LOCAL MOD IN 
     # ####  /usr/share/perl5/vendor_perl/Search/Elasticsearch/Client/6_0/Role/API.pm (line 57) TO NOT REQUIRE IT
     my $bulk = $es->bulk_helper(
         index => $index,
-        max_count => 500,  # max no. of actions before flushing (sending request)
+        max_count => 1000,  # max no. of actions before flushing (sending request)
         verbose => 1,
         on_success => sub {
             # called for every action that has a successful response
@@ -171,13 +192,15 @@ foreach my $index (@sorted_indices) {
         on_conflict => sub {
             # called if, eg, trying to create a document that already exists
             my ($action,$response,$i_action,$version) = @_;
-            print "CONFLICT ERROR DOING UPDATE #$i_action\n"
+            print "CONFLICT ERROR DOING UPDATE #$i_action\n";
+            print Dumper $action;
         },
         on_error => sub {
             # called for errors other than conflicts. $i_action = index of the action in the request, starts at 0.
             my ($action,$response,$i_action) = @_;
-            print "THERE WAS A PROBLEM DOING UPDATE #$i_action\n";
-            print "  ".$response."\n";
+            print "THERE WAS A PROBLEM DOING UPDATE #$i_action in index $index\n";
+            print Dumper $action;
+            print Dumper $response;
         }
     );
 
@@ -205,7 +228,7 @@ foreach my $index (@sorted_indices) {
 
     my $scroll_total = $scroll->total;   # not sure why this is a hash with value and 'relation' => 'eq'!
     my $ndocs = $scroll_total->{'value'};
-    print "    num scireg docs = $ndocs \n";
+    print "num scireg docs = $ndocs \n";
     $total_docs += $ndocs;
     STDOUT->autoflush(1); 
 
@@ -224,9 +247,10 @@ foreach my $index (@sorted_indices) {
         my $src_ip = $data->{'meta'}->{'src_ip'};
         my $dst_ip = $data->{'meta'}->{'dst_ip'};
 
-{ no warnings 'uninitialized'; # turn off uninitalized variable warnings in this {}. 
-      print "$n. fixing ID = $id   "; ######
-      print " $src_discipline -> $dst_discipline.   "; #######
+{ # turn off uninitalized variable warnings in this {}. 
+  no warnings 'uninitialized'; 
+      ###print "$n. fixing ID = $id   "; ######
+      ###print " $src_discipline -> $dst_discipline.   "; #######
 
 ########
 #       print "BEFORE: ".Dumper $data;
@@ -241,41 +265,47 @@ foreach my $index (@sorted_indices) {
         # Revise the new default disciplines if needed using info in %nondefaults.
         my $updates;
         my $new_src_discipline = $discipline_hash{$src_discipline};
+        if ( $nondefaults{$src_resource} ) {
+            $new_src_discipline = $nondefaults{$src_resource};
+            ###print"     resource: $src_resource ... Changed to $new_src_discipline\n"; ######
+        } 
         my $new_dst_discipline = $discipline_hash{$dst_discipline};
-      print "===>  $new_src_discipline -> $new_dst_discipline.  \n"; #######
+        if ( $nondefaults{$dst_resource} ) {
+            $new_dst_discipline = $nondefaults{$dst_resource};
+            ###print"     resource: $dst_resource ... Changed to $new_dst_discipline\n"; ######
+        } 
+        ###print "===>  $new_src_discipline -> $new_dst_discipline.  \n"; #######
 
-        if ($src_discipline && $new_src_discipline) {
-            if ( $nondefaults{$src_resource} ) {
-                $new_src_discipline = $nondefaults{$src_resource};
-                print"     resource: $src_resource ... Changed to $new_src_discipline\n"; ######
-            } 
+        # Check to be sure there is an update to do ("Unknown" is a case where old and new are the same)
+        if ($src_discipline && $new_src_discipline && $src_discipline ne $new_src_discipline) {
             $updates->{"meta"}->{"scireg"}->{"src"}->{"discipline"} = $new_src_discipline;
             $updates->{"meta"}->{"scireg"}->{"src"}->{"discipline_description"} = $descrip_hash{$new_src_discipline};
         }
-        if ($dst_discipline && $new_dst_discipline) {
-            if ( $nondefaults{$dst_resource} ) {
-                $new_dst_discipline = $nondefaults{$dst_resource};
-                print"     resource: $dst_resource ... Changed to $new_dst_discipline\n"; ######
-            } 
+        if ($dst_discipline && $new_dst_discipline && $dst_discipline ne $new_dst_discipline) {
             $updates->{"meta"}->{"scireg"}->{"dst"}->{"discipline"} = $new_dst_discipline;
             $updates->{"meta"}->{"scireg"}->{"dst"}->{"discipline_description"} = $descrip_hash{$new_dst_discipline};
         }
 
         # Add action to $bulk if there's anything to update (updates haven't been done already!). 
-        # The update query will be sent when max_count is reached. (can also call flush it manually)
+        # The update query will be sent when max_count is reached. (can also call flush to do it manually)
         if ($updates) {
             $bulk->add_action( update => { id => $id,
                                            doc => $updates,
                                            doc_as_upsert => "true" }
                              );
+            ###print "$src_discipline -> $dst_discipline.   "; #######
+            ###print "===>  $new_src_discipline -> $new_dst_discipline.  \n"; #######
         } else { 
-            print "    Skipping $index. Already updated. \n"; 
+            ### print "    Skipping $id. Already updated. \n"; 
+            $total_docs = $total_docs - 1;  
         }
 } # end ignoring unitialized warnings
 
 ##########
-if($n == 5) { last; } 
+# for testing, do just a few per index
+#if($n == 10) { last; } 
 #########
+
     } # end doc
 
     # finish anything updates left
