@@ -37,7 +37,6 @@ sub new {
     bless( $self, $class );
 
     $self->{'logger'} = GRNOC::Log->get_logger("GRNOC.NetSage.ResourceDB.DataService.Util");
-
     return $self;
 }
 
@@ -53,6 +52,7 @@ sub install_database {
                               $self->{'password'},
                               {PrintError => 0});
     if (!$db) {
+        print ("Couldn't connect to db");
         $self->{'logger'}->error($DBI::errstr);
         $err = "Couldn't connect to mysql.";
         return (undef, $err);
@@ -72,7 +72,7 @@ sub install_database {
 
     $ok = $db->do("use resourcedb");
     if (!$ok) {
-        $err = "Couldn't use resourcedb database: " . $DBI::errstr . "\n";
+        $err = "Couldn't get into resourcedb database: " . $DBI::errstr . "\n";
         return (undef, $err);
     }
 
@@ -119,7 +119,8 @@ sub schema_created {
 
     if ( ! $db_exists ) {
         warn "ERROR - Couldn't add tables since no resourcedb database exists";
-        return;
+        $err = "ERROR - Couldn't add tables since no resourcedb database exists";
+        return (undef, $err);
     }
 
     # Initialize the database from the Schema located at $path - file has sql to CREATE TABLES

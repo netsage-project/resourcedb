@@ -15,6 +15,7 @@ use DBI;
 use constant DEFAULT_CONFIG_FILE => '/etc/grnoc/netsage/resourcedb/config.xml';
 
 sub main {
+
     my $config = GRNOC::Config->new(
         config_file => DEFAULT_CONFIG_FILE,
         force_array => 0
@@ -34,7 +35,7 @@ sub main {
 
     my ($version, $err) = $db_util->install_database();
     if (defined $err) {
-        warn "$err";
+        print "error: $err \n";
         return;
     }
 
@@ -42,3 +43,4 @@ sub main {
 }
 
 main();
+    print " DONE \n";
