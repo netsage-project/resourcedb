@@ -115,7 +115,6 @@ cp -ar www/* %{buildroot}%{_datadir}/resourcedb/www
 %{__install} -m 544 bin/resourcedb-update-db %{buildroot}%{_bindir}
 %{__install} -m 544 bin/resourcedb-export.pl %{buildroot}%{_bindir}
 %{__install} -m 544 bin/resourcedb-make-mmdb.pl %{buildroot}%{_bindir}
-%{__install} -m 544 bin/resources-import.pl %{buildroot}%{_bindir}
 
 # Misc scripts are not installed       ok???
 
@@ -159,4 +158,3 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/resourcedb-init-db
 %{_bindir}/resourcedb-make-mmdb.pl
 %{_bindir}/resourcedb-export.pl
-%{_bindir}/resources-import.pl

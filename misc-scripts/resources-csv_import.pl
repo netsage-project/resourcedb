@@ -16,6 +16,8 @@ use Data::Dumper;
 # The script will skip resources where the name or abbr+org_id are already in the db.
 # DO BEFORE RUNNING:  Specify the csv file on the command line with -i or edit default location below. 
 #                     Edit $source below.
+#                     Check everything over.
+# USE TO IMPORT RESOURCES FROM A CSV FILLED OUT BY AN ORGANIZATION
 # RUN MANUALLY
 
 # spreadsheet columns

@@ -13,10 +13,11 @@ use Data::Dumper;
 use Encode;
 
 # This script will pull data out of the Science Registry database and write it to a
-# .json file (used by resourcedb-make-mmdb.pl !! )
+# .json file (used by resourcedb-make-mmdb.pl which creates the fake geoip mmdb file used for logstash SciReg tagging!! )
 # AND to a .yaml file (used with logstash translate filter at one point; maybe still useful someday)
 # AND to a .csv file  (to parse or send to a human; delimiter is | )
 # RUNS FROM CRON
+# ~10/23/19 - Filter out resources with discipline = "Unknown" or "non-science" as we don't want to tag flows with those disciplines.
 
 # Defaults
 my $help;
@@ -118,6 +119,7 @@ if(!$conn_res){
 $dbq->{'dbh'}->do("SET NAMES utf8mb4;");
 
 # Get info about resources
+# FILTER OUT resources with discipline = "Unknown" or "non-science" AS WE DON'T WANT TO TAG FLOWS WITH THOSE DISCIPLINES.
 my $resources = $dbq->select(
     table => 'ip_block JOIN organization ON ip_block.organization_id = organization.organization_id '.
              'JOIN discipline ON ip_block.discipline_id = discipline.discipline_id '.
@@ -142,7 +144,8 @@ my $resources = $dbq->select(
                 'organization.latitude  as org_latitude',
                 'organization.longitude as org_longitude',
                 'organization.country_code  as org_country_code'
-               ]
+               ],
+    where => { 'discipline.name' => [ -and => {'!=','Unknown'}, {'!=','non-science'} ] }
     );
 
 if (!$resources) {
