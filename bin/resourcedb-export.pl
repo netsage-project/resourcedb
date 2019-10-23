@@ -12,35 +12,44 @@ use JSON;
 use Data::Dumper;
 use Encode;
 
-# This script will pull data out of the Science Registry database and write it to a .json file (used by resourcedb-make-mmdb.pl)
-# AND to a .yaml file (for use with logstash translate filter)
+# This script will pull data out of the Science Registry database and write it to a
+# .json file (used by resourcedb-make-mmdb.pl which creates the fake geoip mmdb file used for logstash SciReg tagging!! )
+# AND to a .yaml file (used with logstash translate filter at one point; maybe still useful someday)
+# AND to a .csv file  (to parse or send to a human; delimiter is | )
+# RUNS FROM CRON
+# ~10/23/19 - Filter out resources with discipline = "Unknown" or "non-science" as we don't want to tag flows with those disciplines.
 
 # Defaults
 my $help;
 # Use same config file as resourcedb (Science Registry)
 my $config_file = "/etc/grnoc/netsage/resourcedb/config.xml";
 # Name output file with the current timestamp
-my $output_file = "/etc/grnoc/netsage/resourcedb/datadump_".time().".json";
+my $output_file = "/etc/grnoc/netsage/resourcedb/scireg_".time().".json";
 
 #-----------------------------
 sub usage() {
-  print "  USAGE: perl resourcedb-export.pl [-c <config file>] [-o <output file>] [-h] 
-  Without parameters, the defaults are 
-    config_file = /etc/grnoc/netsage/resourcedb/config.xml 
-    output_file = /etc/grnoc/netsage/resourcedb/datadump_<timestamp>.yaml (.json file will have same name. Must run as sudo) \n";
+  print "  USAGE: perl resourcedb-export.pl [-c/--config <config file>] [-o/==output <output-dir/filename.json> [-h/--help]
+  Without parameters, the defaults are
+    config_file = /etc/grnoc/netsage/resourcedb/config.xml
+    output = /etc/grnoc/netsage/resourcedb/scireg_<timestamp>.json (.yaml and .csv are written too)
+    (.yaml and .csv files will have same name. Must run as sudo) \n";
   exit;
 }
 #-----------------------------
 
 # defaults can be overridden on command line (-c and -o)
 GetOptions( 'config|c=s' => \$config_file,
-            'output|o=s' => \$output_file,
-            'help|h|?' => \$help 
+        'output|o=s' => \$output_file,
+            'help|h|?' => \$help
           );
 
 # did they ask for help?
 usage() if $help;
 
+if ( $output_file !~ /\.json/) {
+    print "your output filename has to end in .json\n";
+    die;
+}
 
 # Read config file to get db connection info
 if (! -f $config_file) {
@@ -64,23 +73,34 @@ my $dbname   = $config->get( '/config/database-name' );
 my $host     = $config->get( '/config/database-host' );
 my $port     = $config->get( '/config/database-port' );
 
+# csv file - columns wanted, in order. Values are db columns/hash keys
+my @csv_columns = ("ip_block_id", "addresses_str", "org_name", "resource", "description", "country_code", "discipline", "role");
+my $csv_header = "resource_id|IPs|org|resource|description|country_code|discipline|role \n";
+
 # Try to open output files
-#json file
-$output_file =~ s/yaml$/json/; # just in case
+# json file
 my $fh;
 if (! open($fh, '>', $output_file) ) {
     print "Could not open json output file $output_file\n";
     die;
 }
-#yaml file
-my $output_file_yaml = $output_file; 
-$output_file_yaml =~ s/json$/yaml/;  
+# yaml file
+my $output_file_yaml = $output_file;
+$output_file_yaml =~ s/json$/yaml/;
 my $fh_yaml;
 if (! open($fh_yaml, '>', $output_file_yaml) ) {
     print "Could not open yaml output file $output_file_yaml\n";
     die;
 }
-
+# csv file
+my $output_file_csv = $output_file;
+$output_file_csv =~ s/json$/csv/;
+my $fh_csv;
+if (! open($fh_csv, '>', $output_file_csv) ) {
+    print "Could not open csv output file $output_file_csv\n";
+    die;
+}
+print $fh_csv $csv_header;
 
 # Connect to db
 my $dbq = GRNOC::DatabaseQuery->new(
@@ -95,10 +115,11 @@ my $conn_res = $dbq->connect();
 if(!$conn_res){
     die ("Error connecting to mysql.");
 }
-# tells dbq to expect/use unicode which is what's in the db 
+# tells dbq to expect/use unicode which is what's in the db
 $dbq->{'dbh'}->do("SET NAMES utf8mb4;");
 
 # Get info about resources
+# FILTER OUT resources with discipline = "Unknown" or "non-science" AS WE DON'T WANT TO TAG FLOWS WITH THOSE DISCIPLINES.
 my $resources = $dbq->select(
     table => 'ip_block JOIN organization ON ip_block.organization_id = organization.organization_id '.
              'JOIN discipline ON ip_block.discipline_id = discipline.discipline_id '.
@@ -123,7 +144,8 @@ my $resources = $dbq->select(
                 'organization.latitude  as org_latitude',
                 'organization.longitude as org_longitude',
                 'organization.country_code  as org_country_code'
-               ]
+               ],
+    where => { 'discipline.name' => [ -and => {'!=','Unknown'}, {'!=','non-science'} ] }
     );
 
 if (!$resources) {
@@ -154,13 +176,21 @@ foreach my $res (@$resources) {
     foreach my $proj (@$projects) {
         push(@{$res->{'projects'}}, $proj);
     }
-    ### print Dumper($res); ###
+    ###print Dumper($res); ###
 
     # For json file
     push(@all_resources, $res);
 
+    # For csv file
+    my $line = "";
+    foreach my $col (@csv_columns) {
+        $line = $line . $res->{$col} . '|';
+    }
+    $line =~ s/\n/  /g;
+    $line = $line."\n";
+
     # For yaml file
-    # strip /xx's from addresses and expand any ip blocks 
+    # strip /xx's from addresses and expand any ip blocks
     my @ip_array = split(",", $res->{'addresses_str'});
     my @final_ips;
     foreach my $ip (@ip_array) {
@@ -175,7 +205,7 @@ foreach my $res (@$resources) {
             push(@final_ips, $ipblock->addr());
         } elsif ($slash < 28 or ($slash >32 and $slash < 124)) {
             # if there are too many ip's in the block, write a regular expression that matches ip's in the block
-            # NetAddr::IP -> re() - Returns a Perl regular expression that will match an IP address within the given subnet. 
+            # NetAddr::IP -> re() - Returns a Perl regular expression that will match an IP address within the given subnet.
             # Defaults to ipV4 notation. Will return an ipV6 regex if the address in not in ipV4 space.
             push(@final_ips, $ipblock->re());
         } else {
@@ -188,20 +218,25 @@ foreach my $res (@$resources) {
         }
     }
     # remove dups and join array elements with |
-    @final_ips = uniq(@final_ips); 
+    @final_ips = uniq(@final_ips);
     my $ip_regex = join( "|", @final_ips );
 
-    # convert resource info into a json string, then convert that (which is utf8 from the db) to perl characters 
-    # with internal utf-8 tags, using decode. 
+    # convert resource info into a json string, then convert that (which is utf8 from the db) to perl characters
+    # with internal utf-8 tags, using decode.
     my $res_json = decode( 'utf-8', encode_json($res) );
-    # html-encode simple single quotes since we'll use them to start and end the string that holds the json and escaping them 
+    # html-encode simple single quotes since we'll use them to start and end the string that holds the json and escaping them
     # doesn't work ("s are already escaped)
     $res_json =~ s/'/&apos;/g;
 
     # write  ip:'data'  line to file (perl knows how to write utf8 chars)
     print $fh_yaml  "'".$ip_regex."' : '".$res_json."'\n" ;
+
+    # csv file line
+    print $fh_csv $line;
 }
+
 close($fh_yaml);
+close($fh_csv);
 
 # Add an array of IPs in addition to the addresses string (for the old pipeline scireg tagger)
 foreach my $resrc (@all_resources) {
@@ -214,5 +249,4 @@ my $json = decode( 'utf-8', encode_json(\@all_resources) );
 print  $fh $json ;
 close($fh);
 
-print "Wrote $output_file and $output_file_yaml \n";
-
+print "Wrote $output_file and $output_file_yaml and $output_file_csv \n";

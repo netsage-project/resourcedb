@@ -16,6 +16,9 @@ use Data::Dumper;
 # The script will skip resources where the name or abbr+org_id are already in the db.
 # DO BEFORE RUNNING:  Specify the csv file on the command line with -i or edit default location below. 
 #                     Edit $source below.
+#                     Check everything over.
+# USE TO IMPORT RESOURCES FROM A CSV FILLED OUT BY AN ORGANIZATION
+# RUN MANUALLY
 
 # spreadsheet columns
 # A [0] = org name (changes to org_id)
@@ -32,7 +35,7 @@ use Data::Dumper;
 # L [11]= notes ($source is appended)
 #-----------------------------
 sub usage() {
-  print "  USAGE: perl resource-import.pl 
+  print "  USAGE: perl resources-import.pl 
                   [-c <config file>] 
                   [-i <input file>] 
                   [-h | -help] 

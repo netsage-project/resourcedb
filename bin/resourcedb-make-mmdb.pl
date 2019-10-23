@@ -6,6 +6,7 @@
 # Each db entry is for an individual cidr address. They are sorted so the longest prefixes (most specific addresses) come last, since
 # the logstash GEOIP FILTER gets the LAST MATCH for an IP address.
 # If successful, this script writes a timestamp to status.txt in /var/lib/grnoc/scienceregistry-mmdb-file/status.txt.
+# RUNS VIA CRON
 
 # see https://blog.maxmind.com/2015/09/29/building-your-own-mmdb-database-for-fun-and-profit/
 # also https://stackoverflow.com/questions/47655730/maxmind-writer-to-create-custom-database-to-use-with-geoip-in-elk-stack

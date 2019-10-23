@@ -11,6 +11,7 @@ use Data::Dumper;
 
 # This script will pull only organizations (name/abbr/country_code) out of the Science Registry 
 # database and write it to a file as JSON.
+# RUN MANUALLY
 
 # Defaults
 my $help;

@@ -11,6 +11,7 @@ use Data::Dumper;
 
 # This script will pull organization data out of a CSV file and put it into the Science Registry database.
 # Col. 1 = org name,  col. 2 = org abbr,  col. 3 = org country code (if any)
+# RUN MANUALLY
 
 # Use same config file as resourcedb (Science Registry)
 my $config_file = "/etc/grnoc/netsage/resourcedb/config.xml";

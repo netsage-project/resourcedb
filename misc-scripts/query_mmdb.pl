@@ -3,6 +3,7 @@
 # This script can be used to view the info for an IP in the science registry mmdb file
 # (or any mmdb file with appropriate edits)
 # User must provide an mmdb filename/path and an IP address on the command line
+# RUN MANUALLY
 
 # based on https://blog.maxmind.com/2015/09/29/building-your-own-mmdb-database-for-fun-and-profit/
 
