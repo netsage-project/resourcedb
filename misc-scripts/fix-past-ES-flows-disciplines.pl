@@ -10,6 +10,7 @@ use Data::Dumper;
 # This script updates flows in ElasticSearch from the time the script is run, going back in time.
 # This version will replace science registry disciplines (eg, Astronomy and Astrophysics) with new ones (eg, MPS.Astronomy)
 # based on the given mapping.
+# Uses default discipline mappings with overrides for some specific resource names.
 # (Be sure the discipline descriptions hash matches what's in the resourcedb database!)
 # RUN MANUALLY    (with '-es dev' to update es ES, '-es prod' to update production ES)
 
@@ -58,7 +59,7 @@ my %discipline_hash = (
 "GeoSpace" => "GEO.Atmospheric ", 
 "Materials" => "MPS.Materials", 
 "Mathematics and Statistics" => "MPS.Math", 
-"Multiple" => "MSF.General", 
+"Multiple" => "Multi-Science Facility", 
 "Network Monitoring" => "CS.Network Testing and Monitoring", 
 "Ocean Sciences" => "GEO.Ocean", 
 "Other/Unspecified Biology" => "BIO.General", 
@@ -94,7 +95,7 @@ my %descrip_hash = (
 "SBE.Psychology and Cognitive" => "Research in cognition, language, social behavior, etc",
 "SBE.Social and Economics" => "Economics, Political Science, and Sociology ",
 "SBE.General" => "Other, unknown or multiple Social, Behavioral, and Economics areas",
-"MSF.General" => "MULTI-SCIENCE FACILITY - most often a supercomputer or supercomputer center used for multiple sciences",
+"Multi-Science Facility" -> "A resource used by multiple sciences; most often a supercomputer or supercomputer center",
 "ENG.General" => "Various types of Engineering",
 "Unknown" => "Nothing is known about the science discipline",
 "non-science" => "eg, Microsoft updates, CentOS mirror or archive, rocket and satellite systems, etc."
@@ -111,7 +112,7 @@ my %nondefaults = (
 "Glasgow - GridPP/ScotGrid" => "MPS.Physics.High Energy",
 "RAL - GridPP - Ceph" => "MPS.Physics.High Energy",
 "NOAA - NCEP - NOMADS Boulder" => "GEO.General",
-"ESnet - unknown" => "MSF.General",
+"ESnet - unknown" => "Multi-Science Facility",
 "UW - IRIS - DMC Web Services" => "GEO.Earth",
 "ASTI - unknown" => "Unknown",
 "NOAA - NCEI - NCDC - NOMADS" => "GEO.General",
@@ -128,7 +129,7 @@ my %nondefaults = (
 "NAOJ - WIDE Project - unknown" => "MPS.Astronomy",
 "Federal Agency for Cartography and Geodes" => "GEO.Earth",
 "WUSTL - XNAT" => "BIO.Genomics and Bioinformatics",
-"MPCDF - GridFTP nodes" => "MSF.General",
+"MPCDF - GridFTP nodes" => "Multi-Science Facility",
 "Edinburgh - RDF - GridPP Storage" => "MPS.Physics.High Energy",
 "NICPB - HEPC - Grid FTP servers" => "MPS.Physics.High Energy",
 "HKU" => "Unknown",
@@ -172,6 +173,7 @@ my $total_docs_done = 0;
 foreach my $index (@sorted_indices) {
 
 ########
+# to skip some indices or quit when reaching some index:
 ##if ($index =~ /2019\.10\./) { print ("SKIPPING $index\n"); next; }
 ##if ($index =~ /2019\.09\.[23-30]/) { print ("SKIPPING $index\n"); next; }
 ##if ($index =~ /2019\.08\./) { print ("QUITTING AT AUG 2019\n"); last; }
