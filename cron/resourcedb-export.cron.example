@@ -1,3 +1,11 @@
-0 * * * root /usr/bin/resourcedb-export.pl -o /usr/share/resourcedb/www/exported/scireg.json
-20 * * * root /usr/bin/resourcedb-make-mmdb.pl -i /usr/share/resourcedb/www/exported/scireg.json -o /usr/share/resourcedb/www/exported/scireg.mmdb
-40 * * * root /usr/bin/organization-export.pl -o /usr/share/resourcedb/www/exported/scireg-orgs.json
+# export sci reg db to json. This is needed by resourcedb-make-mmdb!
+# daily at 10:05 UTC
+05 10 * * * root /usr/bin/resourcedb-export.pl -o /usr/share/resourcedb/www/exported/scireg.json >/dev/null 2>&1
+
+# make fake-geoip db for logstash sci reg tagging
+# daily at 10:15 UTC
+15 10 * * * root /usr/bin/resourcedb-make-mmdb.pl -i /usr/share/resourcedb/www/exported/scireg.json -o /usr/share/resourcedb/www/exported/scireg.mmdb >/dev/null 2>&1
+
+# not used yet
+#15 * * * * root /usr/bin/organization-export.pl -o /usr/share/resourcedb/www/exported/scireg-orgs.json >/dev/null 2>&1
+

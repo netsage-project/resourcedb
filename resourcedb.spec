@@ -99,7 +99,7 @@ NetSage Resource Database and User Interface (ie, Science Registry)
 %{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www
 cp -ar www/* %{buildroot}%{_datadir}/resourcedb/www
 
-# dir for exported db files
+# dir for exported/downloaded db files
 %{__install} -d -p %{buildroot}%{_datadir}/resourcedb/www/exported
 
 # dir for status file
@@ -115,8 +115,13 @@ cp -ar www/* %{buildroot}%{_datadir}/resourcedb/www
 %{__install} -m 544 bin/resourcedb-update-db %{buildroot}%{_bindir}
 %{__install} -m 544 bin/resourcedb-export.pl %{buildroot}%{_bindir}
 %{__install} -m 544 bin/resourcedb-make-mmdb.pl %{buildroot}%{_bindir}
+%{__install} -m 544 bin/get-current-geoip %{buildroot}%{_bindir}
 
-# Misc scripts are not installed       ok???
+# example Cron files
+%{__install} -m 644 cron/geoip-update.cron.example %{buildroot}/etc/ccron.d/geoip-update.cron.example
+%{__install} -m 644 cron/resourcedb-export.cron.example %{buildroot}/etc/ccron.d/resourcedb-export.cron.example
+
+# Misc scripts are not installed.        ok???
 
 %check
 make test_jenkins
@@ -158,3 +163,4 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/resourcedb-init-db
 %{_bindir}/resourcedb-make-mmdb.pl
 %{_bindir}/resourcedb-export.pl
+%{_bindir}/get-current-geoip

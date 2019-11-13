@@ -1,0 +1,3 @@
+# Get current GeoLite2 City and ASN dbs
+# Wednesdays at 11:30 UTC
+30 11 * * 3 root  /usr/bin/get-current-geoip > /tmp/get-current-geoip.out 2>&1
