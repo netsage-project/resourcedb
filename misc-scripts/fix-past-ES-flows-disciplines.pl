@@ -70,9 +70,10 @@ my %discipline_hash = (
 "Remote Sensing" => "GEO.General", 
 "Sociology, Politics, Culture" => "SBE.General", 
 "Space Operations and Technology" => "non-science", 
-"Unknown" => "Unknown", 
 "VLBI (geodetic/astrometric)" => "MPS.Astronomy",
+"Unknown" => "Unknown", 
 "Other" => "ENG.General" );
+
 my %descrip_hash = (
 "BIO.Environmental" => "Populations, species, ecosystems, ecological studies",
 "BIO.Genomics and Bioinformatics" => "Genomes, protein sequences, *omics, statistics, computational biology",
@@ -95,11 +96,12 @@ my %descrip_hash = (
 "SBE.Psychology and Cognitive" => "Research in cognition, language, social behavior, etc",
 "SBE.Social and Economics" => "Economics, Political Science, and Sociology ",
 "SBE.General" => "Other, unknown or multiple Social, Behavioral, and Economics areas",
-"Multi-Science Facility" -> "A resource used by multiple sciences; most often a supercomputer or supercomputer center",
+"Multi-Science Facility" => "A resource used by multiple sciences; most often a supercomputer or supercomputer center",
 "ENG.General" => "Various types of Engineering",
 "Unknown" => "Nothing is known about the science discipline",
 "non-science" => "eg, Microsoft updates, CentOS mirror or archive, rocket and satellite systems, etc."
 );
+
 # resources with non-default new disciplines. (resource_name => new discipline)
 my %nondefaults = (
 "NASA - Solar and Heliospheric Observatory (SOHO)" => "MPS.Astronomy",
@@ -165,7 +167,7 @@ foreach my $index (@indices) {
    push(@renamed_indices, $index);
 } 
 my @sorted_indices = reverse sort @renamed_indices;
-###print Dumper \@sorted_indices; exit;
+##print Dumper \@sorted_indices; exit;
 
 # Loop over indices, going from most recent into the past
 my $total_docs = 0;
@@ -174,8 +176,11 @@ foreach my $index (@sorted_indices) {
 
 ########
 # to skip some indices or quit when reaching some index:
-##if ($index =~ /2019\.10\./) { print ("SKIPPING $index\n"); next; }
-##if ($index =~ /2019\.09\.[23-30]/) { print ("SKIPPING $index\n"); next; }
+if ($index =~ /2019\.10\./) { print ("SKIPPING $index\n"); next; }
+if ($index =~ /2019\.09\.0[1-9]/) { print ("SKIPPING $index\n"); next; }
+if ($index =~ /2019\.09\.1[0-9]/) { print ("SKIPPING $index\n"); next; }
+if ($index =~ /2019\.09\.2[0-9]/) { print ("SKIPPING $index\n"); next; }
+if ($index =~ /2019\.09\.3[0-1]/) { print ("SKIPPING $index\n"); next; }
 ##if ($index =~ /2019\.08\./) { print ("QUITTING AT AUG 2019\n"); last; }
 ########
 
@@ -315,6 +320,6 @@ foreach my $index (@sorted_indices) {
 
 }  # end index
 
-print strftime('%F %T',localtime).  " : Docs done = $total_docs_done,  should be = $total_docs.  \n";
+print strftime('%F %T',localtime).  " FINISHED : Docs done = $total_docs_done,  should be = $total_docs.  \n";
 
 

@@ -8,7 +8,7 @@ use Getopt::Long;
 use Data::Dumper;
 
 # This script updates flows in ElasticSearch from the time the script is run, going back in time.
-# This version will replace specified science registry fields in documents having any specified field value.
+# This version will REMOVE ALL SCIENCE REGISTRY FIELDS in documents having any specified field value.
 # EDIT BELOW and RUN MANUALLY    (with '-es dev' to update es ES, '-es prod' to update production ES)
 
 # Get info to access elasticsearch, from command line
@@ -45,31 +45,27 @@ my $index_names = "om-ns-netsage-";   # first part of names
 #                    {terms => { "meta.src_asn" => \@asn_array }},       -- to match any asn in @asn_array
 #                    {exists => { "field" => "meta.scireg.src.discipline" }},  -- to match docs where this field exists
 my $conditions_array = [
-    {term => { "meta.scireg.src.discipline.keyword" => "MSF.General" }},
-    {term => { "meta.scireg.dst.discipline.keyword" => "MSF.General" }}
+    {term => { "meta.scireg.src.discipline.keyword" => "Unknown"}},
+    {term => { "meta.scireg.dst.discipline.keyword" => "Unknown"}},
+    {term => { "meta.scireg.src.discipline.keyword" => "non-science"}},
+    {term => { "meta.scireg.dst.discipline.keyword" => "non-science"}}
 ]; 
 print "Will find docs with ".Dumper($conditions_array)."\n";
 
-# WHAT TO CHANGE IN meta.scireg.src and/or meta.scireg.dst. 
-# Change $change_field from $old_value to $new_value 
-# These are independent! If only 1 old_value matches, only it will be changed.
+# DELETE THE SCIREG TAGS for src or dst if change_field = old value (determines if it's src and/or dst)
 my @changes_array = (
-    { 
-      "change_field" => "discipline", 
-      "old_value" => "MSF.General", 
-      "new_value" => "Multi-Science Facility" 
+    {
+      "change_field" => "discipline",
+      "old_value" => "Unknown"
     },
-    { 
-      "change_field" => "discipline_description", 
-      "old_value" => "MULTI-SCIENCE FACILITY - most often a supercomputer or supercomputer center", 
-      "new_value" => "A resource used by multiple sciences; most often a supercomputer or supercomputer center" 
+    {
+      "change_field" => "discipline",
+      "old_value" => "non-science"
     }
 );
-foreach my $ch_hash (@changes_array) {
-    print "WILL CHANGE meta.scireg.src/dst.".$ch_hash->{"change_field"}." FROM ".$ch_hash->{"old_value"}.
-          " TO ".$ch_hash->{"new_value"}." \n";
-}
-print "\n";
+
+
+#---------------------------
 
 # connect to ES
 # (for debugging, to see the HTTP requests and responses, add to new:  
@@ -134,8 +130,12 @@ foreach my $index (@sorted_indices) {
             # called for errors other than conflicts. $i_action = index of the action in the request, starts at 0.
             my ($action,$response,$i_action) = @_;
             print "THERE WAS A PROBLEM DOING UPDATE #$i_action in index $index\n";
-            print Dumper $action;
-            print Dumper $response;
+            print "   ".Dumper($response);
+            print "   ".$response->{"error"}->{"reason"}."\n";
+            if ($response->{"error"}->{"type"} eq "cluster_block_exception") {
+                print "FORBIDDEN error - quitting\n";
+                exit; ###### how do you just skip to next index???
+            }
         }
     );
 
@@ -194,32 +194,31 @@ foreach my $index (@sorted_indices) {
 ########
 
         my $updates;
+        my $script = "";
         foreach my $ch_hash (@changes_array) {
             my $change_field = $ch_hash->{"change_field"};
             my $old_value = $ch_hash->{"old_value"};
-            my $new_value = $ch_hash->{"new_value"};
             # original values - either could be undef
             my $src_orig_val = $scireg_src->{$change_field};
             my $dst_orig_val = $scireg_dst->{$change_field};
             # add to $updates if orig value of $change_field exists and is what we want to change
+            # update sets scireg.src/dst to null
             if ($src_orig_val && $src_orig_val eq $old_value) {
-                ###print $id.' Will set {"meta"}->{"scireg"}->{"src"}->{'.$change_field.'} = '.$new_value."\n";
-                $updates->{"meta"}->{"scireg"}->{"src"}->{$change_field} = $new_value;
+                ##print $id.' Will remove {"meta"}->{"scireg"}->{"src"} '."\n";
+                $script .= "ctx._source.meta.scireg.remove('src');";
             }
             if ($dst_orig_val && $dst_orig_val eq $old_value) {
-                ###print $id.' Will set {"meta"}->{"scireg"}->{"dst"}->{'.$change_field.'} = '.$new_value."\n";
-                $updates->{"meta"}->{"scireg"}->{"dst"}->{$change_field} = $new_value;
+                ##print $id.' Will remove {"meta"}->{"scireg"}->{"dst"} '."\n";
+                $script .= "ctx._source.meta.scireg.remove('dst');";
             }
         }
-
-        # Add action to $bulk if there's anything to update (updates haven't been done already!). 
-        # The update query will be sent when max_count is reached. (can also call flush to do it manually)
-        if ($updates) {
+        # Add action to $bulk if there's anything to delete.
+        # The query will be sent when max_count is reached. (can also call flush to do it manually)
+        if ($script) {
             $bulk->add_action( update => { id => $id,
-                                           doc => $updates,
-                                           doc_as_upsert => "true" }
+                                           script => { "source" => $script },
+                                          }
                              );
-            ###print "\n";
         } else { 
             print "    Skipping $id. Neither src or dst values existed and also matched required old_values. \n"; 
             $total_docs = $total_docs - 1;  
@@ -228,7 +227,7 @@ foreach my $index (@sorted_indices) {
 
 ##########
 # for testing, do just a few per index
-##if($n == 10) { last; } 
+#if($n == 10) { last; } 
 #########
 
     } # end doc
@@ -238,6 +237,6 @@ foreach my $index (@sorted_indices) {
 
 }  # end index
 
-print strftime('%F %T',localtime).  " : Docs done = $total_docs_done,  should be = $total_docs.  \n";
+print strftime('%F %T',localtime).  " : FINISHED.  Docs done = $total_docs_done,  should be = $total_docs.  \n";
 
 
