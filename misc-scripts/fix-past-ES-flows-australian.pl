@@ -13,7 +13,7 @@ use Data::Dumper;
 
 ###### move to config file #####
 my $username = "netsage_service";
-my $pw = "mow73:trucks";
+my $pw = "";
 
 # elasticsearch url with username, pw, host
 my $es_url = 'https://'.$username.':'.$pw.'@netsage-elk1.grnoc.iu.edu/esproxy2';
@@ -73,6 +73,8 @@ my @sorted_indices = reverse sort @indices;
 my $total_docs = 0;
 my $total_docs_done = 0;
 foreach my $index (@sorted_indices) {
+
+##if ($index =~ /2019\.08\./) { print ("QUITTING AT AUG 2019\n"); last; }
 
     # Get aussie docs (flows with endpoints having Australian ASNs in this index; they may not be IN Australia).
     #   If a doc is already privatized, the relevant meta.src_asn will be 0, so those won't come up.
