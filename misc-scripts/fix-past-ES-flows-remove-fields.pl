@@ -77,7 +77,7 @@ foreach my $index (@sorted_indices) {
 #if ($index =~ /2019\.09\.1[0-9]-.*/) { print ("SKIPPING $index\n"); next; }
 #if ($index =~ /2019\.09\.2[0-9]-.*/) { print ("SKIPPING $index\n"); next; }
 #if ($index =~ /2019\.09\.30-.*/) { print ("SKIPPING $index\n"); next; }
-if ($index =~ /2020\.02\./) { print ("QUITTING AT Feb 2020\n"); last; }
+if ($index =~ /2020\.01\./) { print ("QUITTING AT Jan 2020\n"); last; }
 ########
 
     # bulk_helper for updates of this index - will use to do many updates in one request
@@ -140,7 +140,7 @@ if ($index =~ /2020\.02\./) { print ("QUITTING AT Feb 2020\n"); last; }
     # Loop over documents found
     while (my $doc = $scroll->next) {
         $n++;
-        if ($n % 2000 == 0) { print "."; STDOUT->autoflush(1); } # just some .'s to show things are happening
+        if ($n % 5000 == 0) { print "."; STDOUT->autoflush(1); } # just some .'s to show things are happening
 
         my $id = $doc->{'_id'};
         my $indx = $doc->{'_index'};

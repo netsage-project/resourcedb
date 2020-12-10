@@ -7,10 +7,12 @@
 
 # based on https://blog.maxmind.com/2015/09/29/building-your-own-mmdb-database-for-fun-and-profit/
 
+# You can also get a tool here: https://github.com/maxmind/mmdbinspect
+
 use strict;
 use warnings;
 
-#use Data::Dumper;
+use Data::Dumper;
 use MaxMind::DB::Reader;
 
 my $file = shift @ARGV or die 'Usage: perl query_mmdb.pl <mmdb filename> <ip_address>';
@@ -23,7 +25,8 @@ my $reader = MaxMind::DB::Reader->new( file => $file );
 
 my $record = $reader->record_for_address( $ip );
 if ($record) {
-    print $record->{'city'}->{'names'}->{'en'}."\n";
+     print Dumper $record; # for any db
+    #print $record->{'city'}->{'names'}->{'en'}."\n"; # to see scireg data
 } else {
     print "not found\n";
 }
