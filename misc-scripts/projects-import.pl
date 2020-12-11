@@ -16,6 +16,7 @@ use Data::Dumper;
 # Use same config file as resourcedb (Science Registry)
 my $config_file = "/etc/grnoc/netsage/resourcedb/config.xml";
 my $input_file = "/home/lensman/jens_projects_to_import.tsv";
+my $script_user_id = 4;  # the "Project Import Script" user
 
 my $help;
 #-----------------------------
@@ -88,7 +89,7 @@ if (! open($fh, '<', $input_file) ) {
 ##my $csv = Text::CSV->new({ sep_char => ',' });
 
 my @fields;
-my $input_id;
+my $input_res_id;
 my $input_proj;
 
 my $headers = <$fh>;
@@ -97,17 +98,20 @@ while (my $line = <$fh>) {
     ##if ($csv->parse($line)) {
     ##    @fields = $csv->fields();
     @fields = split("\t", $line);
-        $input_id = chomp($fields[0]);
+        $input_res_id = $fields[0] + 0;  # make sure it's a number
         $input_proj = $fields[1];
+        $input_proj =~ s/^\s+|\s+$//g; # replace any leading or trailing spaces with nothing
     ##} else {
     ##    print ("Line could not be parsed: $line\n");
     ##    next;
     ##}
  
     # see if proj name is already in the db
+    my $proj_exists = 0;
+    my $proj_id;
     my $found = $dbq->select(
         table => 'project',
-        fields => [ 'name' ],
+        fields => [ 'name', 'project_id' ],
         where => {'name' => $input_proj}
     );
     
@@ -116,35 +120,106 @@ while (my $line = <$fh>) {
         die;
     }
     if (@$found > 0) {
-        print " already in db: $input_proj \n";
-        next;
+        $proj_exists = 1;
+        $proj_id = $found->[0]->{'project_id'};
+        print " already in db: project ".$proj_id.": ".$input_proj." \n";
     } else {
-        print " not in db: $input_proj \n";
-        next;
-        # insert into db
-        my $proj_id = $dbq->insert(
+        print " not in db: project ".$input_proj." \n";
+
+        # insert project into db
+        $proj_id = $dbq->insert(
             table => 'project',
             fields => { 'name' => $input_proj }
         );
-        
         if (!$proj_id) {
-            print "Insert query error for -$input_proj-: ".Dumper $dbq->get_error();
+            print " Insert query error for -".$input_proj."-: ".Dumper $dbq->get_error();
             die;
+        } else {
+            print "   Inserted project >".$input_proj."< with id ".$proj_id." \n";
+            $proj_exists = 1;
+
+           # insert event for project (will record current timestamp)
+            my $event_id = $dbq->insert(
+                table => 'event',
+                fields => { user => $script_user_id,
+                            message => "project-import script added '".$input_proj."'",
+                            project_id => $proj_id
+                          }
+            );
+            if (!$event_id) {
+                die "Insert event query error: ".Dumper $dbq->get_error();
+            } else {
+                print "   Added event\n";
+            }
+        }
+     }
+
+     # add project to resource. 
+     if ($proj_exists) {
+            # first make sure resource exists. If not, just print a msg and go to next line.
+            my $resfound = $dbq->select(
+                table => 'ip_block',
+                fields => [ 'name' ],
+                where => {'ip_block_id' => $input_res_id}
+            );
+            if (!$resfound) {
+                print "Select ip_block query Error: ".Dumper($dbq->get_error());
+                die ("error");
+            }
+            my $n = @$resfound + 0;
+            if ($n == 0) {
+                print " **** ip_block_id $input_res_id was not found \n"; 
+                next;
+            }
+            # also see if we already added project_id to resource. If yes, go to next line.
+            my $rp_found = $dbq->select(
+                table => 'ip_block_project',
+                fields => [ 'id' ],
+                where => {'ip_block_id' => $input_res_id,
+                          'project_id' => $proj_id }
+            );
+            if (!$rp_found) {
+                print "Select ip_block_project query Error: ".Dumper($dbq->get_error());
+                die ("error");
+            }
+            $n = @$rp_found + 0;
+            if ($n > 0) {
+                print "   project $proj_id already added to resource $input_res_id \n"; 
+                next;
+            }
+
+
+            # add project_id to resource 
+            my $result = $dbq->insert(
+                table => 'ip_block_project',
+                fields => { project_id => $proj_id ,
+                           ip_block_id => $input_res_id }
+            );
+            if (! $result) {
+                die "Update ip_block_project query error: ".Dumper($dbq->get_error());
+            } else {
+                print "   Added project $proj_id to resource $input_res_id\n";
+            }
+
+           # insert event for resource (will record current timestamp) (user can be null, but let's keep it for now)
+            my $event_id = $dbq->insert(
+                table => 'event',
+                fields => { user => $script_user_id,
+                            message => "project-import script added project '".$input_proj."'",
+                            ip_block_id => $input_res_id
+                          }
+            );
+            if (!$event_id) {
+                die "Insert event query error: ".Dumper $dbq->get_error();
+            } else {
+                print "   Added event\n";
+            }
+
+        } else {
+            print "Proj doesn't exist\n";
         }
     }
 
-#   # insert event
-#    my $event_id = $dbq->insert(
-#        table => 'event',
-#        fields => { 'message' => 'An org import script added this organization.',
-#                    'organization_id' => $org_id }
-#    );
-#    if (!$event_id) {
-#        print "Insert event query Error: ".Dumper $dbq->get_error();
-#        die;
-#    }
-
-}
 
 close($fh);
 
