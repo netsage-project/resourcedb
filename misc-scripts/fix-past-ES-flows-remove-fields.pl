@@ -10,11 +10,17 @@ use Data::Dumper;
 # This script updates flows in ElasticSearch from the time the script is run, going back in time.
 # This version will remove unneeded fields
 # RUN MANUALLY    (with '-es dev' to update dev ES, '-es prod' to update production ES)
+# Note, you may have to enable editing of the indices
+# (Updated for reindexed indices om-netsage-xxxx-*)
 
 # Get info to access elasticsearch, from command line
 my $username;  # eg, netsage_service
 my $pw;
 my $esver;  
+
+#!!!! SET CORRECT INDEX NAMES !!!!
+my $index_names = "om-netsage-irnc-*";   # first part of names
+print ("INDICES:  $index_names \n\n");
 
 GetOptions( 'username|u=s' => \$username, 
             'password|p=s' => \$pw,
@@ -36,8 +42,6 @@ if ($esver eq 'prod') {
     die ("ERROR: Use '-es dev' for dev ES, '-es prod' to use production ES\n"); 
 }
 
-my $index_names = "om-ns-netsage-";   # first part of names
-
 # connect to ES
 # (for debugging, to see the HTTP requests and responses, add to new:  
 #  trace_to => 'Stderr'  or  trace_to => ['File','/path/to/filename'].
@@ -57,15 +61,12 @@ my $response = $es->cat->indices (
 ); 
 my @indices = split("\n",$response);
 
-# some index names start with "shrink-", some don't! There are aliases for the ones with shrink,
-# we need to use those to sort right.
-my @renamed_indices;
-foreach my $index (@indices) {
-    $index =~ s/shrink-//;
-   push(@renamed_indices, $index);
-} 
-my @sorted_indices = reverse sort @renamed_indices;
-###print Dumper \@sorted_indices; exit;
+my @sorted_indices = reverse sort @indices;
+
+#########
+# print Dumper \@sorted_indices; 
+# exit;
+#########
 
 # Loop over indices, going from most recent into the past
 my $total_docs = 0;
@@ -73,11 +74,17 @@ my $total_docs_done = 0;
 foreach my $index (@sorted_indices) {
 
 ########
-#if ($index =~ /2019\.10\./) { print ("SKIPPING $index\n"); next; }
-#if ($index =~ /2019\.09\.1[0-9]-.*/) { print ("SKIPPING $index\n"); next; }
-#if ($index =~ /2019\.09\.2[0-9]-.*/) { print ("SKIPPING $index\n"); next; }
+if ($index =~ /2021\./) { print ("SKIPPING $index\n"); next; }
+if ($index =~ /2020\.[321].*/) { print ("SKIPPING $index\n"); next; }
+#if ($index =~ /2020\.09\.*/) { print ("SKIPPING $index\n"); next; }
+#if ($index =~ /2020\.12\.18-.*/) { print ("SKIPPING $index\n"); next; }
 #if ($index =~ /2019\.09\.30-.*/) { print ("SKIPPING $index\n"); next; }
-if ($index =~ /2020\.01\./) { print ("QUITTING AT Jan 2020\n"); last; }
+if ($index =~ /2020\.07\.18.*/) { print ("\nQUITTING AT $index\n"); last; }
+########
+
+#######
+#   #print $index."  ";
+#   #next;
 ########
 
     # bulk_helper for updates of this index - will use to do many updates in one request
@@ -120,12 +127,24 @@ if ($index =~ /2020\.01\./) { print ("QUITTING AT Jan 2020\n"); last; }
         body => { 
             sort => '_doc', # to actually NOT sort
             query => {
-                bool => { should => [
-                    {exists => { "field" => "meta.src_ifindex" }},
-                    {exists => { "field" => "meta.dst_ifindex" }},
-                    {exists => { "field" => "meta.src_continent_code" }},
-                    {exists => { "field" => "meta.dst_continent_code" }},
-                ] } 
+              "bool" => {
+                "should" => [
+                    {   "exists" => { "field" => "meta.scireg.src.projects" }  },
+                    {   "exists" => { "field" => "meta.scireg.dst.projects" }  },
+                    {   "exists" => { "field" => "meta.scireg.src.project_names" }  },
+                    {   "exists" => { "field" => "meta.scireg.dst.project_names" }  }
+                ],
+                "minimum_should_match"  => 1,         
+                "must" => {
+                   "range" => {
+                      '@timestamp' => {
+                        "lt" => "2020-12-18 00:00:00",
+                        "format" => "yyyy-MM-dd HH:mm:ss",   
+                        "time_zone" => "America/New_York"   
+                      }
+                   }
+                }
+              }
             } 
         } 
     );
@@ -136,6 +155,11 @@ if ($index =~ /2020\.01\./) { print ("QUITTING AT Jan 2020\n"); last; }
     $total_docs += $ndocs;
     STDOUT->autoflush(1); 
 
+########
+## just print no. of docs to update
+#    next; 
+########
+
     my $n = 0;
     # Loop over documents found
     while (my $doc = $scroll->next) {
@@ -145,12 +169,9 @@ if ($index =~ /2020\.01\./) { print ("QUITTING AT Jan 2020\n"); last; }
         my $id = $doc->{'_id'};
         my $indx = $doc->{'_index'};
 
-#      print "$n. fixing ID = $id   in $indx\n"; ######
+         ###print "$n. fixing ID = $id   in $indx\n"; ######
 
 ########
-#       print "BEFORE: ".Dumper $data;
-#       exit;
-#
 #      # Don't process, just loop through
 #       $total_docs_done++; ##### goes with next 
 #       next; 
@@ -158,58 +179,21 @@ if ($index =~ /2020\.01\./) { print ("QUITTING AT Jan 2020\n"); last; }
 
     # Add action to $bulk if there's anything to update (updates haven't been done already!). 
     # The update query will be sent when max_count is reached. (can also call flush to do it manually)
+				      ##if ( ctx._source.meta.scireg.containsKey("src") && ctx._source.meta.scireg.src.containsKey("projects") ) {
+				      ##if ( ctx._source.meta.scireg.containsKey("dst") && ctx._source.meta.scireg.dst.containsKey("projects") ) {
+
+    # CAREFUL - WILL ALWAYS DELETE PROJECT_NAMES
     $bulk->add_action( update => { id => $id,
                                    script => '
-                                      ctx._source.remove("start_timestamp");
-                                      ctx._source.remove("end_timestamp");
-                                      ctx._source.remove("interval");
-                                      ctx._source.remove("flow_num");          
-                                      ctx._source.remove("no_previous");
-                                      ctx._source.remove("stitching_finished");
-
-                                      ctx._source.meta.remove("src_ifindex");
-                                      ctx._source.meta.remove("dst_ifindex");
-                                      ctx._source.meta.remove("src_continent_code");
-                                      ctx._source.meta.remove("dst_continent_code");
-                                      ctx._source.meta.remove("src_country_code");
-                                      ctx._source.meta.remove("dst_country_code");
-                                      ctx._source.meta.remove("src_city");
-                                      ctx._source.meta.remove("dst_city");
-                                      if ( ctx._source.meta.containsKey("src_location") ) {
-					ctx._source.meta.remove("src_latitude");
-                                        ctx._source.meta.remove("src_longitude");
-				      }
-                                      if ( ctx._source.meta.containsKey("dst_location") ) {
-					ctx._source.meta.remove("dst_latitude"); 
-                                        ctx._source.meta.remove("dst_longitude");
-				      }
-
-                                      ctx._source.values.remove("src_asn");
-                                      ctx._source.values.remove("dst_asn");
-                                
-				      if ( ctx._source.meta.containsKey("scireg") && ctx._source.meta.scireg.containsKey("src") && ctx._source.meta.scireg.src != null ) {
-                                        ctx._source.meta.scireg.src.remove("org_description");
-                                        ctx._source.meta.scireg.src.remove("org_url");
-                                        ctx._source.meta.scireg.src.remove("org_country_code");
-                                        ctx._source.meta.scireg.src.remove("org_latitude");
-                                        ctx._source.meta.scireg.src.remove("org_longitude");
-                                        ctx._source.meta.scireg.src.remove("asn");
-                                        ctx._source.meta.scireg.src.remove("description");
-                                        ctx._source.meta.scireg.src.remove("discipline_description");
-                                        ctx._source.meta.scireg.src.remove("role_description");
-                                        ctx._source.meta.scireg.src.remove("country_code");
+				      if ( ctx._source.meta.scireg.containsKey("src") && ctx._source.meta.scireg.src.containsKey("project_names") ) {
+                                        ctx._source.meta.scireg.src.remove("projects");
+                                        ctx._source.meta.scireg.src.remove("project_abbrs");
+                                        ctx._source.meta.scireg.src.remove("project_names");
   				      }
-				      if ( ctx._source.meta.containsKey("scireg") && ctx._source.meta.scireg.containsKey("dst") && ctx._source.meta.scireg.dst != null ) {
-                                        ctx._source.meta.scireg.dst.remove("org_description");
-                                        ctx._source.meta.scireg.dst.remove("org_url");
-                                        ctx._source.meta.scireg.dst.remove("org_country_code");
-                                        ctx._source.meta.scireg.dst.remove("org_latitude");
-                                        ctx._source.meta.scireg.dst.remove("org_longitude");
-                                        ctx._source.meta.scireg.dst.remove("asn");
-                                        ctx._source.meta.scireg.dst.remove("description");
-                                        ctx._source.meta.scireg.dst.remove("discipline_description");
-                                        ctx._source.meta.scireg.dst.remove("role_description");
-                                        ctx._source.meta.scireg.dst.remove("country_code");
+				      if ( ctx._source.meta.scireg.containsKey("dst") && ctx._source.meta.scireg.dst.containsKey("project_names") ) {
+                                        ctx._source.meta.scireg.dst.remove("projects");
+                                        ctx._source.meta.scireg.dst.remove("project_abbrs");
+                                        ctx._source.meta.scireg.dst.remove("project_names");
   				      }
 				   '
 				 }
