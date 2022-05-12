@@ -1,75 +1,95 @@
 #!/usr/bin/perl
 
+# USE THIS SCRIPT TO IMPORT RESOURCES FROM A SPREADSHEET FILLED OUT BY AN ORGANIZATION
+# RUN MANUALLY
+
 use strict;
 use warnings;
 
 use Getopt::Long;
 use GRNOC::Config;
-use GRNOC::DatabaseQuery;
-use Text::CSV;   # install perl-Text-CSV
+use GRNOC::DatabaseQuery;   # install perl-GRNOC-DatabaseQuery
+use Text::CSV;              # install perl-Text-CSV
 use Data::Dumper;
 
 # This script will pull resource data out of a CSV file and put it into the Science Registry database.
-# Save the spreadsheet in format "CSV UTF-8"!
-# The CSV file must have exact matches to existing organization, country, discipline, and role records.
-# Check the IP blocks in the CSV file. Script will warn you if there is a string match to any of them in the registry already, but go ahead and enter it.
-# The script will skip resources where the name or abbr+org_id are already in the db.
-# DO BEFORE RUNNING:  Specify the csv file on the command line with -i or edit default location below. 
-#                     Edit $source below.
-#                     Check everything over.
-# USE TO IMPORT RESOURCES FROM A CSV FILLED OUT BY AN ORGANIZATION
-# RUN MANUALLY
-
+# Save the spreadsheet in format "CSV UTF-8"!  Required columns are listed below.
+# The CSV file must have exact matches to existing organization, country, discipline, and role names.
+# ! Check the IP blocks in the CSV file. The script will warn you if there is a string match to any of them in the registry already, 
+# ! but does NOT check for, eg, a /32 belonging to an existing /24. 
+# ! It will go ahead and enter it after printing a warning!
+# The script will skip resources where the resource name or abbr+org_id are already in the db.
+# DO BEFORE RUNNING:  Check everything over carefully.
+#                     Enter all Organizations in the database
+#                     Specify the csv file on the command line with -i or edit default location below. 
+#                     Specify 'source' on the command line with -s using some unique descriptive text.
+#                     see command line options below
 # spreadsheet columns
-# A [0] = org name (changes to org_id)
+# A [0] = org name (changed to org_id for saving to db table)
 # B [1] = resource name
-# C [2] = resource abbr
+# C [2] = resource abbr (required for checks)
 # D [3] = ip list
 # E [4] = asn
 # F [5] = resource url 
 # G [6] = description
 # H [7] = lat, long
-# I [8] = country (changes to country_code)
-# J [9] = discipline (changes to discipline_id)
-# K [10]= role (changes to role_id)
+# I [8] = country (changed to country_code)
+# J [9] = discipline (changed to discipline_id)
+# K [10]= role (changed to role_id)
 # L [11]= notes ($source is appended)
 #-----------------------------
 sub usage() {
-  print "  USAGE: perl resources-import.pl 
-                  [-c <config file>] 
-                  [-i <input file>] 
-                  [-h | -help] 
-  Without parameters, the defaults are 
+  print "  USAGE: perl resources-csv_import.pl
+                  [--mode|-m <test or doit>] 
+                  [--config|-c <config file>] 
+                  [--input|-i <input file>] 
+                  [--source|-s '<source of imported info>]'
+                  [--help|-h] 
+    Defaults:
+    mode = test  
+        Change to 'doit' when you're ready to modify the database!
     config_file = /etc/grnoc/netsage/resourcedb/config.xml 
-    input_file = /etc/grnoc/netsage/resourcedb/resource-import.csv) \n";
+        Change the path if necessary.
+    input_file = /etc/grnoc/netsage/resourcedb/resource-import.csv 
+        Change the filename to something descriptive, and the path if you like! Filename is saved to the event.
+    source = 'Info imported from spreadsheet.' 
+        Change this to include who or where the info came from! \n"; 
   exit;
 }
 #-----------------------------
-# The "resource import" user's id 
-my $script_user_id = 3; ###  3 = "Resource Import Script" on lensman-dev7 and scienceregistry.grnoc
-
-# source of the spreadsheet (this is put in the Notes)
-my $source = "Info imported from spreadsheet supplied by C. Dodds, UH.";  #######
-
-#------------------------------
-# command line option defaults:
-# DEFAULT FILE TO IMPORT
+# Set command line option defaults:
+# 'test' will check the spreadsheet data not modify the database
+my $mode = "test";
+# Default file to import
 my $input_file = "/etc/grnoc/netsage/resourcedb/resource-import.csv";
 # Use same config file as resourcedb (Science Registry)
 my $config_file = "/etc/grnoc/netsage/resourcedb/config.xml";
-#------------------------------
-
+# Description of where the resources came from
+my $source = "Info imported from spreadsheet.";
+# 
 my $help;
+
+# The "resource import" user's id 
+my $script_user_id = 3; ###  3 = "Resource Import Script" in the database on lensman-dev7 and scienceregistry.grnoc
+
 # Get command line parameters
-GetOptions( 'config|c=s' => \$config_file,
+GetOptions( 'mode|m=s' => \$mode,
+            'config|c=s' => \$config_file,
             'input|i=s' => \$input_file,
+            'source|s=s' => \$source,
             'help|h|?' => \$help 
           );
 
 # Need help?
 usage() if $help;
 
-# filename without path. Will be saved in the event msg.
+print " Mode = $mode \n Config file = $config_file \n Input file = $input_file \n Source description = $source \n\n";
+print "Set mode to 'doit' when you're ready to modify the database!\n\n";
+
+# check file and get filename without path to be saved in the event msg.
+if (! -f $input_file) {
+    die "ERROR: $input_file does not exist\n";
+    }
 $input_file =~ m{.*\/(.*\.csv)$};
 my $filename = $1;
 
@@ -207,7 +227,8 @@ sub get_org_id {
         die "Org query error: ".Dumper $dbq->get_error();
     }
     if (@$found == 0) {
-        die "ERROR: Org '".$org_name."' was not found in the Registry.";
+        print "ERROR: Org '".$org_name."' was not found in the Registry.\n";
+        exit if ($mode ne 'test');
     }
 
     my $id = $found->[0]->{'organization_id'}; 
@@ -231,7 +252,8 @@ sub get_country_code {
         die "Country query error: ".Dumper $dbq->get_error();
     }
     if (@$found == 0) {
-        die "ERROR: Country '".$country_name."' was not found in the Registry.";
+        print "ERROR: Country '".$country_name."' was not found in the Registry.\n";
+        exit if ($mode ne "test"); 
     }
     
     my $code = $found->[0]->{'country_code'}; 
@@ -256,7 +278,8 @@ sub get_discipline_id {
         die "Discipline query error: ".Dumper $dbq->get_error();
     }
     if (@$found == 0) {
-        die "ERROR: Org '".$discipline_name."' was not found in the Registry.";
+        print "ERROR: Discipline '".$discipline_name."' was not found in the Registry.\n";
+        exit if ($mode ne "test"); 
     }
     
     my $id = $found->[0]->{'discipline_id'}; 
@@ -280,7 +303,8 @@ sub get_role_id {
         die "Role query error: ".Dumper $dbq->get_error();
     }
     if (@$found == 0) {
-        die "ERROR: Role '".$role_name."' was not found in the Registry.";
+        print "ERROR: Role '".$role_name."' was not found in the Registry.\n";
+        exit if ($mode ne "test"); 
     }
     
     my $id = $found->[0]->{'role_id'}; 
@@ -337,10 +361,12 @@ sub do_checks {
     my @ips = split(',', $ip_list);
     foreach my $ip (@ips) {
         if ( $ip !~ /.*\/\d{2,3}/ ) {
-            die "ERROR: A '/xx' is missing in '$ip'";
+            print "ERROR: A '/xx' is missing in '$ip'\n";
+            exit if ($mode ne "test"); 
         }
         if ( $ip =~ /.*\/.*\/.*/ ) {
-            die "ERROR: Looks like a missing comma between IPs : '$ip'";
+            print "ERROR: Looks like a missing comma between IPs : '$ip'\n";
+            exit if ($mode ne "test"); 
         }
         my $found = $dbq->select(
             table => 'ip_block',
@@ -352,8 +378,8 @@ sub do_checks {
         }
         if (@$found > 0) {
             print "WARNING: $ip of resource '$res_name' is already in the Registry! \n".
-                "       See existing resource '".$found->[0]->{'name'}."'.\n".
-                "       Inserting the new resource with this IP anyway!\n";
+                "         See existing resource '".$found->[0]->{'name'}."'.\n".
+                "         Inserting the new resource with this IP anyway!\n";
         }
     } 
     # to continue with insert
@@ -381,6 +407,14 @@ sub add_resource {
     ($lat)  = $lat  =~ /(-?\d+\.\d{0,4})/; 
     ($long) = $long =~ /(-?\d+\.\d{0,4})/; 
     
+# if testing, just print
+if ($mode eq "test") {
+    no warnings qw(uninitialized);    
+    print "---WOULD INSERT:  $name, ABBR: $abbr, IPs: $ips, ORG_ID: $org_id, COUNTRY_CODE: $country_code, DISC_ID: $discipline_id, ROLE_ID: $role_id\n";
+}
+# if mode=doit, insert
+elsif ($mode eq "doit") {
+
     # insert into db
     my $res_id = $dbq->insert(
         table => 'ip_block',
@@ -417,6 +451,11 @@ sub add_resource {
     if (!$event_id) {
         die "Insert event query error: ".Dumper $dbq->get_error();
     }
+
+} # end if doit
+else { 
+    die "Unrecognized mode"; 
+}
 
 }
 
