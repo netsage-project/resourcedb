@@ -27,7 +27,7 @@ use Data::Dumper;
 #                     see command line options below
 # spreadsheet is assumed to have 1 row of headers
 # spreadsheet columns:
-#  A [0] = notes (do NOT import)
+#  A [0] = notes (will NOT import)
 # *B [1] = ip list
 #  C [2] = ASN
 # *D [3] = organization name (changes to org_id)
