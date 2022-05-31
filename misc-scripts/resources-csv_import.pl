@@ -31,7 +31,7 @@ use Data::Dumper;
 # *B [1] = ip list
 #  C [2] = ASN
 # *D [3] = organization name (changes to org_id)
-# *E [4] = organization abbreviation (required to make full resource name)
+#  E [4] = organization abbreviation (normally used to make full resource name)
 #  F [5] = sub-org (optional)
 # *G [6] = resource base name (name without org or sub-org)
 #  H [7] = resource short name (optional)
@@ -42,7 +42,7 @@ use Data::Dumper;
 # *M [12] = country (changes to country_code)
 # *N [13] = role (changes to role_id)
 # *O [14] = project (changes to project_id)
-# * required
+# * required (E,F, and or G is required)
 #-----------------------------
 sub usage() {
   print "  USAGE: perl resources-csv_import.pl
