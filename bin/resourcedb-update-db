@@ -12,7 +12,7 @@ use GRNOC::NetSage::ResourceDB::DataService::Util;
 
 use DBI;
 
-use constant DEFAULT_CONFIG_FILE => '/etc/grnoc/netsage/resourcedb/config.xml';
+use constant DEFAULT_CONFIG_FILE => '/etc/netsage/resourcedb/config.xml';
 
 sub main {
 

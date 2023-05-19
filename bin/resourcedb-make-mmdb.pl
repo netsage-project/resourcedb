@@ -5,7 +5,7 @@
 # The Science Registry info is stored (as json) in the city name field.  Logstash can use the json filter to break it up.
 # Each db entry is for an individual cidr address. They are sorted so the longest prefixes (most specific addresses) come last, since
 # the logstash GEOIP FILTER gets the LAST MATCH for an IP address.
-# If successful, this script writes a timestamp to status.txt in /var/lib/grnoc/scienceregistry-mmdb-file/status.txt.
+# If successful, this script writes a timestamp to status.txt in /var/lib/scienceregistry-mmdb-file/status.txt.
 # RUNS VIA CRON
 
 # see https://blog.maxmind.com/2015/09/29/building-your-own-mmdb-database-for-fun-and-profit/
@@ -167,13 +167,13 @@ sub byprefix {
 }
 
 sub write_status {
-    # writes to /var/lib/grnoc/scienceregistry-mmdb-file/status.txt
+    # writes to /var/lib/scienceregistry-mmdb-file/status.txt
     my $error_text = shift;
     my $error = 0;
     if ($error_text) { $error=1; }
 
 
-    my $result = write_service_status( path => "/var/lib/grnoc/scienceregistry-mmdb-file/",
+    my $result = write_service_status( path => "/var/lib/scienceregistry-mmdb-file/",
                                        error => $error,
                                        error_txt => $error_text,
                                        timestamp => time() );

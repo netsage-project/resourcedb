@@ -22,16 +22,16 @@ use Encode;
 # Defaults
 my $help;
 # Use same config file as resourcedb (Science Registry)
-my $config_file = "/etc/grnoc/netsage/resourcedb/config.xml";
+my $config_file = "/etc/netsage/resourcedb/config.xml";
 # Name output file with the current timestamp
-my $output_file = "/etc/grnoc/netsage/resourcedb/scireg_".time().".json";
+my $output_file = "/etc/netsage/resourcedb/scireg_".time().".json";
 
 #-----------------------------
 sub usage() {
   print "  USAGE: perl resourcedb-export.pl [-c/--config <config file>] [-o/==output <output-dir/filename.json> [-h/--help]
   Without parameters, the defaults are
-    config_file = /etc/grnoc/netsage/resourcedb/config.xml
-    output = /etc/grnoc/netsage/resourcedb/scireg_<timestamp>.json (.yaml and .csv are written too)
+    config_file = /etc/netsage/resourcedb/config.xml
+    output = /etc/netsage/resourcedb/scireg_<timestamp>.json (.yaml and .csv are written too)
     (.yaml and .csv files will have same name. Must run as sudo) \n";
   exit;
 }

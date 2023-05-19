@@ -3,6 +3,29 @@ NetSage Resource Database (Science Registry or ResourceDB)
 
 Registry for pairing IP addresses or CIDR ranges with organizations, disciplines, roles, projects, etc.
 
+## Dependencies
+
+The perl programs in this repo use the following:
+
+From CPAN:
+  GRNOC::Config
+   Which depends on:
+      XML::LibXML
+      which needs: apt-get install libxml2-dev libxslt1-dev
+ MaxMind::DB::Writer
+ DBI
+ Term::ProgressBar
+ DBD::mysql
+ Log::Log4perl
+ Log::Dispatch::Syslog
+
+From github:
+   https://github.com/GlobalNOC/GRNOC-CLI.git
+   https://github.com/GlobalNOC/GRNOC-Log.git
+
+From this repo:
+   lib/GRNOC/NetSage
+
 ## Installation
 
 To quickly build the package use the following command. The release

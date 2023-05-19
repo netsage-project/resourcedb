@@ -1,8 +1,11 @@
 #!/usr/bin/perl
 
 # This is a script to run when installing Science Registry for the first time.
-# It will create database users for the scripts to use and write /etc/grnoc/resourcedb/config.xml
+# It will create database users for the scripts to use and write /etc/netsage/resourcedb/config.xml
 # RUN MANUALLY with sudo
+#
+# NOTE: By default this sets all passwords to 'netsage'. If you ever decide to make mysqld allow remote 
+# connections, be sure to change this!!!
 
 use strict;
 use warnings;
@@ -23,8 +26,8 @@ sub main {
     my $cli = GRNOC::CLI->new();
 
     my $user = $cli->get_input("   Existing MySQL/MariaDB admin user", default => "root");
-    my $pass = $cli->get_password("   Password");
-    my $host = $cli->get_input("   Database host address", default => "127.0.0.1");
+    my $pass = $cli->get_password("   Password", default => "netsage");
+    my $host = $cli->get_input("   Database host address", default => "localhost");
     my $port = $cli->get_input("   Database port number", default => 3306);
 
     my $handle = DBI->connect("DBI:mysql:dbname=mysql;host=$host;port=$port",
@@ -44,15 +47,22 @@ sub main {
     my $rw_user  = $cli->get_input("   Read/Write Username", default => "rdb");
 
     while (1) {
-        $rw_alpha = $cli->get_password("   $rw_user Password:");
-        $rw_bravo = $cli->get_password("   $rw_user Password confirmation:");
+        $rw_alpha = $cli->get_password("   $rw_user Password:", default => "netsage");
+        $rw_bravo = $cli->get_password("   $rw_user Password confirmation:", default => "netsage");
 
         last if ($rw_alpha eq $rw_bravo);
         print "Passwords do not match. Please try again.\n";
     }
 
-    $handle->do("GRANT ALL ON resourcedb.* to '$rw_user'\@'localhost' identified by '$rw_alpha'") or die DBI::errstr;
-    $handle->do("GRANT ALL ON resourcedbtest.* to '$rw_user'\@'localhost' identified by '$rw_alpha'") or die DBI::errstr;
+# no longer works on new version of mysql
+#    $handle->do("GRANT ALL ON resourcedb.* to '$rw_user'\@'localhost' identified by '$rw_alpha'") or die DBI::errstr;
+#    $handle->do("GRANT ALL ON resourcedbtest.* to '$rw_user'\@'localhost' identified by '$rw_alpha'") or die DBI::errstr;
+
+    $handle->do("CREATE DATABASE IF NOT EXISTS resourcedb") or die DBI::errstr;
+    $handle->do("DROP USER '$rw_user'@'localhost'");    #delete if already exists
+    $handle->do("flush privileges");
+    $handle->do("CREATE USER '$rw_user'\@'localhost' IDENTIFIED BY '$rw_alpha'") or die DBI::errstr;
+    $handle->do("GRANT ALL PRIVILEGES ON resourcedb.* TO '$rw_user'\@'localhost'") or die DBI::errstr;
     $handle->do("flush privileges");
 
     my $ro_alpha = undef;
@@ -60,54 +70,61 @@ sub main {
     my $ro_user  = $cli->get_input("   Read-Only Username", default => "rdb_ro");
 
     while (1) {
-        $ro_alpha = $cli->get_password("   $ro_user Password");
-        $ro_bravo = $cli->get_password("   $ro_user Password confirmation:");
+        $ro_alpha = $cli->get_password("   $ro_user Password", default => "netsage");
+        $ro_bravo = $cli->get_password("   $ro_user Password confirmation:", default => "netsage");
 
         last if ($ro_alpha eq $ro_bravo);
         print "Passwords do not match. Please try again.\n";
     }
 
-    $handle->do("GRANT SELECT ON resourcedb.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
-    $handle->do("GRANT SELECT ON resourcedbtest.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
+# no longer works on new version of mysql
+#    $handle->do("GRANT SELECT ON resourcedb.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
+#    $handle->do("GRANT SELECT ON resourcedbtest.* to '$ro_user'\@'localhost' identified by '$ro_alpha'") or die DBI::errstr;
+
+    $handle->do("DROP USER '$ro_user'@'localhost'");    #delete if already exists
+    $handle->do("flush privileges");
+    $handle->do("CREATE USER '$ro_user'\@'localhost' IDENTIFIED BY '$ro_alpha'") or die DBI::errstr;
+    $handle->do("GRANT SELECT ON resourcedb.* TO '$ro_user'\@'localhost'") or die DBI::errstr;
     $handle->do("flush privileges");
 
     print "Users were created for the resourcedb database.\n";
 
-    `/bin/mkdir -p /etc/grnoc/netsage/resourcedb/`;
-
-    my $opened = open(FILE, "> /etc/grnoc/netsage/resourcedb/config.xml");
-    if ($opened) {
-        print "Writing /etc/grnoc/netsage/resourcedb/config.xml.\n";
-        print FILE << "END";
-<config debug="0">
-  <database-name>resourcedb</database-name>
-  <database-schema>/etc/grnoc/netsage/resourcedb/resourcedb.sql</database-schema>
-
-  <database-readonly-username>$ro_user</database-readonly-username>
-  <database-readonly-password>$ro_alpha</database-readonly-password>
-
-  <database-readwrite-username>$rw_user</database-readwrite-username>
-  <database-readwrite-password>$rw_alpha</database-readwrite-password>
-
-  <database-host>$host</database-host>
-  <database-port>$port</database-port>
-  <database-query-debug>0</database-query-debug>
-
-  <geoip>
-    <config_files>
-      <country>/usr/share/GeoIP/GeoIP.dat</country>
-      <country_ipv6>/usr/share/GeoIP/GeoIPv6.dat</country_ipv6>
-      <city>/usr/share/GeoIP/GeoIPCity.dat</city>
-      <city_ipv6>/usr/share/GeoIP/GeoIPCityv6.dat</city_ipv6>
-      <asn>/usr/share/GeoIP/GeoIPASNum.dat</asn>
-      <asn_ipv6>/usr/share/GeoIP/GeoIPASNumv6.dat</asn_ipv6>
-    </config_files>
-  </geoip>
-</config>
-END
-    } else {
-	print "Could not write /etc/grnoc/netsage/resourcedb/config.xml. Did you run with sudo? Create it by hand.\n";
-    }
+# old method: should really just read everything from existing config file...
+#    `/bin/mkdir -p /etc/netsage/resourcedb/`;
+#
+#    my $opened = open(FILE, "> /etc/netsage/resourcedb/config.xml");
+#    if ($opened) {
+#        print "Writing /etc/netsage/resourcedb/config.xml.\n";
+#        print FILE << "END";
+#<config debug="0">
+#  <database-name>resourcedb</database-name>
+#  <database-schema>/etc/netsage/resourcedb/resourcedb.sql</database-schema>
+#
+#  <database-readonly-username>$ro_user</database-readonly-username>
+#  <database-readonly-password>$ro_alpha</database-readonly-password>
+#
+#  <database-readwrite-username>$rw_user</database-readwrite-username>
+#  <database-readwrite-password>$rw_alpha</database-readwrite-password>
+#
+#  <database-host>$host</database-host>
+#  <database-port>$port</database-port>
+#  <database-query-debug>0</database-query-debug>
+#
+#  <geoip>
+#    <config_files>
+#      <country>/usr/share/GeoIP/GeoIP.dat</country>
+#      <country_ipv6>/usr/share/GeoIP/GeoIPv6.dat</country_ipv6>
+#      <city>/usr/share/GeoIP/GeoIPCity.dat</city>
+#      <city_ipv6>/usr/share/GeoIP/GeoIPCityv6.dat</city_ipv6>
+#      <asn>/usr/share/GeoIP/GeoIPASNum.dat</asn>
+#      <asn_ipv6>/usr/share/GeoIP/GeoIPASNumv6.dat</asn_ipv6>
+#    </config_files>
+#  </geoip>
+#</config>
+#END
+#    } else {
+#	print "Could not write /etc/netsage/resourcedb/config.xml. Did you run with sudo? Create it by hand.\n";
+#    }
 
     print("You now need to run 'sudo resourcedb-update-db' to create and update the resourcedb database. \n\n");
 
