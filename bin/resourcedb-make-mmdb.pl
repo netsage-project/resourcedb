@@ -20,7 +20,7 @@ use Getopt::Long;
 use JSON::XS;
 use Net::IP;
 use MaxMind::DB::Writer::Tree;
-use GRNOC::Monitoring::Service::Status;
+#use GRNOC::Monitoring::Service::Status;
 
 # command line params are input and output file names
 my $scireg_json_file = '/usr/share/resourcedb/www/exported/scireg.json';
@@ -141,7 +141,8 @@ close $fh_out;
 if ( -s $outfile > 3000 ) {
     print "$outfile has been created\n";
     # on success, write status file for monitoring
-    write_status("");
+    # only work at GRNOC
+    #write_status("");
 } else {
     warn "$outfile seems to be too small. Check to be sure it is ok.";
 }
@@ -158,8 +159,8 @@ sub byprefix {
         my $aa = Net::IP->new($a);
         my $bb = Net::IP->new($b);
         # ran into this sitation at least once. This will make the problem IP come out as the last /xx.
-        if(!$aa) { warn "$a - couldn't make a Net::IP object!?\n"; warn(Net::IP::Error()); return -1; }
-        if(!$bb) { warn "$b - couldn't make a Net::IP object!?\n"; warn(Net::IP::Error()); return -1; }
+        if(!$aa) { warn "$a - warning: couldn't make a Net::IP object!?\n"; warn(Net::IP::Error()); return -1; }
+        if(!$bb) { warn "$b - warning: couldn't make a Net::IP object!?\n"; warn(Net::IP::Error()); return -1; }
         return ($aa->intip) <=> ($bb->intip);
     } else {
         return $result;
